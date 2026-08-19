@@ -63,5 +63,10 @@ jobs:
     environment: dev
 
     steps:
-      - name: Solicitar despliegue a Render
-        run: curl --fail --silent --show-error -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
+      - name: Descargar codigo
+        uses: actions/checkout@v6
+
+      - name: Desplegar en Railway
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: npx -y @railway/cli@latest up --ci
