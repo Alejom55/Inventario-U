@@ -1,7 +1,7 @@
 import os
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import DeclarativeBase, sessionmaker
+from psycopg import connect
+from psycopg.rows import dict_row
 
 
 DATABASE_URL = os.getenv(
@@ -9,17 +9,9 @@ DATABASE_URL = os.getenv(
     "postgresql+psycopg://inventario:inventario@localhost:5432/inventario",
 )
 
-engine = create_engine(DATABASE_URL, pool_pre_ping=True)
-SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
-
-
-class Base(DeclarativeBase):
-    pass
-
-
 def get_db():
-    """Entrega una sesión y la cierra cuando termina la solicitud."""
-    db = SessionLocal()
+    """Abre una conexión a PostgreSQL y la cierra al terminar la solicitud."""
+    db = connect(DATABASE_URL, row_factory=dict_row)
     try:
         yield db
     finally:
