@@ -18,3 +18,18 @@ def crear_tabla_skus():
                 );
                 """
             )
+
+
+def crear_tabla_almacenes():
+    """Crea la tabla de almacenes si todavía no existe."""
+    with connect(DATABASE_URL) as db:
+        with db.cursor() as cursor:
+            cursor.execute(
+                """
+                CREATE TABLE IF NOT EXISTS almacenes (
+                    id SERIAL PRIMARY KEY,
+                    nombre VARCHAR(120) UNIQUE NOT NULL,
+                    ubicacion VARCHAR(255) NOT NULL
+                );
+                """
+            )
