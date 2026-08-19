@@ -52,3 +52,31 @@ def crear_tabla_movimientos():
                 );
                 """
             )
+            cursor.execute(
+                """
+                DO $$
+                BEGIN
+                    IF EXISTS (
+                        SELECT 1
+                        FROM information_schema.columns
+                        WHERE table_name = 'movimientos'
+                          AND column_name = 'tipo'
+                          AND udt_name = 'tipomovimiento'
+                    ) THEN
+                        ALTER TABLE movimientos
+                        ALTER COLUMN tipo TYPE VARCHAR(10)
+                        USING LOWER(tipo::text);
+                    END IF;
+                END $$;
+                """
+            )
+            cursor.execute(
+                "ALTER TABLE movimientos DROP CONSTRAINT IF EXISTS movimientos_tipo_check;"
+            )
+            cursor.execute(
+                """
+                ALTER TABLE movimientos
+                ADD CONSTRAINT movimientos_tipo_check
+                CHECK (tipo IN ('entrada', 'salida', 'ajuste'));
+                """
+            )
