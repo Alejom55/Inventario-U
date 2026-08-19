@@ -48,7 +48,3 @@ La guía con PostgreSQL y Docker se completará más adelante. El comando final 
 ```bash
 docker compose up --build
 ```
-
-## Plan del proyecto
-
-Consulta [PLAN_DE_DESARROLLO.md](PLAN_DE_DESARROLLO.md) para ver los pasos, commits y requisitos de entrega.
