@@ -60,7 +60,7 @@ jobs:
     name: Desplegar en produccion
     needs: calidad
     runs-on: ubuntu-latest
-    environment: produccion
+    environment: production
 
     steps:
       - name: Solicitar despliegue a Render
