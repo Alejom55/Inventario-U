@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import Depends, FastAPI, HTTPException, Response, status
 from psycopg import errors
 
@@ -436,3 +438,109 @@ def eliminar_movimiento(movimiento_id: int, db=Depends(get_db)):
     db.execute("DELETE FROM movimientos WHERE id = %s;", (movimiento_id,))
     db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+def validar_fecha(fecha, campo: str):
+    if fecha is None:
+        return None
+    if not isinstance(fecha, str):
+        raise HTTPException(status_code=400, detail=f"{campo} debe ser una fecha ISO 8601")
+    try:
+        return datetime.fromisoformat(fecha.replace("Z", "+00:00"))
+    except ValueError:
+        raise HTTPException(status_code=400, detail=f"{campo} debe ser una fecha ISO 8601")
+
+
+def validar_filtros_inventario(filtros: dict):
+    sku_id = filtros.get("sku_id")
+    almacen_id = filtros.get("almacen_id")
+    tipo = filtros.get("tipo")
+    fecha_desde = validar_fecha(filtros.get("fecha_desde"), "fecha_desde")
+    fecha_hasta = validar_fecha(filtros.get("fecha_hasta"), "fecha_hasta")
+    solo_stock_bajo = filtros.get("solo_stock_bajo", False)
+
+    if sku_id is not None and (isinstance(sku_id, bool) or not isinstance(sku_id, int) or sku_id <= 0):
+        raise HTTPException(status_code=400, detail="El SKU debe ser un número válido")
+    if almacen_id is not None and (
+        isinstance(almacen_id, bool) or not isinstance(almacen_id, int) or almacen_id <= 0
+    ):
+        raise HTTPException(status_code=400, detail="El almacén debe ser un número válido")
+    if tipo is not None and tipo not in TIPOS_MOVIMIENTO:
+        raise HTTPException(status_code=400, detail="El tipo debe ser entrada, salida o ajuste")
+    if fecha_desde and fecha_hasta and fecha_desde > fecha_hasta:
+        raise HTTPException(status_code=400, detail="fecha_desde no puede ser posterior a fecha_hasta")
+    if not isinstance(solo_stock_bajo, bool):
+        raise HTTPException(status_code=400, detail="solo_stock_bajo debe ser verdadero o falso")
+
+    return sku_id, almacen_id, tipo, fecha_desde, fecha_hasta, solo_stock_bajo
+
+
+@app.options("/inventario/query")
+def opciones_query():
+    return Response(headers={"Accept-Query": "application/json"})
+
+
+@app.api_route("/inventario/query", methods=["QUERY"])
+def consultar_inventario(filtros: dict, db=Depends(get_db)):
+    sku_id, almacen_id, tipo, fecha_desde, fecha_hasta, solo_stock_bajo = (
+        validar_filtros_inventario(filtros)
+    )
+
+    condiciones = []
+    valores = []
+    if sku_id is not None:
+        condiciones.append("i.sku_id = %s")
+        valores.append(sku_id)
+    if almacen_id is not None:
+        condiciones.append("i.almacen_id = %s")
+        valores.append(almacen_id)
+    if solo_stock_bajo:
+        condiciones.append("i.stock_disponible <= i.stock_minimo")
+
+    filtro_movimiento = []
+    valores_movimiento = []
+    if tipo is not None:
+        filtro_movimiento.append("mf.tipo = %s")
+        valores_movimiento.append(tipo)
+    if fecha_desde is not None:
+        filtro_movimiento.append("mf.fecha >= %s")
+        valores_movimiento.append(fecha_desde)
+    if fecha_hasta is not None:
+        filtro_movimiento.append("mf.fecha <= %s")
+        valores_movimiento.append(fecha_hasta)
+    if filtro_movimiento:
+        condiciones.append(
+            """EXISTS (
+                SELECT 1
+                FROM movimientos mf
+                WHERE mf.sku_id = i.sku_id
+                  AND mf.almacen_id = i.almacen_id
+                  AND """ + " AND ".join(filtro_movimiento) + ")"
+        )
+        valores.extend(valores_movimiento)
+
+    filtro_sql = ""
+    if condiciones:
+        filtro_sql = " WHERE " + " AND ".join(condiciones)
+
+    resultado = db.execute(
+        """
+        WITH inventario AS (
+            SELECT s.id AS sku_id, s.codigo AS sku_codigo, s.nombre AS sku_nombre,
+                   s.stock_minimo, a.id AS almacen_id, a.nombre AS almacen_nombre,
+                   COALESCE(SUM(
+                       CASE WHEN m.tipo = 'salida' THEN -m.cantidad ELSE m.cantidad END
+                   ), 0) AS stock_disponible
+            FROM skus s
+            CROSS JOIN almacenes a
+            LEFT JOIN movimientos m ON m.sku_id = s.id AND m.almacen_id = a.id
+            GROUP BY s.id, s.codigo, s.nombre, s.stock_minimo, a.id, a.nombre
+        )
+        SELECT sku_id, sku_codigo, sku_nombre, stock_minimo,
+               almacen_id, almacen_nombre, stock_disponible
+        FROM inventario i
+        """ + filtro_sql + " ORDER BY i.sku_codigo, i.almacen_nombre;",
+        valores,
+    )
+
+    return {"resultados": resultado.fetchall()}

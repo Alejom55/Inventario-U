@@ -54,3 +54,36 @@ docker compose up --build
 1. Copia `.env.example` como `.env`.
 2. Ajusta `DATABASE_URL` con las credenciales de tu PostgreSQL local.
 3. No subas `.env` al repositorio: contiene valores específicos de cada ambiente.
+
+## Consulta de inventario con HTTP QUERY
+
+La API admite el método HTTP `QUERY` en `/inventario/query`. Este método solo consulta: no crea, modifica ni elimina datos.
+
+Envía un body JSON con filtros opcionales:
+
+```json
+{
+  "sku_id": 1,
+  "almacen_id": 1,
+  "tipo": "salida",
+  "fecha_desde": "2026-08-01T00:00:00",
+  "fecha_hasta": "2026-08-31T23:59:59",
+  "solo_stock_bajo": false
+}
+```
+
+El resultado muestra el stock total disponible de cada SKU por almacén. Si filtras por tipo o fecha, se muestran únicamente las combinaciones que tengan movimientos que coincidan con ese filtro, pero el stock sigue calculándose con todo el historial.
+
+```bash
+curl -X QUERY http://127.0.0.1:8000/inventario/query \
+  -H "Content-Type: application/json" \
+  -d "{\"almacen_id\": 1, \"solo_stock_bajo\": true}"
+```
+
+Puedes verificar los formatos aceptados con:
+
+```bash
+curl -X OPTIONS -i http://127.0.0.1:8000/inventario/query
+```
+
+La respuesta incluye el encabezado `Accept-Query: application/json`.
