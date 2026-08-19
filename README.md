@@ -87,3 +87,15 @@ curl -X OPTIONS -i http://127.0.0.1:8000/inventario/query
 ```
 
 La respuesta incluye el encabezado `Accept-Query: application/json`.
+
+## Pruebas automatizadas
+
+Las pruebas usan una base de datos aislada indicada por `TEST_DATABASE_URL`. Crea primero esa base en PostgreSQL y verifica que su nombre sea diferente de la usada en `DATABASE_URL`.
+
+```bash
+uv sync --group dev
+uv run python scripts/create_test_database.py
+uv run pytest
+```
+
+La cobertura se muestra al terminar y debe ser al menos 85%. Para el futuro pipeline de pruebas se podrá permitir un mínimo de 60%, mientras que producción exigirá 85%.
