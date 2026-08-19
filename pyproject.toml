@@ -1,0 +1,13 @@
+[project]
+name = "gestor-inventario"
+version = "0.1.0"
+description = "API de gestión de inventario"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi[standard]>=0.115.0",
+    "psycopg[binary]>=3.2.0",
+    "sqlalchemy>=2.0.0",
+]
+
+[dependency-groups]
+dev = []

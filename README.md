@@ -48,3 +48,9 @@ La guía con PostgreSQL y Docker se completará más adelante. El comando final 
 ```bash
 docker compose up --build
 ```
+
+## Configuración de base de datos
+
+1. Copia `.env.example` como `.env`.
+2. Ajusta `DATABASE_URL` con las credenciales de tu PostgreSQL local.
+3. No subas `.env` al repositorio: contiene valores específicos de cada ambiente.
