@@ -33,3 +33,22 @@ def crear_tabla_almacenes():
                 );
                 """
             )
+
+
+def crear_tabla_movimientos():
+    """Crea la tabla de movimientos si todavía no existe."""
+    with connect(DATABASE_URL) as db:
+        with db.cursor() as cursor:
+            cursor.execute(
+                """
+                CREATE TABLE IF NOT EXISTS movimientos (
+                    id SERIAL PRIMARY KEY,
+                    sku_id INTEGER NOT NULL REFERENCES skus(id) ON DELETE RESTRICT,
+                    almacen_id INTEGER NOT NULL REFERENCES almacenes(id) ON DELETE RESTRICT,
+                    tipo VARCHAR(10) NOT NULL CHECK (tipo IN ('entrada', 'salida', 'ajuste')),
+                    cantidad INTEGER NOT NULL CHECK (cantidad <> 0),
+                    motivo VARCHAR(255),
+                    fecha TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+                );
+                """
+            )

@@ -2,7 +2,7 @@ from fastapi import Depends, FastAPI, HTTPException, Response, status
 from psycopg import errors
 
 from .database import get_db
-from .schema import crear_tabla_almacenes, crear_tabla_skus
+from .schema import crear_tabla_almacenes, crear_tabla_movimientos, crear_tabla_skus
 
 
 app = FastAPI(
@@ -16,6 +16,7 @@ app = FastAPI(
 def iniciar_api():
     crear_tabla_skus()
     crear_tabla_almacenes()
+    crear_tabla_movimientos()
 
 
 def validar_datos_sku(datos: dict):
@@ -220,5 +221,218 @@ def eliminar_almacen(almacen_id: int, db=Depends(get_db)):
         db.rollback()
         raise HTTPException(status_code=404, detail="Almacén no encontrado")
 
+    db.commit()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+TIPOS_MOVIMIENTO = {"entrada", "salida", "ajuste"}
+
+
+def validar_datos_movimiento(datos: dict):
+    sku_id = datos.get("sku_id")
+    almacen_id = datos.get("almacen_id")
+    tipo = datos.get("tipo")
+    cantidad = datos.get("cantidad")
+    motivo = datos.get("motivo")
+
+    if isinstance(sku_id, bool) or not isinstance(sku_id, int) or sku_id <= 0:
+        raise HTTPException(status_code=400, detail="El SKU debe ser un número válido")
+    if isinstance(almacen_id, bool) or not isinstance(almacen_id, int) or almacen_id <= 0:
+        raise HTTPException(status_code=400, detail="El almacén debe ser un número válido")
+    if tipo not in TIPOS_MOVIMIENTO:
+        raise HTTPException(status_code=400, detail="El tipo debe ser entrada, salida o ajuste")
+    if isinstance(cantidad, bool) or not isinstance(cantidad, int) or cantidad == 0:
+        raise HTTPException(status_code=400, detail="La cantidad debe ser un entero diferente de cero")
+    if tipo in {"entrada", "salida"} and cantidad < 0:
+        raise HTTPException(status_code=400, detail="Las entradas y salidas deben tener cantidad positiva")
+    if motivo is not None and not isinstance(motivo, str):
+        raise HTTPException(status_code=400, detail="El motivo debe ser texto")
+
+    return sku_id, almacen_id, tipo, cantidad, motivo
+
+
+def verificar_sku_y_almacen(db, sku_id: int, almacen_id: int):
+    sku = db.execute("SELECT id FROM skus WHERE id = %s;", (sku_id,)).fetchone()
+    if sku is None:
+        raise HTTPException(status_code=404, detail="SKU no encontrado")
+
+    almacen = db.execute(
+        "SELECT id FROM almacenes WHERE id = %s;", (almacen_id,)
+    ).fetchone()
+    if almacen is None:
+        raise HTTPException(status_code=404, detail="Almacén no encontrado")
+
+
+def cambio_en_stock(tipo: str, cantidad: int):
+    if tipo == "salida":
+        return -cantidad
+    return cantidad
+
+
+def calcular_stock(db, sku_id: int, almacen_id: int, excluir_movimiento_id: int | None = None):
+    consulta = """
+        SELECT COALESCE(SUM(
+            CASE
+                WHEN tipo = 'salida' THEN -cantidad
+                ELSE cantidad
+            END
+        ), 0) AS stock
+        FROM movimientos
+        WHERE sku_id = %s AND almacen_id = %s
+    """
+    valores = [sku_id, almacen_id]
+
+    if excluir_movimiento_id is not None:
+        consulta += " AND id <> %s"
+        valores.append(excluir_movimiento_id)
+
+    return db.execute(consulta, valores).fetchone()["stock"]
+
+
+def validar_stock_resultante(stock_actual: int, tipo: str, cantidad: int):
+    if stock_actual + cambio_en_stock(tipo, cantidad) < 0:
+        raise HTTPException(status_code=400, detail="El movimiento dejaría el inventario en negativo")
+
+
+@app.post("/movimientos", status_code=status.HTTP_201_CREATED)
+def crear_movimiento(datos: dict, db=Depends(get_db)):
+    sku_id, almacen_id, tipo, cantidad, motivo = validar_datos_movimiento(datos)
+    verificar_sku_y_almacen(db, sku_id, almacen_id)
+
+    stock_actual = calcular_stock(db, sku_id, almacen_id)
+    validar_stock_resultante(stock_actual, tipo, cantidad)
+
+    resultado = db.execute(
+        """
+        INSERT INTO movimientos (sku_id, almacen_id, tipo, cantidad, motivo)
+        VALUES (%s, %s, %s, %s, %s)
+        RETURNING id, sku_id, almacen_id, tipo, cantidad, motivo, fecha;
+        """,
+        (sku_id, almacen_id, tipo, cantidad, motivo),
+    )
+    movimiento = resultado.fetchone()
+    db.commit()
+    return movimiento
+
+
+@app.get("/movimientos")
+def listar_movimientos(
+    sku_id: int | None = None,
+    almacen_id: int | None = None,
+    tipo: str | None = None,
+    db=Depends(get_db),
+):
+    if tipo is not None and tipo not in TIPOS_MOVIMIENTO:
+        raise HTTPException(status_code=400, detail="El tipo debe ser entrada, salida o ajuste")
+
+    condiciones = []
+    valores = []
+    if sku_id is not None:
+        condiciones.append("m.sku_id = %s")
+        valores.append(sku_id)
+    if almacen_id is not None:
+        condiciones.append("m.almacen_id = %s")
+        valores.append(almacen_id)
+    if tipo is not None:
+        condiciones.append("m.tipo = %s")
+        valores.append(tipo)
+
+    filtro_sql = ""
+    if condiciones:
+        filtro_sql = " WHERE " + " AND ".join(condiciones)
+
+    resultado = db.execute(
+        """
+        SELECT m.id, m.sku_id, s.codigo AS sku_codigo, m.almacen_id,
+               a.nombre AS almacen_nombre, m.tipo, m.cantidad, m.motivo, m.fecha
+        FROM movimientos m
+        JOIN skus s ON s.id = m.sku_id
+        JOIN almacenes a ON a.id = m.almacen_id
+        """ + filtro_sql + " ORDER BY m.fecha DESC, m.id DESC;",
+        valores,
+    )
+    return resultado.fetchall()
+
+
+@app.get("/movimientos/{movimiento_id}")
+def consultar_movimiento(movimiento_id: int, db=Depends(get_db)):
+    resultado = db.execute(
+        """
+        SELECT id, sku_id, almacen_id, tipo, cantidad, motivo, fecha
+        FROM movimientos
+        WHERE id = %s;
+        """,
+        (movimiento_id,),
+    )
+    movimiento = resultado.fetchone()
+
+    if movimiento is None:
+        raise HTTPException(status_code=404, detail="Movimiento no encontrado")
+
+    return movimiento
+
+
+@app.put("/movimientos/{movimiento_id}")
+def actualizar_movimiento(movimiento_id: int, datos: dict, db=Depends(get_db)):
+    sku_id, almacen_id, tipo, cantidad, motivo = validar_datos_movimiento(datos)
+    movimiento_actual = db.execute(
+        "SELECT id, sku_id, almacen_id FROM movimientos WHERE id = %s;", (movimiento_id,)
+    ).fetchone()
+    if movimiento_actual is None:
+        raise HTTPException(status_code=404, detail="Movimiento no encontrado")
+
+    verificar_sku_y_almacen(db, sku_id, almacen_id)
+
+    stock_origen_sin_movimiento = calcular_stock(
+        db,
+        movimiento_actual["sku_id"],
+        movimiento_actual["almacen_id"],
+        movimiento_id,
+    )
+    if stock_origen_sin_movimiento < 0:
+        raise HTTPException(
+            status_code=400,
+            detail="No se puede modificar porque el inventario de origen quedaría en negativo",
+        )
+
+    stock_sin_movimiento = calcular_stock(db, sku_id, almacen_id, movimiento_id)
+    validar_stock_resultante(stock_sin_movimiento, tipo, cantidad)
+
+    resultado = db.execute(
+        """
+        UPDATE movimientos
+        SET sku_id = %s, almacen_id = %s, tipo = %s, cantidad = %s, motivo = %s
+        WHERE id = %s
+        RETURNING id, sku_id, almacen_id, tipo, cantidad, motivo, fecha;
+        """,
+        (sku_id, almacen_id, tipo, cantidad, motivo, movimiento_id),
+    )
+    db.commit()
+    return resultado.fetchone()
+
+
+@app.delete("/movimientos/{movimiento_id}", status_code=status.HTTP_204_NO_CONTENT)
+def eliminar_movimiento(movimiento_id: int, db=Depends(get_db)):
+    movimiento = db.execute(
+        """
+        SELECT id, sku_id, almacen_id
+        FROM movimientos
+        WHERE id = %s;
+        """,
+        (movimiento_id,),
+    ).fetchone()
+    if movimiento is None:
+        raise HTTPException(status_code=404, detail="Movimiento no encontrado")
+
+    stock_sin_movimiento = calcular_stock(
+        db, movimiento["sku_id"], movimiento["almacen_id"], movimiento_id
+    )
+    if stock_sin_movimiento < 0:
+        raise HTTPException(
+            status_code=400,
+            detail="No se puede eliminar porque el inventario quedaría en negativo",
+        )
+
+    db.execute("DELETE FROM movimientos WHERE id = %s;", (movimiento_id,))
     db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
