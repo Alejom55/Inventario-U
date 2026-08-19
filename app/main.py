@@ -21,6 +21,11 @@ def iniciar_api():
     crear_tabla_movimientos()
 
 
+@app.get("/health")
+def estado_api():
+    return {"estado": "ok"}
+
+
 def validar_datos_sku(datos: dict):
     codigo = datos.get("codigo")
     nombre = datos.get("nombre")

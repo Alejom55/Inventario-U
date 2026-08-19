@@ -34,6 +34,12 @@ def crear_movimiento(client, sku_id, almacen_id, tipo, cantidad, motivo="Prueba"
     )
 
 
+def test_estado_de_la_api(client):
+    respuesta = client.get("/health")
+    assert respuesta.status_code == 200
+    assert respuesta.json() == {"estado": "ok"}
+
+
 def test_crud_sku(client):
     sku = crear_sku(client)
 

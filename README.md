@@ -99,3 +99,23 @@ uv run pytest
 ```
 
 La cobertura se muestra al terminar y debe ser al menos 85%. Para el futuro pipeline de pruebas se podrá permitir un mínimo de 60%, mientras que producción exigirá 85%.
+
+## Docker
+
+Docker Compose levanta dos servicios: la API y PostgreSQL. La base de datos se mantiene en el volumen `postgres_data`.
+
+```bash
+docker compose up --build
+```
+
+Cuando ambos contenedores estén listos, comprueba la API:
+
+```bash
+curl http://127.0.0.1:8000/health
+```
+
+Para detener los contenedores:
+
+```bash
+docker compose down
+```
