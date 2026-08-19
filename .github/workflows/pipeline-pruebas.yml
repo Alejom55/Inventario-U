@@ -1,0 +1,67 @@
+name: Pipeline de pruebas
+
+on:
+  push:
+    branches: [dev]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: despliegue-dev
+  cancel-in-progress: true
+
+jobs:
+  calidad:
+    name: Instalacion, pruebas y cobertura
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: inventario_test
+          POSTGRES_USER: inventario
+          POSTGRES_PASSWORD: inventario
+        options: >-
+          --health-cmd "pg_isready -U inventario -d inventario_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    env:
+      TEST_DATABASE_URL: postgresql://inventario:inventario@localhost:5432/inventario_test
+
+    steps:
+      - name: Descargar codigo
+        uses: actions/checkout@v6
+
+      - name: Instalar Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Instalar uv
+        uses: astral-sh/setup-uv@v9.0.0
+
+      - name: Instalar dependencias
+        run: uv sync --frozen --group dev
+
+      - name: Construir imagen Docker
+        run: docker build --tag gestor-inventario:ci .
+
+      - name: Ejecutar pruebas con cobertura minima de 60%
+        run: uv run --frozen pytest --cov-fail-under=60
+
+  desplegar:
+    name: Desplegar en pruebas
+    needs: calidad
+    runs-on: ubuntu-latest
+    environment: dev
+
+    steps:
+      - name: Solicitar despliegue a Render
+        run: curl --fail --silent --show-error -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
