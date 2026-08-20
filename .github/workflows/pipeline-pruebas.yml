@@ -53,8 +53,8 @@ jobs:
       - name: Construir imagen Docker
         run: docker build --tag gestor-inventario:ci .
 
-      - name: Ejecutar pruebas con cobertura minima de 60%
-        run: uv run --frozen pytest --cov-fail-under=60
+      - name: Ejecutar pruebas con cobertura minima de 100%
+        run: uv run --frozen pytest --cov-fail-under=100
 
   desplegar:
     name: Desplegar en pruebas
