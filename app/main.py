@@ -148,7 +148,7 @@ def validar_datos_almacen(datos: dict):
     return nombre.strip(), ubicacion.strip()
 
 
-@app.post("/almacenes", status_code=status.HTTP_201_CREATED)
+@app.post("/apis/v2/almacenes", status_code=status.HTTP_201_CREATED)
 def crear_almacen(datos: dict, db=Depends(get_db)):
     nombre, ubicacion = validar_datos_almacen(datos)
 
@@ -169,7 +169,7 @@ def crear_almacen(datos: dict, db=Depends(get_db)):
         raise HTTPException(status_code=409, detail="Ya existe un almacén con ese nombre")
 
 
-@app.get("/almacenes")
+@app.get("/apis/v2/almacenes")
 def listar_almacenes(db=Depends(get_db)):
     resultado = db.execute(
         "SELECT id, nombre, ubicacion FROM almacenes ORDER BY id;"
@@ -177,7 +177,7 @@ def listar_almacenes(db=Depends(get_db)):
     return resultado.fetchall()
 
 
-@app.get("/almacenes/{almacen_id}")
+@app.get("/apis/v2/almacenes/{almacen_id}")
 def consultar_almacen(almacen_id: int, db=Depends(get_db)):
     resultado = db.execute(
         "SELECT id, nombre, ubicacion FROM almacenes WHERE id = %s;",
@@ -191,7 +191,7 @@ def consultar_almacen(almacen_id: int, db=Depends(get_db)):
     return almacen
 
 
-@app.put("/almacenes/{almacen_id}")
+@app.put("/apis/v2/almacenes/{almacen_id}")
 def actualizar_almacen(almacen_id: int, datos: dict, db=Depends(get_db)):
     nombre, ubicacion = validar_datos_almacen(datos)
 
@@ -216,7 +216,7 @@ def actualizar_almacen(almacen_id: int, datos: dict, db=Depends(get_db)):
         raise HTTPException(status_code=409, detail="Ya existe un almacén con ese nombre")
 
 
-@app.delete("/almacenes/{almacen_id}", status_code=status.HTTP_204_NO_CONTENT)
+@app.delete("/apis/v2/almacenes/{almacen_id}", status_code=status.HTTP_204_NO_CONTENT)
 def eliminar_almacen(almacen_id: int, db=Depends(get_db)):
     resultado = db.execute(
         "DELETE FROM almacenes WHERE id = %s RETURNING id;",
