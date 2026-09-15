@@ -23,7 +23,7 @@ def crear_almacen(client, nombre="Principal", ubicacion="Bogotá"):
 
 def crear_movimiento(client, sku_id, almacen_id, tipo, cantidad, motivo="Prueba"):
     return client.post(
-        "/movimientos",
+        "/apis/v2/movimientos",
         json={
             "sku_id": sku_id,
             "almacen_id": almacen_id,
@@ -143,13 +143,13 @@ def test_movimientos_y_filtros(client):
     assert ajuste.status_code == 201
 
     respuesta = client.get(
-        f"/movimientos?sku_id={sku['id']}&almacen_id={almacen['id']}&tipo=salida"
+        f"/apis/v2/movimientos?sku_id={sku['id']}&almacen_id={almacen['id']}&tipo=salida"
     )
     assert respuesta.status_code == 200
     assert len(respuesta.json()) == 1
     assert respuesta.json()[0]["tipo"] == "salida"
 
-    respuesta = client.get(f"/movimientos/{entrada.json()['id']}")
+    respuesta = client.get(f"/apis/v2/movimientos/{entrada.json()['id']}")
     assert respuesta.status_code == 200
     assert respuesta.json()["cantidad"] == 10
 
@@ -160,7 +160,7 @@ def test_actualizar_y_eliminar_movimiento(client):
     movimiento = crear_movimiento(client, sku["id"], almacen["id"], "entrada", 10).json()
 
     respuesta = client.put(
-        f"/movimientos/{movimiento['id']}",
+        f"/apis/v2/movimientos/{movimiento['id']}",
         json={
             "sku_id": sku["id"],
             "almacen_id": almacen["id"],
@@ -172,8 +172,8 @@ def test_actualizar_y_eliminar_movimiento(client):
     assert respuesta.status_code == 200
     assert respuesta.json()["cantidad"] == 12
 
-    assert client.delete(f"/movimientos/{movimiento['id']}").status_code == 204
-    assert client.get(f"/movimientos/{movimiento['id']}").status_code == 404
+    assert client.delete(f"/apis/v2/movimientos/{movimiento['id']}").status_code == 204
+    assert client.get(f"/apis/v2/movimientos/{movimiento['id']}").status_code == 404
 
 
 def test_reglas_de_inventario(client):
@@ -186,7 +186,7 @@ def test_reglas_de_inventario(client):
     entrada = crear_movimiento(client, sku["id"], almacen["id"], "entrada", 5).json()
     assert crear_movimiento(client, sku["id"], almacen["id"], "salida", 3).status_code == 201
 
-    respuesta = client.delete(f"/movimientos/{entrada['id']}")
+    respuesta = client.delete(f"/apis/v2/movimientos/{entrada['id']}")
     assert respuesta.status_code == 400
 
     respuesta = crear_movimiento(client, 999, almacen["id"], "entrada", 1)
