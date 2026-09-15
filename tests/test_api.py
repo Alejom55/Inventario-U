@@ -47,12 +47,12 @@ def test_crud_sku(client):
     assert respuesta.status_code == 200
     assert respuesta.json() == [sku]
 
-    respuesta = client.get(f"/skus/{sku['id']}")
+    respuesta = client.get(f"/apis/v2/skus/{sku['id']}")
     assert respuesta.status_code == 200
     assert respuesta.json()["codigo"] == "SKU-001"
 
     respuesta = client.put(
-        f"/skus/{sku['id']}",
+        f"/apis/v2/skus/{sku['id']}",
         json={
             "codigo": "SKU-002",
             "nombre": "Teclado mecánico",
@@ -63,9 +63,9 @@ def test_crud_sku(client):
     assert respuesta.status_code == 200
     assert respuesta.json()["codigo"] == "SKU-002"
 
-    respuesta = client.delete(f"/skus/{sku['id']}")
+    respuesta = client.delete(f"/apis/v2/skus/{sku['id']}")
     assert respuesta.status_code == 204
-    assert client.get(f"/skus/{sku['id']}").status_code == 404
+    assert client.get(f"/apis/v2/skus/{sku['id']}").status_code == 404
 
 
 def test_validaciones_sku(client):
@@ -84,12 +84,12 @@ def test_validaciones_sku(client):
     assert respuesta.status_code == 400
 
     respuesta = client.put(
-        "/skus/999",
+        "/apis/v2/skus/999",
         json={"codigo": "SKU-999", "nombre": "No existe", "stock_minimo": 0},
     )
     assert respuesta.status_code == 404
 
-    assert client.delete("/skus/999").status_code == 404
+    assert client.delete("/apis/v2/skus/999").status_code == 404
 
 
 def test_crud_almacen(client):
