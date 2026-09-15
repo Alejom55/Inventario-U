@@ -1,6 +1,6 @@
 def crear_sku(client, codigo="SKU-001", nombre="Teclado", stock_minimo=2):
     respuesta = client.post(
-        "/skus",
+        "/apis/v2/skus",
         json={
             "codigo": codigo,
             "nombre": nombre,
@@ -43,7 +43,7 @@ def test_estado_de_la_api(client):
 def test_crud_sku(client):
     sku = crear_sku(client)
 
-    respuesta = client.get("/skus")
+    respuesta = client.get("/apis/v2/skus")
     assert respuesta.status_code == 200
     assert respuesta.json() == [sku]
 
@@ -72,13 +72,13 @@ def test_validaciones_sku(client):
     crear_sku(client)
 
     respuesta = client.post(
-        "/skus",
+        "/apis/v2/skus",
         json={"codigo": "SKU-001", "nombre": "Duplicado", "stock_minimo": 0},
     )
     assert respuesta.status_code == 409
 
     respuesta = client.post(
-        "/skus",
+        "/apis/v2/skus",
         json={"codigo": "", "nombre": "Inválido", "stock_minimo": -1},
     )
     assert respuesta.status_code == 400
