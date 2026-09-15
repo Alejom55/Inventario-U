@@ -21,7 +21,7 @@ def iniciar_api():
     crear_tabla_movimientos()
 
 
-@app.get("/health")
+@app.get("/apis/v2/health")
 def estado_api():
     return {"estado": "ok"}
 
