@@ -480,12 +480,12 @@ def validar_filtros_inventario(filtros: dict):
     return sku_id, almacen_id, tipo, fecha_desde, fecha_hasta, solo_stock_bajo
 
 
-@app.options("/inventario/query")
+@app.options("/apis/v2/inventario/query")
 def opciones_query():
     return Response(headers={"Accept-Query": "application/json"})
 
 
-@app.api_route("/inventario/query", methods=["QUERY"])
+@app.api_route("/apis/v2/inventario/query", methods=["QUERY"])
 def consultar_inventario(filtros: dict, db=Depends(get_db)):
     sku_id, almacen_id, tipo, fecha_desde, fecha_hasta, solo_stock_bajo = (
         validar_filtros_inventario(filtros)
