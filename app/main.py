@@ -44,7 +44,7 @@ def validar_datos_sku(datos: dict):
     return codigo.strip(), nombre.strip(), descripcion, stock_minimo
 
 
-@app.post("/skus", status_code=status.HTTP_201_CREATED)
+@app.post("/apis/v2/skus", status_code=status.HTTP_201_CREATED)
 def crear_sku(datos: dict, db=Depends(get_db)):
     codigo, nombre, descripcion, stock_minimo = validar_datos_sku(datos)
 
@@ -65,7 +65,7 @@ def crear_sku(datos: dict, db=Depends(get_db)):
         raise HTTPException(status_code=409, detail="Ya existe un SKU con ese código")
 
 
-@app.get("/skus")
+@app.get("/apis/v2/skus")
 def listar_skus(db=Depends(get_db)):
     resultado = db.execute(
         """
