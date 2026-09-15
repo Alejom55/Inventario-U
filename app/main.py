@@ -301,7 +301,7 @@ def validar_stock_resultante(stock_actual: int, tipo: str, cantidad: int):
         raise HTTPException(status_code=400, detail="El movimiento dejaría el inventario en negativo")
 
 
-@app.post("/movimientos", status_code=status.HTTP_201_CREATED)
+@app.post("/apis/v2/movimientos", status_code=status.HTTP_201_CREATED)
 def crear_movimiento(datos: dict, db=Depends(get_db)):
     sku_id, almacen_id, tipo, cantidad, motivo = validar_datos_movimiento(datos)
     verificar_sku_y_almacen(db, sku_id, almacen_id)
@@ -322,7 +322,7 @@ def crear_movimiento(datos: dict, db=Depends(get_db)):
     return movimiento
 
 
-@app.get("/movimientos")
+@app.get("/apis/v2/movimientos")
 def listar_movimientos(
     sku_id: int | None = None,
     almacen_id: int | None = None,
@@ -361,7 +361,7 @@ def listar_movimientos(
     return resultado.fetchall()
 
 
-@app.get("/movimientos/{movimiento_id}")
+@app.get("/apis/v2/movimientos/{movimiento_id}")
 def consultar_movimiento(movimiento_id: int, db=Depends(get_db)):
     resultado = db.execute(
         """
@@ -379,7 +379,7 @@ def consultar_movimiento(movimiento_id: int, db=Depends(get_db)):
     return movimiento
 
 
-@app.put("/movimientos/{movimiento_id}")
+@app.put("/apis/v2/movimientos/{movimiento_id}")
 def actualizar_movimiento(movimiento_id: int, datos: dict, db=Depends(get_db)):
     sku_id, almacen_id, tipo, cantidad, motivo = validar_datos_movimiento(datos)
     movimiento_actual = db.execute(
@@ -418,7 +418,7 @@ def actualizar_movimiento(movimiento_id: int, datos: dict, db=Depends(get_db)):
     return resultado.fetchone()
 
 
-@app.delete("/movimientos/{movimiento_id}", status_code=status.HTTP_204_NO_CONTENT)
+@app.delete("/apis/v2/movimientos/{movimiento_id}", status_code=status.HTTP_204_NO_CONTENT)
 def eliminar_movimiento(movimiento_id: int, db=Depends(get_db)):
     movimiento = db.execute(
         """
