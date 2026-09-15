@@ -14,7 +14,7 @@ def crear_sku(client, codigo="SKU-001", nombre="Teclado", stock_minimo=2):
 
 def crear_almacen(client, nombre="Principal", ubicacion="Bogotá"):
     respuesta = client.post(
-        "/almacenes",
+        "/apis/v2/almacenes",
         json={"nombre": nombre, "ubicacion": ubicacion},
     )
     assert respuesta.status_code == 201
@@ -95,40 +95,40 @@ def test_validaciones_sku(client):
 def test_crud_almacen(client):
     almacen = crear_almacen(client)
 
-    respuesta = client.get("/almacenes")
+    respuesta = client.get("/apis/v2/almacenes")
     assert respuesta.status_code == 200
     assert respuesta.json() == [almacen]
 
-    respuesta = client.get(f"/almacenes/{almacen['id']}")
+    respuesta = client.get(f"/apis/v2/almacenes/{almacen['id']}")
     assert respuesta.status_code == 200
     assert respuesta.json()["ubicacion"] == "Bogotá"
 
     respuesta = client.put(
-        f"/almacenes/{almacen['id']}",
+        f"/apis/v2/almacenes/{almacen['id']}",
         json={"nombre": "Secundario", "ubicacion": "Medellín"},
     )
     assert respuesta.status_code == 200
     assert respuesta.json()["nombre"] == "Secundario"
 
-    assert client.delete(f"/almacenes/{almacen['id']}").status_code == 204
-    assert client.get(f"/almacenes/{almacen['id']}").status_code == 404
+    assert client.delete(f"/apis/v2/almacenes/{almacen['id']}").status_code == 204
+    assert client.get(f"/apis/v2/almacenes/{almacen['id']}").status_code == 404
 
 
 def test_validaciones_almacen(client):
     crear_almacen(client)
 
     respuesta = client.post(
-        "/almacenes", json={"nombre": "Principal", "ubicacion": "Cali"}
+        "/apis/v2/almacenes", json={"nombre": "Principal", "ubicacion": "Cali"}
     )
     assert respuesta.status_code == 409
 
-    respuesta = client.post("/almacenes", json={"nombre": "", "ubicacion": ""})
+    respuesta = client.post("/apis/v2/almacenes", json={"nombre": "", "ubicacion": ""})
     assert respuesta.status_code == 400
 
-    respuesta = client.put("/almacenes/999", json={"nombre": "X", "ubicacion": "Y"})
+    respuesta = client.put("/apis/v2/almacenes/999", json={"nombre": "X", "ubicacion": "Y"})
     assert respuesta.status_code == 404
 
-    assert client.delete("/almacenes/999").status_code == 404
+    assert client.delete("/apis/v2/almacenes/999").status_code == 404
 
 
 def test_movimientos_y_filtros(client):
