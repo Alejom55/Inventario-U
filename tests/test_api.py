@@ -204,7 +204,7 @@ def test_query_de_inventario(client):
 
     respuesta = client.request(
         "QUERY",
-        "/inventario/query",
+        "/apis/v2/inventario/query",
         json={"sku_id": sku["id"], "almacen_id": almacen["id"], "tipo": "salida"},
     )
     assert respuesta.status_code == 200
@@ -212,7 +212,7 @@ def test_query_de_inventario(client):
 
     respuesta = client.request(
         "QUERY",
-        "/inventario/query",
+        "/apis/v2/inventario/query",
         json={"solo_stock_bajo": True},
     )
     assert respuesta.status_code == 200
@@ -220,11 +220,11 @@ def test_query_de_inventario(client):
 
     respuesta = client.request(
         "QUERY",
-        "/inventario/query",
+        "/apis/v2/inventario/query",
         json={"fecha_desde": "fecha-inválida"},
     )
     assert respuesta.status_code == 400
 
-    respuesta = client.options("/inventario/query")
+    respuesta = client.options("/apis/v2/inventario/query")
     assert respuesta.status_code == 200
     assert respuesta.headers["accept-query"] == "application/json"
