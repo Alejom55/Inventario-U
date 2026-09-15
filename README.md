@@ -2,6 +2,10 @@
 
 API para administrar inventario entre varios almacenes.
 
+## Versionamiento
+
+Todos los endpoints públicos usan el prefijo `/apis/v2`.
+
 ## Objetivo
 
 Construir una API RESTful con persistencia real que permita administrar productos, almacenes y movimientos de inventario. El proyecto incluirá el método HTTP `QUERY` para realizar consultas complejas de inventario sin modificar datos.
@@ -57,7 +61,7 @@ docker compose up --build
 
 ## Consulta de inventario con HTTP QUERY
 
-La API admite el método HTTP `QUERY` en `/inventario/query`. Este método solo consulta: no crea, modifica ni elimina datos.
+La API admite el método HTTP `QUERY` en `/apis/v2/inventario/query`. Este método solo consulta: no crea, modifica ni elimina datos.
 
 Envía un body JSON con filtros opcionales:
 
@@ -75,7 +79,7 @@ Envía un body JSON con filtros opcionales:
 El resultado muestra el stock total disponible de cada SKU por almacén. Si filtras por tipo o fecha, se muestran únicamente las combinaciones que tengan movimientos que coincidan con ese filtro, pero el stock sigue calculándose con todo el historial.
 
 ```bash
-curl -X QUERY http://127.0.0.1:8000/inventario/query \
+curl -X QUERY http://127.0.0.1:8000/apis/v2/inventario/query \
   -H "Content-Type: application/json" \
   -d "{\"almacen_id\": 1, \"solo_stock_bajo\": true}"
 ```
@@ -83,7 +87,7 @@ curl -X QUERY http://127.0.0.1:8000/inventario/query \
 Puedes verificar los formatos aceptados con:
 
 ```bash
-curl -X OPTIONS -i http://127.0.0.1:8000/inventario/query
+curl -X OPTIONS -i http://127.0.0.1:8000/apis/v2/inventario/query
 ```
 
 La respuesta incluye el encabezado `Accept-Query: application/json`.
@@ -111,7 +115,7 @@ docker compose up --build
 Cuando ambos contenedores estén listos, comprueba la API:
 
 ```bash
-curl http://127.0.0.1:8000/health
+curl http://127.0.0.1:8000/apis/v2/health
 ```
 
 Para detener los contenedores:
