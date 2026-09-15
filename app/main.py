@@ -77,7 +77,7 @@ def listar_skus(db=Depends(get_db)):
     return resultado.fetchall()
 
 
-@app.get("/skus/{sku_id}")
+@app.get("/apis/v2/skus/{sku_id}")
 def consultar_sku(sku_id: int, db=Depends(get_db)):
     resultado = db.execute(
         """
@@ -95,7 +95,7 @@ def consultar_sku(sku_id: int, db=Depends(get_db)):
     return sku
 
 
-@app.put("/skus/{sku_id}")
+@app.put("/apis/v2/skus/{sku_id}")
 def actualizar_sku(sku_id: int, datos: dict, db=Depends(get_db)):
     codigo, nombre, descripcion, stock_minimo = validar_datos_sku(datos)
 
@@ -120,7 +120,7 @@ def actualizar_sku(sku_id: int, datos: dict, db=Depends(get_db)):
         raise HTTPException(status_code=409, detail="Ya existe un SKU con ese código")
 
 
-@app.delete("/skus/{sku_id}", status_code=status.HTTP_204_NO_CONTENT)
+@app.delete("/apis/v2/skus/{sku_id}", status_code=status.HTTP_204_NO_CONTENT)
 def eliminar_sku(sku_id: int, db=Depends(get_db)):
     resultado = db.execute(
         "DELETE FROM skus WHERE id = %s RETURNING id;",
