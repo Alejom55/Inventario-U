@@ -1,4 +1,5 @@
 import logging
+import os
 
 import httpx
 
@@ -21,9 +22,14 @@ def get_json(base_url: str | None, path: str, service: str, trace_id: str):
         raise ExternalApiError(service, f"{service} no está configurada")
 
     url = f"{base_url.rstrip('/')}{path}"
+    headers = {"X-Trace-Id": trace_id}
+    team_api_key = os.getenv("TEAM_API_KEY")
+    if team_api_key:
+        headers["X-Api-Key"] = team_api_key
+
     try:
         with httpx.Client(timeout=TIMEOUT_SECONDS) as client:
-            response = client.get(url, headers={"X-Trace-Id": trace_id})
+            response = client.get(url, headers=headers)
             response.raise_for_status()
             return response.json()
     except httpx.TimeoutException:

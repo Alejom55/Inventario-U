@@ -256,6 +256,77 @@ def test_trace_id_recibido_se_conserva(client):
     assert respuesta.headers["x-trace-id"] == trace_id
 
 
+def test_api_key_correcta_permite_rutas_v1_y_v2(client, monkeypatch):
+    monkeypatch.setenv("TEAM_API_KEY", "clave-de-prueba")
+
+    respuesta_v1 = client.get("/skus", headers={"X-Api-Key": "clave-de-prueba"})
+    respuesta_v2 = client.get("/api/v2/skus", headers={"X-Api-Key": "clave-de-prueba"})
+
+    assert respuesta_v1.status_code == 200
+    assert respuesta_v2.status_code == 200
+
+
+def test_api_key_incorrecta_es_rechazada(client, monkeypatch):
+    monkeypatch.setenv("TEAM_API_KEY", "clave-de-prueba")
+
+    respuesta = client.get("/api/v2/skus", headers={"X-Api-Key": "clave-incorrecta"})
+
+    assert respuesta.status_code == 401
+    assert respuesta.json()["detail"] == "API key inválida o ausente"
+
+
+def test_api_key_ausente_es_rechazada_y_health_permanece_publico(client, monkeypatch):
+    monkeypatch.setenv("TEAM_API_KEY", "clave-de-prueba")
+
+    respuesta = client.get("/skus")
+    health_v1 = client.get("/health")
+    health_v2 = client.get("/api/v2/health")
+
+    assert respuesta.status_code == 401
+    assert health_v1.status_code == 200
+    assert health_v2.status_code == 200
+
+
+def test_api_permanece_abierta_sin_team_api_key(client, monkeypatch):
+    monkeypatch.delenv("TEAM_API_KEY", raising=False)
+
+    respuesta = client.get("/api/v2/skus")
+
+    assert respuesta.status_code == 200
+
+
+def test_cliente_externo_omite_api_key_sin_configuracion(monkeypatch):
+    from app.integrations.external_api import get_json
+
+    headers_enviados = {}
+
+    class RespuestaExterna:
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return {"ok": True}
+
+    class ClienteExterno:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return None
+
+        def get(self, url, headers):
+            headers_enviados.update(headers)
+            return RespuestaExterna()
+
+    monkeypatch.delenv("TEAM_API_KEY", raising=False)
+    monkeypatch.setattr("app.integrations.external_api.httpx.Client", lambda timeout: ClienteExterno())
+
+    respuesta = get_json("https://externa.test", "/recurso", "externa", "trace-sin-key")
+
+    assert respuesta == {"ok": True}
+    assert headers_enviados == {"X-Trace-Id": "trace-sin-key"}
+
+
 def test_integracion_v2_propagates_trace_id(client, monkeypatch):
     sku = crear_sku(client)
     almacen = crear_almacen(client)
@@ -286,6 +357,7 @@ def test_integracion_v2_propagates_trace_id(client, monkeypatch):
 
     monkeypatch.setenv("DEPORTBACK_API_URL", "https://deportback.test")
     monkeypatch.setenv("FASTIFY_API_URL", "https://fastify.test")
+    monkeypatch.setenv("TEAM_API_KEY", "clave-de-prueba")
     monkeypatch.setattr("app.integrations.external_api.httpx.Client", lambda timeout: ClienteExterno())
 
     respuesta = client.get(
@@ -296,7 +368,7 @@ def test_integracion_v2_propagates_trace_id(client, monkeypatch):
             "deportista_id": "dep-1",
             "articulo_id": 7,
         },
-        headers={"X-Trace-Id": "trace-integracion"},
+        headers={"X-Trace-Id": "trace-integracion", "X-Api-Key": "clave-de-prueba"},
     )
 
     assert respuesta.status_code == 200
@@ -308,6 +380,7 @@ def test_integracion_v2_propagates_trace_id(client, monkeypatch):
         "https://fastify.test/articulos/7",
     ]
     assert all(headers["X-Trace-Id"] == "trace-integracion" for _, headers in llamadas)
+    assert all(headers["X-Api-Key"] == "clave-de-prueba" for _, headers in llamadas)
 
 
 def test_integracion_v2_controla_fallo_externo(client, monkeypatch):

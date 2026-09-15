@@ -21,6 +21,7 @@ services:
       DATABASE_URL: postgresql://inventario:inventario@db:5432/inventario
       DEPORTBACK_API_URL: ${DEPORTBACK_API_URL:-}
       FASTIFY_API_URL: ${FASTIFY_API_URL:-}
+      TEAM_API_KEY: ${TEAM_API_KEY:-}
     depends_on:
       db:
         condition: service_healthy

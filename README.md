@@ -71,7 +71,9 @@ docker compose up --build
 2. Ajusta `DATABASE_URL` con las credenciales de tu PostgreSQL local.
 3. Define `DEPORTBACK_API_URL` y `FASTIFY_API_URL` con las URL base de los
    servicios de los compañeros.
-4. No subas `.env` al repositorio: contiene valores específicos de cada ambiente.
+4. Define `TEAM_API_KEY` solo cuando el equipo haya acordado una clave compartida.
+   Si está vacía, la API queda abierta para desarrollo local.
+5. No subas `.env` al repositorio: contiene valores específicos de cada ambiente.
 
 ## Integración V2 y trazabilidad
 
@@ -88,6 +90,16 @@ La respuesta conserva o genera `X-Trace-Id`, lo devuelve en el encabezado y
 en el cuerpo, y lo reenvía a ambos servicios externos. Si alguno falla o se
 agota el tiempo de espera, el endpoint responde `502` con el servicio y la
 causa; no persiste los datos externos.
+
+Mientras los contratos propietarios V2 de los compañeros están pendientes, la
+integración consulta temporalmente `/deportistas/{id}` y `/articulos/{id}`.
+Estas rutas no se cambiarán hasta que los endpoints equivalentes bajo
+`/api/v2` estén disponibles y no introduzcan ciclos.
+
+Cuando `TEAM_API_KEY` está configurada, las rutas funcionales V1 y V2 requieren
+el encabezado `X-Api-Key`. Los endpoints `/health` y `/api/v2/health` siempre
+permanecen públicos para probes. Las llamadas externas propagan tanto
+`X-Api-Key` como `X-Trace-Id`.
 
 ## Consulta de inventario con HTTP QUERY
 

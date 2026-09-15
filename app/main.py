@@ -1,8 +1,11 @@
+import hmac
 import logging
+import os
 from datetime import datetime
 from uuid import uuid4
 
 from fastapi import Depends, FastAPI, HTTPException, Request, Response, status
+from fastapi.responses import JSONResponse
 from psycopg import errors
 
 from .database import get_db
@@ -14,6 +17,8 @@ from .schema import crear_tabla_almacenes, crear_tabla_movimientos, crear_tabla_
 
 logger = logging.getLogger(__name__)
 API_V2_PREFIX = "/api/v2"
+HEALTH_PATHS = {"/health", f"{API_V2_PREFIX}/health"}
+FUNCTIONAL_PATHS = ("/skus", "/almacenes", "/movimientos", "/inventario/query", API_V2_PREFIX)
 
 app = FastAPI(
     title="Gestor de inventario",
@@ -34,6 +39,20 @@ async def agregar_trace_id(request: Request, call_next):
     trace_id = request.headers.get("X-Trace-Id") or str(uuid4())
     request.state.trace_id = trace_id
     logger.info("Solicitud recibida", extra={"trace_id": trace_id, "path": request.url.path})
+
+    team_api_key = os.getenv("TEAM_API_KEY")
+    es_ruta_funcional = request.url.path.startswith(FUNCTIONAL_PATHS)
+    if (
+        team_api_key
+        and request.url.path not in HEALTH_PATHS
+        and es_ruta_funcional
+        and not hmac.compare_digest(request.headers.get("X-Api-Key", ""), team_api_key)
+    ):
+        logger.warning("API key inválida o ausente", extra={"trace_id": trace_id})
+        response = JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={"detail": "API key inválida o ausente"})
+        response.headers["X-Trace-Id"] = trace_id
+        return response
+
     response = await call_next(request)
     response.headers["X-Trace-Id"] = trace_id
     return response
