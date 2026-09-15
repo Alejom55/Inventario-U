@@ -1,15 +1,23 @@
+import logging
 from datetime import datetime
+from uuid import uuid4
 
-from fastapi import Depends, FastAPI, HTTPException, Response, status
+from fastapi import Depends, FastAPI, HTTPException, Request, Response, status
 from psycopg import errors
 
 from .database import get_db
+from .integrations.deportback_client import obtener_deportista
+from .integrations.external_api import ExternalApiError
+from .integrations.fastify_client import obtener_articulo
 from .schema import crear_tabla_almacenes, crear_tabla_movimientos, crear_tabla_skus
 
 
+logger = logging.getLogger(__name__)
+API_V2_PREFIX = "/api/v2"
+
 app = FastAPI(
     title="Gestor de inventario",
-    version="0.1.0",
+    version="2.0.0",
     description="API para la gestión de SKU, almacenes y movimientos de inventario.",
 )
 
@@ -21,8 +29,21 @@ def iniciar_api():
     crear_tabla_movimientos()
 
 
-@app.get("/apis/v2/health")
-def estado_api():
+@app.middleware("http")
+async def agregar_trace_id(request: Request, call_next):
+    trace_id = request.headers.get("X-Trace-Id") or str(uuid4())
+    request.state.trace_id = trace_id
+    logger.info("Solicitud recibida", extra={"trace_id": trace_id, "path": request.url.path})
+    response = await call_next(request)
+    response.headers["X-Trace-Id"] = trace_id
+    return response
+
+
+@app.get("/health")
+@app.get(f"{API_V2_PREFIX}/health")
+def estado_api(request: Request):
+    if request.url.path.startswith(API_V2_PREFIX):
+        return {"status": "ok", "version": "2.0.0", "service": "inventario-u"}
     return {"estado": "ok"}
 
 
@@ -44,7 +65,8 @@ def validar_datos_sku(datos: dict):
     return codigo.strip(), nombre.strip(), descripcion, stock_minimo
 
 
-@app.post("/apis/v2/skus", status_code=status.HTTP_201_CREATED)
+@app.post("/skus", status_code=status.HTTP_201_CREATED)
+@app.post(f"{API_V2_PREFIX}/skus", status_code=status.HTTP_201_CREATED)
 def crear_sku(datos: dict, db=Depends(get_db)):
     codigo, nombre, descripcion, stock_minimo = validar_datos_sku(datos)
 
@@ -65,7 +87,8 @@ def crear_sku(datos: dict, db=Depends(get_db)):
         raise HTTPException(status_code=409, detail="Ya existe un SKU con ese código")
 
 
-@app.get("/apis/v2/skus")
+@app.get("/skus")
+@app.get(f"{API_V2_PREFIX}/skus")
 def listar_skus(db=Depends(get_db)):
     resultado = db.execute(
         """
@@ -77,7 +100,8 @@ def listar_skus(db=Depends(get_db)):
     return resultado.fetchall()
 
 
-@app.get("/apis/v2/skus/{sku_id}")
+@app.get("/skus/{sku_id}")
+@app.get(f"{API_V2_PREFIX}/skus/{{sku_id}}")
 def consultar_sku(sku_id: int, db=Depends(get_db)):
     resultado = db.execute(
         """
@@ -95,7 +119,8 @@ def consultar_sku(sku_id: int, db=Depends(get_db)):
     return sku
 
 
-@app.put("/apis/v2/skus/{sku_id}")
+@app.put("/skus/{sku_id}")
+@app.put(f"{API_V2_PREFIX}/skus/{{sku_id}}")
 def actualizar_sku(sku_id: int, datos: dict, db=Depends(get_db)):
     codigo, nombre, descripcion, stock_minimo = validar_datos_sku(datos)
 
@@ -120,7 +145,8 @@ def actualizar_sku(sku_id: int, datos: dict, db=Depends(get_db)):
         raise HTTPException(status_code=409, detail="Ya existe un SKU con ese código")
 
 
-@app.delete("/apis/v2/skus/{sku_id}", status_code=status.HTTP_204_NO_CONTENT)
+@app.delete("/skus/{sku_id}", status_code=status.HTTP_204_NO_CONTENT)
+@app.delete(f"{API_V2_PREFIX}/skus/{{sku_id}}", status_code=status.HTTP_204_NO_CONTENT)
 def eliminar_sku(sku_id: int, db=Depends(get_db)):
     resultado = db.execute(
         "DELETE FROM skus WHERE id = %s RETURNING id;",
@@ -148,7 +174,8 @@ def validar_datos_almacen(datos: dict):
     return nombre.strip(), ubicacion.strip()
 
 
-@app.post("/apis/v2/almacenes", status_code=status.HTTP_201_CREATED)
+@app.post("/almacenes", status_code=status.HTTP_201_CREATED)
+@app.post(f"{API_V2_PREFIX}/almacenes", status_code=status.HTTP_201_CREATED)
 def crear_almacen(datos: dict, db=Depends(get_db)):
     nombre, ubicacion = validar_datos_almacen(datos)
 
@@ -169,7 +196,8 @@ def crear_almacen(datos: dict, db=Depends(get_db)):
         raise HTTPException(status_code=409, detail="Ya existe un almacén con ese nombre")
 
 
-@app.get("/apis/v2/almacenes")
+@app.get("/almacenes")
+@app.get(f"{API_V2_PREFIX}/almacenes")
 def listar_almacenes(db=Depends(get_db)):
     resultado = db.execute(
         "SELECT id, nombre, ubicacion FROM almacenes ORDER BY id;"
@@ -177,7 +205,8 @@ def listar_almacenes(db=Depends(get_db)):
     return resultado.fetchall()
 
 
-@app.get("/apis/v2/almacenes/{almacen_id}")
+@app.get("/almacenes/{almacen_id}")
+@app.get(f"{API_V2_PREFIX}/almacenes/{{almacen_id}}")
 def consultar_almacen(almacen_id: int, db=Depends(get_db)):
     resultado = db.execute(
         "SELECT id, nombre, ubicacion FROM almacenes WHERE id = %s;",
@@ -191,7 +220,8 @@ def consultar_almacen(almacen_id: int, db=Depends(get_db)):
     return almacen
 
 
-@app.put("/apis/v2/almacenes/{almacen_id}")
+@app.put("/almacenes/{almacen_id}")
+@app.put(f"{API_V2_PREFIX}/almacenes/{{almacen_id}}")
 def actualizar_almacen(almacen_id: int, datos: dict, db=Depends(get_db)):
     nombre, ubicacion = validar_datos_almacen(datos)
 
@@ -216,7 +246,8 @@ def actualizar_almacen(almacen_id: int, datos: dict, db=Depends(get_db)):
         raise HTTPException(status_code=409, detail="Ya existe un almacén con ese nombre")
 
 
-@app.delete("/apis/v2/almacenes/{almacen_id}", status_code=status.HTTP_204_NO_CONTENT)
+@app.delete("/almacenes/{almacen_id}", status_code=status.HTTP_204_NO_CONTENT)
+@app.delete(f"{API_V2_PREFIX}/almacenes/{{almacen_id}}", status_code=status.HTTP_204_NO_CONTENT)
 def eliminar_almacen(almacen_id: int, db=Depends(get_db)):
     resultado = db.execute(
         "DELETE FROM almacenes WHERE id = %s RETURNING id;",
@@ -301,7 +332,8 @@ def validar_stock_resultante(stock_actual: int, tipo: str, cantidad: int):
         raise HTTPException(status_code=400, detail="El movimiento dejaría el inventario en negativo")
 
 
-@app.post("/apis/v2/movimientos", status_code=status.HTTP_201_CREATED)
+@app.post("/movimientos", status_code=status.HTTP_201_CREATED)
+@app.post(f"{API_V2_PREFIX}/movimientos", status_code=status.HTTP_201_CREATED)
 def crear_movimiento(datos: dict, db=Depends(get_db)):
     sku_id, almacen_id, tipo, cantidad, motivo = validar_datos_movimiento(datos)
     verificar_sku_y_almacen(db, sku_id, almacen_id)
@@ -322,7 +354,8 @@ def crear_movimiento(datos: dict, db=Depends(get_db)):
     return movimiento
 
 
-@app.get("/apis/v2/movimientos")
+@app.get("/movimientos")
+@app.get(f"{API_V2_PREFIX}/movimientos")
 def listar_movimientos(
     sku_id: int | None = None,
     almacen_id: int | None = None,
@@ -361,7 +394,8 @@ def listar_movimientos(
     return resultado.fetchall()
 
 
-@app.get("/apis/v2/movimientos/{movimiento_id}")
+@app.get("/movimientos/{movimiento_id}")
+@app.get(f"{API_V2_PREFIX}/movimientos/{{movimiento_id}}")
 def consultar_movimiento(movimiento_id: int, db=Depends(get_db)):
     resultado = db.execute(
         """
@@ -379,7 +413,8 @@ def consultar_movimiento(movimiento_id: int, db=Depends(get_db)):
     return movimiento
 
 
-@app.put("/apis/v2/movimientos/{movimiento_id}")
+@app.put("/movimientos/{movimiento_id}")
+@app.put(f"{API_V2_PREFIX}/movimientos/{{movimiento_id}}")
 def actualizar_movimiento(movimiento_id: int, datos: dict, db=Depends(get_db)):
     sku_id, almacen_id, tipo, cantidad, motivo = validar_datos_movimiento(datos)
     movimiento_actual = db.execute(
@@ -418,7 +453,8 @@ def actualizar_movimiento(movimiento_id: int, datos: dict, db=Depends(get_db)):
     return resultado.fetchone()
 
 
-@app.delete("/apis/v2/movimientos/{movimiento_id}", status_code=status.HTTP_204_NO_CONTENT)
+@app.delete("/movimientos/{movimiento_id}", status_code=status.HTTP_204_NO_CONTENT)
+@app.delete(f"{API_V2_PREFIX}/movimientos/{{movimiento_id}}", status_code=status.HTTP_204_NO_CONTENT)
 def eliminar_movimiento(movimiento_id: int, db=Depends(get_db)):
     movimiento = db.execute(
         """
@@ -480,12 +516,14 @@ def validar_filtros_inventario(filtros: dict):
     return sku_id, almacen_id, tipo, fecha_desde, fecha_hasta, solo_stock_bajo
 
 
-@app.options("/apis/v2/inventario/query")
+@app.options("/inventario/query")
+@app.options(f"{API_V2_PREFIX}/inventario/query")
 def opciones_query():
     return Response(headers={"Accept-Query": "application/json"})
 
 
-@app.api_route("/apis/v2/inventario/query", methods=["QUERY"])
+@app.api_route("/inventario/query", methods=["QUERY"])
+@app.api_route(f"{API_V2_PREFIX}/inventario/query", methods=["QUERY"])
 def consultar_inventario(filtros: dict, db=Depends(get_db)):
     sku_id, almacen_id, tipo, fecha_desde, fecha_hasta, solo_stock_bajo = (
         validar_filtros_inventario(filtros)
@@ -549,3 +587,46 @@ def consultar_inventario(filtros: dict, db=Depends(get_db)):
     )
 
     return {"resultados": resultado.fetchall()}
+
+
+@app.get(f"{API_V2_PREFIX}/integracion")
+def consultar_integracion(
+    request: Request,
+    sku_id: int,
+    almacen_id: int,
+    deportista_id: str,
+    articulo_id: int,
+    db=Depends(get_db),
+):
+    """Combina entidades propietarias sin persistir datos externos."""
+    trace_id = request.state.trace_id
+    inventario = consultar_inventario(
+        {"sku_id": sku_id, "almacen_id": almacen_id},
+        db,
+    )
+    if not inventario["resultados"]:
+        raise HTTPException(status_code=404, detail="No se encontró inventario para el SKU y almacén")
+
+    try:
+        # Se usan rutas propietarias V1: las V2 externas ya integran a otros
+        # servicios y producirían una dependencia circular.
+        deportista = obtener_deportista(deportista_id, trace_id)
+        articulo = obtener_articulo(articulo_id, trace_id)
+    except ExternalApiError as error:
+        logger.warning(
+            "Integración externa fallida: %s",
+            error.detail,
+            extra={"trace_id": trace_id, "service": error.service},
+        )
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail={"service": error.service, "message": error.detail, "trace_id": trace_id},
+        )
+
+    logger.info("Integración completada", extra={"trace_id": trace_id})
+    return {
+        "trace_id": trace_id,
+        "inventario": inventario["resultados"][0],
+        "deportista": deportista,
+        "articulo": articulo,
+    }

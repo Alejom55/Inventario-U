@@ -4,7 +4,19 @@ API para administrar inventario entre varios almacenes.
 
 ## Versionamiento
 
-Todos los endpoints públicos usan el prefijo `/apis/v2`.
+La API original se conserva sin prefijo (`/skus`, `/almacenes`, `/movimientos`
+e `/inventario/query`). La versión 2 expone las mismas operaciones bajo
+`/api/v2` y añade trazabilidad e integración externa.
+
+`GET /api/v2/health` responde:
+
+```json
+{
+  "status": "ok",
+  "version": "2.0.0",
+  "service": "inventario-u"
+}
+```
 
 ## Objetivo
 
@@ -57,11 +69,30 @@ docker compose up --build
 
 1. Copia `.env.example` como `.env`.
 2. Ajusta `DATABASE_URL` con las credenciales de tu PostgreSQL local.
-3. No subas `.env` al repositorio: contiene valores específicos de cada ambiente.
+3. Define `DEPORTBACK_API_URL` y `FASTIFY_API_URL` con las URL base de los
+   servicios de los compañeros.
+4. No subas `.env` al repositorio: contiene valores específicos de cada ambiente.
+
+## Integración V2 y trazabilidad
+
+`GET /api/v2/integracion` combina un inventario local con un deportista y un
+artículo obtenidos en tiempo real desde sus APIs propietarias. Requiere los
+parámetros `sku_id`, `almacen_id`, `deportista_id` y `articulo_id`.
+
+```bash
+curl "http://127.0.0.1:8000/api/v2/integracion?sku_id=1&almacen_id=1&deportista_id=<uuid>&articulo_id=1" \
+  -H "X-Trace-Id: demo-123"
+```
+
+La respuesta conserva o genera `X-Trace-Id`, lo devuelve en el encabezado y
+en el cuerpo, y lo reenvía a ambos servicios externos. Si alguno falla o se
+agota el tiempo de espera, el endpoint responde `502` con el servicio y la
+causa; no persiste los datos externos.
 
 ## Consulta de inventario con HTTP QUERY
 
-La API admite el método HTTP `QUERY` en `/apis/v2/inventario/query`. Este método solo consulta: no crea, modifica ni elimina datos.
+La API admite el método HTTP `QUERY` en `/inventario/query` y
+`/api/v2/inventario/query`. Este método solo consulta: no crea, modifica ni elimina datos.
 
 Envía un body JSON con filtros opcionales:
 
@@ -79,7 +110,7 @@ Envía un body JSON con filtros opcionales:
 El resultado muestra el stock total disponible de cada SKU por almacén. Si filtras por tipo o fecha, se muestran únicamente las combinaciones que tengan movimientos que coincidan con ese filtro, pero el stock sigue calculándose con todo el historial.
 
 ```bash
-curl -X QUERY http://127.0.0.1:8000/apis/v2/inventario/query \
+curl -X QUERY http://127.0.0.1:8000/api/v2/inventario/query \
   -H "Content-Type: application/json" \
   -d "{\"almacen_id\": 1, \"solo_stock_bajo\": true}"
 ```
@@ -87,7 +118,7 @@ curl -X QUERY http://127.0.0.1:8000/apis/v2/inventario/query \
 Puedes verificar los formatos aceptados con:
 
 ```bash
-curl -X OPTIONS -i http://127.0.0.1:8000/apis/v2/inventario/query
+curl -X OPTIONS -i http://127.0.0.1:8000/api/v2/inventario/query
 ```
 
 La respuesta incluye el encabezado `Accept-Query: application/json`.
@@ -115,7 +146,7 @@ docker compose up --build
 Cuando ambos contenedores estén listos, comprueba la API:
 
 ```bash
-curl http://127.0.0.1:8000/apis/v2/health
+curl http://127.0.0.1:8000/api/v2/health
 ```
 
 Para detener los contenedores:
