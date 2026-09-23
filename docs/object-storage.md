@@ -143,6 +143,50 @@ OCI puede ocultar la existencia de recursos por permisos. Un `404` ambiguo de
 OCI no se presenta como objeto ausente. No se publican mensajes originales,
 credenciales ni cabeceras del SDK; los logs de error incluyen `trace_id`.
 
+## Listar todo el bucket
+
+`GET /api/v2/storage` muestra los objetos actuales de todo el bucket configurado,
+incluidos los que no pertenecen a `flujos/`. Devuelve nombre, tamaño en bytes,
+fecha de creación y modificación; no descarga el contenido de cada archivo ni
+enumera otros buckets o versiones históricas.
+
+```powershell
+Invoke-RestMethod -Uri 'http://127.0.0.1:8000/api/v2/storage?limit=100' -Headers $headers
+```
+
+Respuesta:
+
+```json
+{
+  "bucket": "mi-bucket",
+  "objects": [
+    {
+      "object_name": "flujos/abc-123.json",
+      "size": 123,
+      "time_created": "2026-09-23T12:00:00Z",
+      "time_modified": "2026-09-23T12:00:00Z"
+    }
+  ],
+  "next_start": null
+}
+```
+
+Parámetros: `limit` entre 1 y 1000 (100 por defecto), `prefix` opcional para
+filtrar por nombre y `start` para continuar. Si `next_start` no es null, envíalo
+como `start` en la siguiente petición, codificado como parámetro URL y manteniendo
+el mismo prefijo. Repite hasta que sea null. Ejemplo de filtro:
+`GET /api/v2/storage?prefix=flujos%2F&limit=100`.
+
+Para leer el JSON de un flujo, conserva `GET /api/v2/storage/{trace_id}`.
+El listado reutiliza `X-Api-Key` y `X-Trace-Id` del middleware existente.
+
+La identidad OCI necesita también `OBJECT_INSPECT`. Si usaste la política
+restringida anterior, añade `request.permission='OBJECT_INSPECT'` al bloque
+`any`, conservando la restricción al bucket. Sin ese permiso, el listado puede
+responder 503 aunque guardar y recuperar funcionen. Consulta
+[ListObjects del SDK oficial](https://docs.oracle.com/en-us/iaas/tools/python/latest/api/object_storage/client/oci.object_storage.ObjectStorageClient.html#oci.object_storage.ObjectStorageClient.list_objects)
+y los permisos IAM enlazados anteriormente.
+
 ## Reutilización desde integración
 
 `GET /api/v2/integracion` no escribe en OCI. Cuando se decida habilitarlo, puede

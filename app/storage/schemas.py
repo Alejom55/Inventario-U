@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Annotated, Any, Literal
 
 from pydantic import BaseModel, Field
@@ -17,3 +18,16 @@ class JsonGuardado(BaseModel):
     object_name: str
     bucket: str
     status: Literal["stored"] = "stored"
+
+
+class ObjetoStorage(BaseModel):
+    object_name: str
+    size: int | None = None
+    time_created: datetime | None = None
+    time_modified: datetime | None = None
+
+
+class ListadoStorage(BaseModel):
+    bucket: str
+    objects: list[ObjetoStorage]
+    next_start: str | None = None

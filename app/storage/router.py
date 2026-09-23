@@ -1,8 +1,8 @@
 import logging
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 
-from .schemas import GuardarJsonRequest, JsonGuardado, TraceId
+from .schemas import GuardarJsonRequest, JsonGuardado, ListadoStorage, TraceId
 from .service import ObjectStorageService, StorageError, get_storage_service, nombre_objeto, traducir_error
 
 
@@ -38,6 +38,21 @@ def guardar_json(
         nombre_objeto(trace_id)
         request.state.trace_id = trace_id
         return storage.guardar_json(trace_id, datos.data)
+    except StorageError as error:
+        raise error_http(error, request) from None
+
+
+@router.get("/storage", response_model=ListadoStorage)
+def listar_storage(
+    request: Request,
+    limit: int = Query(100, ge=1, le=1000, description="Máximo de objetos por página"),
+    prefix: str = Query("", max_length=1024, description="Prefijo opcional, por ejemplo flujos/"),
+    start: str | None = Query(None, min_length=1, max_length=1024, description="next_start de la página anterior"),
+    storage: ObjectStorageService = Depends(storage_dependency),
+) -> ListadoStorage:
+    """Lista los objetos del bucket configurado; continúa con next_start hasta que sea null."""
+    try:
+        return storage.listar_objetos(request.state.trace_id, limit=limit, prefix=prefix, start=start)
     except StorageError as error:
         raise error_http(error, request) from None
 

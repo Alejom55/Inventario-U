@@ -8,7 +8,7 @@ from typing import Any
 
 import oci
 
-from .schemas import TRACE_ID_PATTERN, JsonGuardado
+from .schemas import TRACE_ID_PATTERN, JsonGuardado, ListadoStorage, ObjetoStorage
 
 
 logger = logging.getLogger(__name__)
@@ -78,6 +78,34 @@ class ObjectStorageService:
     def __init__(self, config: StorageConfig, client: Any):
         self.config = config
         self.client = client
+
+    def listar_objetos(
+        self, trace_id: str, *, limit: int = 100, prefix: str = "", start: str | None = None,
+    ) -> ListadoStorage:
+        """Lista una página de objetos actuales del bucket sin descargar su contenido."""
+        try:
+            response = self.client.list_objects(
+                namespace_name=self.config.namespace,
+                bucket_name=self.config.bucket,
+                limit=limit,
+                prefix=prefix,
+                start=start,
+                fields="name,size,timeCreated,timeModified",
+                opc_client_request_id=trace_id,
+            )
+            return ListadoStorage(
+                bucket=self.config.bucket,
+                objects=[
+                    ObjetoStorage(
+                        object_name=obj.name, size=obj.size,
+                        time_created=obj.time_created, time_modified=obj.time_modified,
+                    )
+                    for obj in response.data.objects
+                ],
+                next_start=response.data.next_start_with,
+            )
+        except Exception as error:
+            raise traducir_error(error, trace_id) from None
 
     def guardar_json(self, trace_id: str, contenido: dict[str, Any]) -> JsonGuardado:
         object_name = nombre_objeto(trace_id)

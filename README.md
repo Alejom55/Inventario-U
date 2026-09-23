@@ -4,6 +4,7 @@ API para administrar inventario entre varios almacenes.
 
 ## Object Storage V2
 
+`GET /api/v2/storage` lista el bucket con paginación y filtro opcional por prefijo.
 `POST /api/v2/storage` guarda JSON en OCI y `GET /api/v2/storage/{trace_id}` lo
 recupera. Reutiliza la API key y trazabilidad existentes. Consulta la
 [guía de Object Storage](docs/object-storage.md) para configurar autenticación,
