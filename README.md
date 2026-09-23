@@ -2,6 +2,13 @@
 
 API para administrar inventario entre varios almacenes.
 
+## Object Storage V2
+
+`POST /api/v2/storage` guarda JSON en OCI y `GET /api/v2/storage/{trace_id}` lo
+recupera. Reutiliza la API key y trazabilidad existentes. Consulta la
+[guía de Object Storage](docs/object-storage.md) para configurar autenticación,
+crear el bucket, probar las rutas y ejecutar las pruebas sin credenciales OCI.
+
 ## Versionamiento
 
 La API original se conserva sin prefijo (`/skus`, `/almacenes`, `/movimientos`

@@ -13,6 +13,7 @@ from .integrations.deportback_client import obtener_deportista
 from .integrations.external_api import ExternalApiError
 from .integrations.fastify_client import obtener_articulo
 from .schema import crear_tabla_almacenes, crear_tabla_movimientos, crear_tabla_skus
+from .storage.router import router as storage_router
 
 
 logger = logging.getLogger(__name__)
@@ -25,6 +26,7 @@ app = FastAPI(
     version="2.0.0",
     description="API para la gestión de SKU, almacenes y movimientos de inventario.",
 )
+app.include_router(storage_router, prefix=API_V2_PREFIX)
 
 
 @app.on_event("startup")
@@ -54,7 +56,7 @@ async def agregar_trace_id(request: Request, call_next):
         return response
 
     response = await call_next(request)
-    response.headers["X-Trace-Id"] = trace_id
+    response.headers["X-Trace-Id"] = request.state.trace_id
     return response
 
 
