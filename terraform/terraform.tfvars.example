@@ -1,0 +1,8 @@
+tenancy_ocid            = "ocid1.tenancy.oc1..REPLACE"
+parent_compartment_ocid = "ocid1.tenancy.oc1..REPLACE"
+region                 = "sa-bogota-1"
+project_name           = "inventario-u-s3"
+api_allowed_cidr       = "203.0.113.10/32" # Sustituir por tu IP publica real.
+deportback_api_url      = ""
+fastify_api_url         = ""
+# TEAM_API_KEY opcional se pasa con TF_VAR_team_api_key, no se guarda aqui.
