@@ -1,0 +1,75 @@
+name: Validacion OCI
+
+on:
+  push:
+    paths:
+      - 'terraform/**'
+      - 'deploy/**'
+      - 'scripts/**'
+      - 'tests/**'
+      - 'app/**'
+      - 'Dockerfile'
+      - 'pyproject.toml'
+      - 'uv.lock'
+      - '.github/workflows/*oci.yml'
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: inventario
+          POSTGRES_PASSWORD: local-test-only
+          POSTGRES_DB: inventario_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U inventario -d inventario_test"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      TEST_DATABASE_URL: postgresql://inventario:local-test-only@127.0.0.1:5432/inventario_test
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - uses: astral-sh/setup-uv@v9.0.0
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.16.5'
+          terraform_wrapper: false
+      - name: Dependencias y pruebas con PostgreSQL
+        run: |
+          uv sync --frozen --group dev
+          uv run --frozen pytest --cov-fail-under=85
+      - name: Terraform y pruebas sin cuenta OCI
+        run: |
+          terraform -chdir=terraform fmt -check -recursive
+          terraform -chdir=terraform init -backend=false -input=false -lockfile=readonly
+          terraform -chdir=terraform validate
+          terraform -chdir=terraform test
+          terraform -chdir=terraform/bootstrap init -input=false -lockfile=readonly
+          terraform -chdir=terraform/bootstrap validate
+      - name: Sintaxis Bash
+        run: |
+          for script in deploy/*.sh scripts/*oci.sh; do bash -n "$script"; done
+      - name: Construir imagen API
+        run: docker build --tag inventario-api:validation .
+      - name: Validar Docker Compose con valores ficticios
+        env:
+          APP_REVISION: validation
+          POSTGRES_PASSWORD: local-test-only
+          TEAM_API_KEY: local-validation-key-only
+          OCI_REGION: sa-bogota-1
+          OCI_NAMESPACE: validation
+          OCI_BUCKET_NAME: validation-json
+        run: docker compose -f deploy/compose.oci.yml config --quiet
