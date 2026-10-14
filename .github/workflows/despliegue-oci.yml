@@ -1,0 +1,122 @@
+name: Infraestructura y API en OCI
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: Operacion Terraform
+        type: choice
+        options: [plan, deploy, destroy]
+        default: plan
+        required: true
+      confirmation:
+        description: 'Para destroy escribe ELIMINAR: borra PostgreSQL y JSON'
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: inventario-oci-infrastructure
+  cancel-in-progress: false
+
+jobs:
+  quality:
+    if: inputs.action != 'destroy'
+    uses: ./.github/workflows/validacion-oci.yml
+  infrastructure:
+    needs: quality
+    if: ${{ !cancelled() && (needs.quality.result == 'success' || inputs.action == 'destroy') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    environment: oci-demo
+    env:
+      TF_IN_AUTOMATION: 'true'
+      TF_INPUT: 'false'
+      TF_VAR_tenancy_ocid: ${{ secrets.OCI_TENANCY_OCID }}
+      TF_VAR_parent_compartment_ocid: ${{ secrets.OCI_PARENT_COMPARTMENT_OCID || secrets.OCI_TENANCY_OCID }}
+      TF_VAR_region: ${{ vars.OCI_REGION || 'sa-bogota-1' }}
+      TF_VAR_api_allowed_cidr: ${{ vars.OCI_API_ALLOWED_CIDR }}
+      TF_VAR_deportback_api_url: ${{ vars.DEPORTBACK_API_URL }}
+      TF_VAR_fastify_api_url: ${{ vars.FASTIFY_API_URL }}
+      TF_VAR_team_api_key: ${{ secrets.TEAM_API_KEY }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - uses: astral-sh/setup-uv@v9.0.0
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.16.5'
+          terraform_wrapper: false
+      - name: Preparar acceso OCI del runner
+        env:
+          OCI_USER_OCID: ${{ secrets.OCI_USER_OCID }}
+          OCI_FINGERPRINT: ${{ secrets.OCI_FINGERPRINT }}
+          OCI_PRIVATE_KEY: ${{ secrets.OCI_PRIVATE_KEY }}
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          os.umask(0o077)
+          folder = Path.home() / '.oci'
+          folder.mkdir(mode=0o700, exist_ok=True)
+          key = folder / 'api_key.pem'
+          key.write_text(os.environ['OCI_PRIVATE_KEY'], encoding='utf-8')
+          values = {
+              'user': os.environ['OCI_USER_OCID'],
+              'tenancy': os.environ['TF_VAR_tenancy_ocid'],
+              'fingerprint': os.environ['OCI_FINGERPRINT'],
+              'region': os.environ['TF_VAR_region'],
+              'key_file': str(key),
+          }
+          assert all(value and '\n' not in value and '\r' not in value for value in values.values()), 'Faltan secrets OCI validos'
+          (folder / 'config').write_text('[DEFAULT]\n' + ''.join(f'{k}={v}\n' for k, v in values.items()), encoding='utf-8')
+          PY
+          uv sync --frozen --no-dev
+      - name: Inicializar estado remoto con bloqueo
+        env:
+          STATE_BUCKET: ${{ vars.OCI_STATE_BUCKET || 'inventario-u-tfstate' }}
+          STATE_NAMESPACE: ${{ vars.OCI_NAMESPACE }}
+        run: |
+          test -n "$STATE_NAMESPACE"
+          terraform -chdir=terraform init -input=false -lockfile=readonly \
+            -backend-config="bucket=$STATE_BUCKET" \
+            -backend-config="namespace=$STATE_NAMESPACE" \
+            -backend-config="region=$TF_VAR_region"
+          terraform -chdir=terraform validate
+      - name: Plan de infraestructura
+        if: inputs.action != 'destroy'
+        run: terraform -chdir=terraform plan -lock-timeout=5m -out=deploy.tfplan
+      - name: Crear infraestructura
+        if: inputs.action == 'deploy'
+        run: terraform -chdir=terraform apply -lock-timeout=5m deploy.tfplan
+      - name: Instalar API y comprobar PostgreSQL y Object Storage
+        if: inputs.action == 'deploy'
+        run: |
+          uv run --frozen python scripts/deploy_oci.py \
+            --instance-id "$(terraform -chdir=terraform output -raw instance_id)" \
+            --compartment-id "$(terraform -chdir=terraform output -raw compartment_id)" \
+            --revision "$GITHUB_SHA"
+          terraform -chdir=terraform output -raw api_url >> "$GITHUB_STEP_SUMMARY"
+      - name: Eliminar infraestructura de la demo
+        if: inputs.action == 'destroy'
+        env:
+          CONFIRMATION: ${{ inputs.confirmation }}
+        run: |
+          test "$CONFIRMATION" = ELIMINAR || { echo 'Falta confirmacion ELIMINAR'; exit 1; }
+          terraform -chdir=terraform plan -destroy -lock-timeout=5m -out=destroy.tfplan
+          uv run --frozen python scripts/cleanup_oci.py \
+            --instance-id "$(terraform -chdir=terraform output -raw instance_id)" \
+            --compartment-id "$(terraform -chdir=terraform output -raw compartment_id)" \
+            --namespace "$(terraform -chdir=terraform output -raw namespace)" \
+            --bucket "$(terraform -chdir=terraform output -raw bucket_name)" \
+            --confirm "$(terraform -chdir=terraform output -raw bucket_name)"
+          terraform -chdir=terraform apply -lock-timeout=5m destroy.tfplan
+      - name: Retirar credenciales y planes del runner
+        if: always()
+        run: |
+          rm -f "$HOME/.oci/api_key.pem" "$HOME/.oci/config"
+          rm -f terraform/deploy.tfplan terraform/destroy.tfplan
