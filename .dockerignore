@@ -8,3 +8,14 @@ __pycache__/
 tests/
 htmlcov/
 coverage.xml
+terraform/
+deploy/
+scripts/
+docs/
+.github/
+*.tfstate*
+*.tfvars*
+*.tfplan
+*.pem
+*.key
+.oci/

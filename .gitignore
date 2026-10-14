@@ -9,3 +9,13 @@ htmlcov/
 *.pem
 *.key
 indicaciones.md
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+*.tfvars.json
+backend.hcl
+crash.log
+deploy/*.env
+.uv-cache/
