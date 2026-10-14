@@ -1,0 +1,51 @@
+name: inventario-oci
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: inventario
+      POSTGRES_USER: inventario
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?required}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U inventario -d inventario]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"
+  api:
+    image: inventario-api:${APP_REVISION:?required}
+    build:
+      context: ..
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://inventario:${POSTGRES_PASSWORD:?required}@db:5432/inventario
+      TEAM_API_KEY: ${TEAM_API_KEY:?required}
+      DEPORTBACK_API_URL: ${DEPORTBACK_API_URL:-}
+      FASTIFY_API_URL: ${FASTIFY_API_URL:-}
+      OCI_REGION: ${OCI_REGION:?required}
+      OCI_NAMESPACE: ${OCI_NAMESPACE:?required}
+      OCI_BUCKET_NAME: ${OCI_BUCKET_NAME:?required}
+      OCI_AUTH_MODE: instance_principals
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, /app/.venv/bin/python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v2/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"
+volumes:
+  postgres_data:
