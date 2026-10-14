@@ -1,0 +1,4 @@
+bucket    = "inventario-u-tfstate"
+namespace = "REPLACE_WITH_OBJECT_STORAGE_NAMESPACE"
+region    = "sa-bogota-1"
+# Usa ~/.oci/config; nunca incluyas claves privadas en este archivo.
