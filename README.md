@@ -2,6 +2,14 @@
 
 API para administrar inventario entre varios almacenes.
 
+## Entrega 3: infraestructura con Terraform
+
+La [guía de Terraform y OCI](terraform/readme.md) explica cómo crear Compute,
+VCN, Object Storage y Vault, instalar esta API y PostgreSQL, validar el resultado
+y eliminar la demo. El nuevo pipeline `Infraestructura y API en OCI` es manual;
+`Validacion OCI` comprueba código, Terraform y Docker sin credenciales de nube.
+Los pipelines anteriores de Railway y Render se conservan.
+
 ## Object Storage V2
 
 `GET /api/v2/storage` lista el bucket con paginación y filtro opcional por prefijo.
