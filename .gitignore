@@ -2,6 +2,8 @@
 __pycache__/
 *.py[cod]
 .env
+.env.*
+!.env.example
 .pytest_cache/
 .coverage
 htmlcov/
@@ -13,9 +15,12 @@ indicaciones.md
 *.tfstate
 *.tfstate.*
 *.tfplan
+*.tfplan.*
+*.tfbackend
 *.tfvars
 *.tfvars.json
 backend.hcl
 crash.log
+crash.*.log
 deploy/*.env
 .uv-cache/

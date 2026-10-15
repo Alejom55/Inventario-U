@@ -19,6 +19,7 @@ variables {
   tenancy_ocid            = "ocid1.tenancy.oc1..test"
   parent_compartment_ocid = "ocid1.tenancy.oc1..test"
   api_allowed_cidr        = "203.0.113.10/32"
+  compute_shape           = "VM.Standard.A1.Flex"
 }
 
 run "small_private_infrastructure" {
@@ -53,6 +54,15 @@ run "reject_public_access" {
   command = plan
   variables { api_allowed_cidr = "0.0.0.0/0" }
   expect_failures = [var.api_allowed_cidr]
+}
+
+run "explicit_e5_uses_compatible_image" {
+  command = plan
+  variables { compute_shape = "VM.Standard.E5.Flex" }
+  assert {
+    condition     = oci_core_instance.api.shape == "VM.Standard.E5.Flex" && data.oci_core_images.oracle_linux.shape == oci_core_instance.api.shape
+    error_message = "La imagen debe corresponder a la arquitectura de la VM elegida."
+  }
 }
 
 run "reject_weak_shared_key" {

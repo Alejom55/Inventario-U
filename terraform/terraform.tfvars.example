@@ -2,6 +2,7 @@ tenancy_ocid            = "ocid1.tenancy.oc1..REPLACE"
 parent_compartment_ocid = "ocid1.tenancy.oc1..REPLACE"
 region                 = "sa-bogota-1"
 project_name           = "inventario-u-s3"
+# Solo con presupuesto autorizado: compute_shape = "VM.Standard.E5.Flex"
 api_allowed_cidr       = "203.0.113.10/32" # Sustituir por tu IP publica real.
 deportback_api_url      = ""
 fastify_api_url         = ""

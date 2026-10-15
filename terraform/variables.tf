@@ -22,6 +22,16 @@ variable "region" {
   default     = "sa-bogota-1"
 }
 
+variable "compute_shape" {
+  description = "A1 por defecto. E5 es facturable y requiere autorizacion de presupuesto."
+  type        = string
+  default     = "VM.Standard.A1.Flex"
+  validation {
+    condition     = contains(["VM.Standard.A1.Flex", "VM.Standard.E5.Flex"], var.compute_shape)
+    error_message = "Usa A1 o E5; E5 requiere presupuesto autorizado."
+  }
+}
+
 variable "project_name" {
   type    = string
   default = "inventario-u-s3"

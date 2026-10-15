@@ -2,7 +2,7 @@ data "oci_core_images" "oracle_linux" {
   compartment_id           = var.parent_compartment_ocid
   operating_system         = "Oracle Linux"
   operating_system_version = "9"
-  shape                    = "VM.Standard.A1.Flex"
+  shape                    = var.compute_shape
   sort_by                  = "TIMECREATED"
   sort_order               = "DESC"
 }
@@ -11,7 +11,7 @@ resource "oci_core_instance" "api" {
   compartment_id       = oci_identity_compartment.project.id
   availability_domain  = data.oci_identity_availability_domains.available.availability_domains[0].name
   display_name         = var.project_name
-  shape                = "VM.Standard.A1.Flex"
+  shape                = var.compute_shape
   preserve_boot_volume = false
 
   shape_config {

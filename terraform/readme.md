@@ -7,7 +7,7 @@ las rutas V1/V2, Object Storage y las integraciones externas de la entrega 2.
 
 | Servicio OCI | Archivo | Uso real |
 | --- | --- | --- |
-| Compute | `compute.tf` | Oracle Linux 9 ARM: API y PostgreSQL 16 con Docker |
+| Compute | `compute.tf` | Oracle Linux 9: API y PostgreSQL 16 con Docker |
 | Networking / VCN | `network.tf` | Red, subred, salida a Internet y acceso restringido a API |
 | Object Storage | `storage.tf` | JSON de `/api/v2/storage` en bucket privado |
 | Vault | `vault.tf`, `database.tf` | Clave compartida y contraseña de PostgreSQL |
@@ -23,7 +23,13 @@ La VM usa 1 OCPU ARM, 6 GB RAM y 50 GB de disco; Vault es `DEFAULT`, con clave
 `SOFTWARE`. No se crean balanceadores, NAT Gateway ni base administrada de pago.
 La elegibilidad Always Free depende de **home region, cuotas globales y capacidad**.
 Revisa también recursos en otros compartimentos. No cambies automáticamente de
-shape por falta de capacidad. Terraform plan no calcula costos. Los créditos
+shape por falta de capacidad. Si el titular autoriza una demo facturable,
+`compute_shape = "VM.Standard.E5.Flex"` selecciona AMD y una imagen compatible;
+mantiene 1 OCPU, 6 GB y 50 GB de disco. El pipeline debe recibir también
+`OCI_COMPUTE_SHAPE=VM.Standard.E5.Flex` para no intentar volver a A1. E5 no es
+Always Free: detener la instancia al terminar las pruebas y eliminar después
+los recursos que ya no hagan falta; el almacenamiento puede seguir facturando.
+Terraform plan no calcula costos. Los créditos
 temporales de Free Trial no equivalen a gratuidad permanente.
 
 ## Requisitos
@@ -146,6 +152,7 @@ Crea el environment `oci-demo` y configura:
 | Variable | `OCI_NAMESPACE` | Namespace mostrado por bootstrap |
 | Variable | `OCI_API_ALLOWED_CIDR` | IP/red permitida |
 | Variable opcional | `OCI_REGION` | Por defecto `sa-bogota-1` |
+| Variable opcional | `OCI_COMPUTE_SHAPE` | Por defecto A1; E5 solo con presupuesto autorizado |
 | Variable opcional | `OCI_STATE_BUCKET` | Por defecto `inventario-u-tfstate` |
 | Variables opcionales | `DEPORTBACK_API_URL`, `FASTIFY_API_URL` | URLs HTTPS |
 
