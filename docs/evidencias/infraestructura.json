@@ -1,0 +1,107 @@
+{
+  "checked_at_utc": "2026-10-15T02:01:07.106411+00:00",
+  "source": "Terraform remote state filtered; Compute state verified live using OCI SDK",
+  "result": "deployed and tested successfully; VM stopped after tests",
+  "region": "sa-bogota-1",
+  "resources": [
+    {
+      "resource": "oci_core_instance.api",
+      "type": "oci_core_instance",
+      "name": "inventario-u-s3",
+      "state": "STOPPED"
+    },
+    {
+      "resource": "oci_core_internet_gateway.project",
+      "type": "oci_core_internet_gateway",
+      "name": "inventario-u-s3-internet",
+      "state": "AVAILABLE"
+    },
+    {
+      "resource": "oci_core_route_table.public",
+      "type": "oci_core_route_table",
+      "name": "routetable20261015012359",
+      "state": "AVAILABLE"
+    },
+    {
+      "resource": "oci_core_security_list.api",
+      "type": "oci_core_security_list",
+      "name": "inventario-u-s3-api",
+      "state": "AVAILABLE"
+    },
+    {
+      "resource": "oci_core_subnet.api",
+      "type": "oci_core_subnet",
+      "name": "inventario-u-s3-api",
+      "state": "AVAILABLE"
+    },
+    {
+      "resource": "oci_core_vcn.project",
+      "type": "oci_core_vcn",
+      "name": "inventario-u-s3",
+      "state": "AVAILABLE"
+    },
+    {
+      "resource": "oci_identity_compartment.project",
+      "type": "oci_identity_compartment",
+      "name": "inventario-u-s3",
+      "state": "ACTIVE"
+    },
+    {
+      "resource": "oci_identity_dynamic_group.api",
+      "type": "oci_identity_dynamic_group",
+      "name": "inventario-u-s3-instances",
+      "state": "ACTIVE"
+    },
+    {
+      "resource": "oci_identity_policy.api",
+      "type": "oci_identity_policy",
+      "name": "inventario-u-s3-runtime",
+      "state": "ACTIVE"
+    },
+    {
+      "resource": "oci_kms_key.secrets",
+      "type": "oci_kms_key",
+      "name": "inventario-u-s3-secrets",
+      "state": "ENABLED"
+    },
+    {
+      "resource": "oci_kms_vault.project",
+      "type": "oci_kms_vault",
+      "name": "inventario-u-s3",
+      "state": "ACTIVE"
+    },
+    {
+      "resource": "oci_objectstorage_bucket.api",
+      "type": "oci_objectstorage_bucket",
+      "name": "inventario-u-s3-json",
+      "state": null
+    },
+    {
+      "resource": "oci_vault_secret.database",
+      "type": "oci_vault_secret",
+      "name": "inventario-u-s3-postgres",
+      "state": "ACTIVE"
+    },
+    {
+      "resource": "oci_vault_secret.team",
+      "type": "oci_vault_secret",
+      "name": "inventario-u-s3-team-api-key",
+      "state": "ACTIVE"
+    },
+    {
+      "resource": "random_password.database",
+      "type": "random_password",
+      "name": null,
+      "state": null
+    },
+    {
+      "resource": "random_password.team",
+      "type": "random_password",
+      "name": null,
+      "state": null
+    }
+  ],
+  "api_deployed": true,
+  "pipeline_deployment_verified": true,
+  "api_runtime_commit": "4e8d5d15ff5e6913f62592cc93ce94a19a7bf744"
+}

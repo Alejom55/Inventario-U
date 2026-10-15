@@ -1,0 +1,12 @@
+{
+  "requested_at": "2026-10-15T02:00:23.820111+00:00",
+  "action": "SOFTSTOP",
+  "instance_id": "ocid1.instance.oc1.sa-bogota-1.anrgcljrkuqy2gico74th4xrb7sff2zpfz7npb5s73nhdynurqvwlayi6u7a",
+  "state_before": "RUNNING",
+  "created_at": "2026-10-15 01:34:47.357000+00:00",
+  "shape": "VM.Standard.E5.Flex",
+  "ocpus": 1.0,
+  "memory_gbs": 6.0,
+  "state_verified": "STOPPED",
+  "verified_at": "2026-10-15T02:01:03.759538+00:00"
+}

@@ -1,0 +1,93 @@
+{
+  "checked_at_utc": "2026-10-15T01:42:41.907499+00:00",
+  "api_url": "http://157.137.207.154:8000",
+  "health": {
+    "status": 200,
+    "body": {
+      "status": "ok",
+      "version": "2.0.0",
+      "service": "inventario-u"
+    }
+  },
+  "unauthenticated_skus_status": 401,
+  "sku": {
+    "status": 201,
+    "body": {
+      "id": 1,
+      "codigo": "DEMO-S3-780b2212",
+      "nombre": "Producto sustentacion",
+      "descripcion": null,
+      "stock_minimo": 2
+    }
+  },
+  "almacen": {
+    "status": 201,
+    "body": {
+      "id": 1,
+      "nombre": "Bodega demo 780b2212",
+      "ubicacion": "Datos de prueba"
+    }
+  },
+  "movimiento": {
+    "status": 201,
+    "body": {
+      "id": 1,
+      "sku_id": 1,
+      "almacen_id": 1,
+      "tipo": "entrada",
+      "cantidad": 10,
+      "motivo": "Evidencia Seguimiento 3",
+      "fecha": "2026-10-15T01:42:40.092147"
+    }
+  },
+  "inventario": {
+    "status": 200,
+    "body": {
+      "resultados": [
+        {
+          "sku_id": 1,
+          "sku_codigo": "DEMO-S3-780b2212",
+          "sku_nombre": "Producto sustentacion",
+          "stock_minimo": 2,
+          "almacen_id": 1,
+          "almacen_nombre": "Bodega demo 780b2212",
+          "stock_disponible": 10
+        }
+      ]
+    }
+  },
+  "storage_write": {
+    "status": 201,
+    "body": {
+      "trace_id": "sustentacion-780b2212",
+      "object_name": "flujos/sustentacion-780b2212.json",
+      "bucket": "inventario-u-s3-json",
+      "status": "stored"
+    }
+  },
+  "storage_read": {
+    "status": 200,
+    "body": {
+      "entrega": 3,
+      "sku_id": 1,
+      "almacen_id": 1,
+      "stock": 10
+    }
+  },
+  "storage_list": {
+    "status": 200,
+    "body": {
+      "bucket": "inventario-u-s3-json",
+      "objects": [
+        {
+          "object_name": "flujos/sustentacion-780b2212.json",
+          "size": 57,
+          "time_created": "2026-10-15T01:42:40.342000Z",
+          "time_modified": "2026-10-15T01:42:40.342000Z"
+        }
+      ],
+      "next_start": null
+    }
+  },
+  "all_assertions_passed": true
+}
