@@ -9,9 +9,13 @@ test "$(git rev-parse HEAD)" = "$revision"
 install -m 0700 deploy/host-deploy.sh /opt/inventario/deploy.sh
 /opt/inventario/sdk/bin/python deploy/runtime_env.py "$revision" /opt/inventario/runtime.env
 
-# Build exactly once. Every traffic stage uses this same content-addressed image.
-docker build --tag "inventario-api:$revision" .
-image=$(docker image inspect --format '{{.Id}}' "inventario-api:$revision")
+# Deployment-only changes retain the already verified application image.
+if image=$(/opt/inventario/sdk/bin/python -m deploy.canary.reuse_image "$revision"); then
+  echo 'Reusing verified application image'
+else
+  docker build --tag "inventario-api:$revision" .
+  image=$(docker image inspect --format '{{.Id}}' "inventario-api:$revision")
+fi
 [[ $image =~ ^sha256:[a-f0-9]{64}$ ]] || exit 2
 /opt/inventario/sdk/bin/python - "$image" <<'PY'
 import json
@@ -54,6 +58,11 @@ if ! "${compose[@]}" up -d --wait --wait-timeout 120 gateway; then
   "${compose[@]}" stop gateway
   docker compose --project-name inventario-oci --env-file /opt/inventario/runtime.env -f deploy/compose.oci.yml start api
   exit 1
+fi
+"${compose[@]}" --profile classroom up -d --wait --wait-timeout 120 classroom
+if systemctl is-active --quiet firewalld; then
+  firewall-cmd --permanent --add-port=80/tcp
+  firewall-cmd --add-port=80/tcp
 fi
 /opt/inventario/sdk/bin/python -m deploy.canary.rollout rollback
 /opt/inventario/sdk/bin/python -m deploy.canary.smoke

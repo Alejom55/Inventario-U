@@ -35,6 +35,15 @@ resource "oci_core_security_list" "api" {
     protocol = "6"
     source   = var.api_allowed_cidr
     tcp_options {
+      min = 80
+      max = 80
+    }
+  }
+
+  ingress_security_rules {
+    protocol = "6"
+    source   = var.api_allowed_cidr
+    tcp_options {
       min = 8000
       max = 8000
     }
