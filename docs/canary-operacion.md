@@ -17,6 +17,11 @@ El entorno GitHub `oci-demo` conserva los secrets `OCI_TENANCY_OCID`,
 `OCI_USER_OCID`, `OCI_FINGERPRINT` y `OCI_PRIVATE_KEY`. Añadir las variables
 `OCI_INSTANCE_ID`, `OCI_COMPARTMENT_ID` y `OCI_REGION` con los identificadores
 del despliegue existente. No publicar claves, contraseñas ni archivos `.env`.
+El workflow también valida su propio archivo al publicarlo; ese evento nunca
+despliega. Para operar una revisión instalada aunque la rama haya avanzado
+con documentación, indicar su SHA completo en el campo `revision` al ejecutar
+`promote`, `regression` o `rollback`. `install` usa siempre la revisión de la
+referencia seleccionada y su validación correspondiente.
 
 La entrada pública sigue siendo el puerto 8000 limitado por `api_allowed_cidr`.
 PostgreSQL y las APIs no publican puertos. Prometheus solo escucha en loopback
@@ -118,6 +123,9 @@ Las decisiones se guardan en `deploy/canary/evidence/rollout.jsonl` dentro del
 checkout de la VM. Incluyen fecha UTC, revisión, imagen, política, percentiles,
 muestras, reparto y resultado del rollback, sin credenciales. Conservar una
 copia sanitizada junto a capturas de la nube para documentar la ejecución real.
+Cada operación archiva además un informe sin credenciales en el bucket privado
+existente, bajo `canary-evidence/<revision>/<action>.json`. El informe incluye
+eventos, estado del dashboard y hash de inventario para comparar antes y después.
 Los archivos `docs/evidencias/` anteriores corresponden a Terraform v2 y no
 prueban este despliegue canary.
 

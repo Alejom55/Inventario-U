@@ -1,6 +1,8 @@
 name: Canary en OCI
 
 on:
+  push:
+    paths: ['.github/workflows/canary-oci.yml']
   workflow_dispatch:
     inputs:
       action:
@@ -9,6 +11,10 @@ on:
         options: [install, promote, regression, rollback]
         default: install
         required: true
+      revision:
+        description: SHA ya instalado para promote, regression o rollback
+        type: string
+        default: ''
 
 permissions:
   contents: read
@@ -19,11 +25,11 @@ concurrency:
 
 jobs:
   quality:
-    if: inputs.action == 'install'
+    if: github.event_name == 'push' || inputs.action == 'install'
     uses: ./.github/workflows/validacion-oci.yml
   canary:
     needs: quality
-    if: ${{ !cancelled() && (needs.quality.result == 'success' || inputs.action != 'install') }}
+    if: ${{ github.event_name == 'workflow_dispatch' && !cancelled() && (needs.quality.result == 'success' || inputs.action != 'install') }}
     runs-on: ubuntu-latest
     timeout-minutes: 50
     environment: oci-demo
@@ -61,13 +67,14 @@ jobs:
       - name: Ejecutar accion canary sin modificar infraestructura
         env:
           CANARY_ACTION: ${{ inputs.action }}
+          CANARY_REVISION: ${{ inputs.action == 'install' && github.sha || inputs.revision || github.sha }}
           INSTANCE_ID: ${{ vars.OCI_INSTANCE_ID }}
           COMPARTMENT_ID: ${{ vars.OCI_COMPARTMENT_ID }}
         run: |
           test -n "$INSTANCE_ID" && test -n "$COMPARTMENT_ID"
           uv run --frozen python -m scripts.canary_oci "$CANARY_ACTION" \
-            --revision "$GITHUB_SHA" --instance-id "$INSTANCE_ID" --compartment-id "$COMPARTMENT_ID"
-          echo "Canary action $CANARY_ACTION completed for $GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
+            --revision "$CANARY_REVISION" --instance-id "$INSTANCE_ID" --compartment-id "$COMPARTMENT_ID"
+          echo "Canary action $CANARY_ACTION completed for $CANARY_REVISION" >> "$GITHUB_STEP_SUMMARY"
       - name: Retirar credenciales del runner
         if: always()
         run: rm -f "$HOME/.oci/api_key.pem" "$HOME/.oci/config"
