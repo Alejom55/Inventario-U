@@ -1,0 +1,5175 @@
+{
+  "checked_at_utc": "2026-11-06T03:37:22.861400+00:00",
+  "environment": "OCI Compute",
+  "action": "regression",
+  "revision": "bf49423d2aa328529f927e8835d9fd78c59c9c05",
+  "image": "sha256:680ff6764850bc69b47d003742eb297b6c958d0e009a74bdd7e3e1b620775212",
+  "dashboard": {
+    "title": "Inventario U stable y canary",
+    "panels": 18,
+    "datasource_status": "OK"
+  },
+  "inventory_rows": 1,
+  "inventory_sha256": "6c378b0b9b3de084d9f399d2b68930dd5739984274531c6d532ed1a04fd1ae29",
+  "metrics": {
+    "stable": {
+      "requests": 2439.272727272727,
+      "5xx": 0.0,
+      "4xx": 0.0,
+      "business": 2439.272727272727,
+      "cpu": 0.24290909090909088,
+      "memory": 109776896.0,
+      "up": 1.0,
+      "p50": 0.02091796875,
+      "p95": 0.1214705882352944,
+      "p99": 0.18723529411764733
+    },
+    "canary": {
+      "requests": 2328.859127272727,
+      "5xx": 249.58640000000003,
+      "4xx": 0.0,
+      "business": 2078.181818181818,
+      "cpu": 0.22672727272727294,
+      "memory": 110891008.0,
+      "up": 1.0,
+      "p50": 0.02052212709380235,
+      "p95": 0.12990218468468456,
+      "p99": 0.18760193716216203
+    }
+  },
+  "events": [
+    {
+      "at": "2026-11-06T02:50:05.351070+00:00",
+      "event": "start",
+      "scenario": "rollback",
+      "policy": {
+        "window_seconds": 60,
+        "minimum_requests": 1000,
+        "abort_minimum_requests": 100,
+        "maximum_5xx_ratio": 0.01,
+        "maximum_4xx_ratio": 0.01,
+        "maximum_error_delta": 0.005,
+        "maximum_p95_seconds": 0.5,
+        "maximum_p99_seconds": 1.0,
+        "maximum_p95_ratio": 1.5,
+        "p95_tolerance_seconds": 0.05,
+        "maximum_cpu_cores": 0.85,
+        "maximum_memory_bytes": 429496729.6,
+        "minimum_business_success_ratio": 0.99,
+        "stages": [
+          {
+            "percent": 0,
+            "bake_seconds": 60,
+            "timeout_seconds": 300
+          },
+          {
+            "percent": 10,
+            "bake_seconds": 120,
+            "timeout_seconds": 300
+          },
+          {
+            "percent": 50,
+            "bake_seconds": 120,
+            "timeout_seconds": 300
+          },
+          {
+            "percent": 100,
+            "bake_seconds": 120,
+            "timeout_seconds": 300
+          }
+        ]
+      },
+      "image": "sha256:a676bdafc4fdd0bcfdfcf921529c9c12f06bff20e3ad07a7417bc152352562c7",
+      "revision": "585b93ed3bfb172c56d80e1f37ba3b127060c009"
+    },
+    {
+      "at": "2026-11-06T02:50:07.556136+00:00",
+      "event": "stage",
+      "percent": 0
+    },
+    {
+      "at": "2026-11-06T02:50:08.043385+00:00",
+      "event": "rollback_verified",
+      "percent": 0,
+      "stable_requests": 30
+    },
+    {
+      "at": "2026-11-06T02:59:52.894964+00:00",
+      "event": "start",
+      "scenario": "rollback",
+      "policy": {
+        "window_seconds": 60,
+        "minimum_requests": 1000,
+        "abort_minimum_requests": 100,
+        "maximum_5xx_ratio": 0.01,
+        "maximum_4xx_ratio": 0.01,
+        "maximum_error_delta": 0.005,
+        "maximum_p95_seconds": 0.5,
+        "maximum_p99_seconds": 1.0,
+        "maximum_p95_ratio": 1.5,
+        "p95_tolerance_seconds": 0.05,
+        "maximum_cpu_cores": 0.85,
+        "maximum_memory_bytes": 429496729.6,
+        "minimum_business_success_ratio": 0.99,
+        "stages": [
+          {
+            "percent": 0,
+            "bake_seconds": 60,
+            "timeout_seconds": 300
+          },
+          {
+            "percent": 10,
+            "bake_seconds": 120,
+            "timeout_seconds": 300
+          },
+          {
+            "percent": 50,
+            "bake_seconds": 120,
+            "timeout_seconds": 300
+          },
+          {
+            "percent": 100,
+            "bake_seconds": 120,
+            "timeout_seconds": 300
+          }
+        ]
+      },
+      "image": "sha256:a15cd6c22388b963583f2ebe94dc35739dd2a980b946848457f7051f74bf5b8c",
+      "revision": "269a6ae1369aa086d1f85309edae20864c4fb989"
+    },
+    {
+      "at": "2026-11-06T02:59:55.108626+00:00",
+      "event": "stage",
+      "percent": 0
+    },
+    {
+      "at": "2026-11-06T02:59:55.581095+00:00",
+      "event": "rollback_verified",
+      "percent": 0,
+      "stable_requests": 30
+    },
+    {
+      "at": "2026-11-06T03:04:13.536530+00:00",
+      "event": "start",
+      "scenario": "promote",
+      "policy": {
+        "window_seconds": 60,
+        "minimum_requests": 1000,
+        "abort_minimum_requests": 100,
+        "maximum_5xx_ratio": 0.01,
+        "maximum_4xx_ratio": 0.01,
+        "maximum_error_delta": 0.005,
+        "maximum_p95_seconds": 0.5,
+        "maximum_p99_seconds": 1.0,
+        "maximum_p95_ratio": 1.5,
+        "p95_tolerance_seconds": 0.05,
+        "maximum_cpu_cores": 0.85,
+        "maximum_memory_bytes": 429496729.6,
+        "minimum_business_success_ratio": 0.99,
+        "stages": [
+          {
+            "percent": 0,
+            "bake_seconds": 60,
+            "timeout_seconds": 300
+          },
+          {
+            "percent": 10,
+            "bake_seconds": 120,
+            "timeout_seconds": 300
+          },
+          {
+            "percent": 50,
+            "bake_seconds": 120,
+            "timeout_seconds": 300
+          },
+          {
+            "percent": 100,
+            "bake_seconds": 120,
+            "timeout_seconds": 300
+          }
+        ]
+      },
+      "image": "sha256:a15cd6c22388b963583f2ebe94dc35739dd2a980b946848457f7051f74bf5b8c",
+      "revision": "269a6ae1369aa086d1f85309edae20864c4fb989"
+    },
+    {
+      "at": "2026-11-06T03:04:15.741636+00:00",
+      "event": "stage",
+      "percent": 0
+    },
+    {
+      "at": "2026-11-06T03:04:18.270654+00:00",
+      "event": "stage",
+      "percent": 0
+    },
+    {
+      "at": "2026-11-06T03:04:28.303176+00:00",
+      "event": "analysis",
+      "percent": 0,
+      "elapsed": 10.0,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 513.8133636363635,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 513.8393818181818,
+        "cpu": 0.053272727272727284,
+        "memory": 107200512.0,
+        "up": 1.0,
+        "p50": 0.020803745030581043,
+        "p95": 0.10745801772708675,
+        "p99": 0.21522070742520563
+      },
+      "canary": {
+        "requests": 481.6481818181818,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 481.6827272727272,
+        "cpu": 0.05781818181818181,
+        "memory": 108101632.0,
+        "up": 1.0,
+        "p50": 0.03657847995466948,
+        "p95": 0.1350018666352286,
+        "p99": 0.19450037388172284
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 400
+        },
+        "calibration": {
+          "canary:200": 402
+        },
+        "public_requests": 400,
+        "public_canary_ratio": 0.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:04:38.348399+00:00",
+      "event": "analysis",
+      "percent": 0,
+      "elapsed": 20.0,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 918.3599818181818,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 918.4716000000001,
+        "cpu": 0.09709090909090909,
+        "memory": 107331584.0,
+        "up": 1.0,
+        "p50": 0.02044183906772057,
+        "p95": 0.09259793175965292,
+        "p99": 0.186580404719143
+      },
+      "canary": {
+        "requests": 884.0664727272726,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 884.1140363636364,
+        "cpu": 0.10454545454545454,
+        "memory": 108494848.0,
+        "up": 1.0,
+        "p50": 0.03554286148905046,
+        "p95": 0.1032158029250109,
+        "p99": 0.1863574467212168
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 800
+        },
+        "calibration": {
+          "canary:200": 803
+        },
+        "public_requests": 800,
+        "public_canary_ratio": 0.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:04:48.388656+00:00",
+      "event": "analysis",
+      "percent": 0,
+      "elapsed": 30.1,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 1321.6740909090909,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1321.7668181818183,
+        "cpu": 0.14018181818181816,
+        "memory": 107462656.0,
+        "up": 1.0,
+        "p50": 0.020396155090134246,
+        "p95": 0.09181173496517218,
+        "p99": 0.17720556864345635
+      },
+      "canary": {
+        "requests": 1289.0776181818183,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1289.1700545454548,
+        "cpu": 0.15072727272727274,
+        "memory": 108888064.0,
+        "up": 1.0,
+        "p50": 0.035149166050520556,
+        "p95": 0.09984553418704634,
+        "p99": 0.18380022451017358
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 1203
+        },
+        "calibration": {
+          "canary:200": 1205
+        },
+        "public_requests": 1203,
+        "public_canary_ratio": 0.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:04:58.433315+00:00",
+      "event": "analysis",
+      "percent": 0,
+      "elapsed": 40.1,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 1727.5263636363636,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1727.6786363636365,
+        "cpu": 0.18581818181818183,
+        "memory": 107593728.0,
+        "up": 1.0,
+        "p50": 0.021281048924040584,
+        "p95": 0.09133694689378145,
+        "p99": 0.17233489782542222
+      },
+      "canary": {
+        "requests": 1695.697818181818,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1695.8497272727273,
+        "cpu": 0.19781818181818178,
+        "memory": 108888064.0,
+        "up": 1.0,
+        "p50": 0.03434087573128816,
+        "p95": 0.10049470670299857,
+        "p99": 0.18306190452167492
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 1603
+        },
+        "calibration": {
+          "canary:200": 1604
+        },
+        "public_requests": 1603,
+        "public_canary_ratio": 0.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:05:08.475617+00:00",
+      "event": "analysis",
+      "percent": 0,
+      "elapsed": 50.2,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2131.0490181818186,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2131.237381818182,
+        "cpu": 0.23127272727272727,
+        "memory": 107855872.0,
+        "up": 1.0,
+        "p50": 0.022102700506453708,
+        "p95": 0.09086269785595824,
+        "p99": 0.1673134600831651
+      },
+      "canary": {
+        "requests": 2102.8373906877805,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2102.9503481628276,
+        "cpu": 0.24380488336999803,
+        "memory": 108888064.0,
+        "up": 1.0,
+        "p50": 0.03279102055826748,
+        "p95": 0.09904449589326314,
+        "p99": 0.18134752601699822
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 2004
+        },
+        "calibration": {
+          "canary:200": 2005
+        },
+        "public_requests": 2004,
+        "public_canary_ratio": 0.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:05:18.526347+00:00",
+      "event": "analysis",
+      "percent": 0,
+      "elapsed": 60.2,
+      "decision": "promote",
+      "reasons": [
+        "SLO and comparable samples passed"
+      ],
+      "stable": {
+        "requests": 2395.6363636363635,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2395.6363636363635,
+        "cpu": 0.2458181818181818,
+        "memory": 108118016.0,
+        "up": 1.0,
+        "p50": 0.02209251101321586,
+        "p95": 0.09321428571428568,
+        "p99": 0.16871641791044728
+      },
+      "canary": {
+        "requests": 2398.9090909090905,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2398.9090909090905,
+        "cpu": 0.2565454545454546,
+        "memory": 108888064.0,
+        "up": 1.0,
+        "p50": 0.029646060426255665,
+        "p95": 0.09873407643312099,
+        "p99": 0.17844117647058813
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 2401
+        },
+        "calibration": {
+          "canary:200": 2406
+        },
+        "public_requests": 2401,
+        "public_canary_ratio": 0.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:05:21.181639+00:00",
+      "event": "stage",
+      "percent": 10
+    },
+    {
+      "at": "2026-11-06T03:05:31.228352+00:00",
+      "event": "analysis",
+      "percent": 10,
+      "elapsed": 10.0,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2384.7272727272725,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2384.7272727272725,
+        "cpu": 0.24509090909090908,
+        "memory": 108118016.0,
+        "up": 1.0,
+        "p50": 0.023032591414944358,
+        "p95": 0.1025471698113203,
+        "p99": 0.1850377358490567
+      },
+      "canary": {
+        "requests": 2394.5454545454545,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2394.5454545454545,
+        "cpu": 0.25818181818181823,
+        "memory": 109019136.0,
+        "up": 1.0,
+        "p50": 0.029677522349936144,
+        "p95": 0.1318965517241378,
+        "p99": 0.19244827586206908
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 361,
+          "canary:200": 40
+        },
+        "calibration": {
+          "canary:200": 360,
+          "stable:200": 40
+        },
+        "public_requests": 401,
+        "public_canary_ratio": 0.09975062344139651
+      }
+    },
+    {
+      "at": "2026-11-06T03:05:41.274299+00:00",
+      "event": "analysis",
+      "percent": 10,
+      "elapsed": 20.1,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2373.8181818181815,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2373.8181818181815,
+        "cpu": 0.24454545454545448,
+        "memory": 108249088.0,
+        "up": 1.0,
+        "p50": 0.023702770780856426,
+        "p95": 0.11776000000000011,
+        "p99": 0.18739200000000003
+      },
+      "canary": {
+        "requests": 2401.090909090909,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2401.090909090909,
+        "cpu": 0.2594545454545455,
+        "memory": 109019136.0,
+        "up": 1.0,
+        "p50": 0.0275036023054755,
+        "p95": 0.1403313253012049,
+        "p99": 0.19336746987951808
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 713,
+          "canary:200": 90
+        },
+        "calibration": {
+          "canary:200": 722,
+          "stable:200": 79
+        },
+        "public_requests": 803,
+        "public_canary_ratio": 0.11207970112079702
+      }
+    },
+    {
+      "at": "2026-11-06T03:05:51.315821+00:00",
+      "event": "analysis",
+      "percent": 10,
+      "elapsed": 30.1,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2378.181818181818,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2378.181818181818,
+        "cpu": 0.24490909090909094,
+        "memory": 108249088.0,
+        "up": 1.0,
+        "p50": 0.024106988783433998,
+        "p95": 0.11825396825396811,
+        "p99": 0.18746031746031738
+      },
+      "canary": {
+        "requests": 2401.090909090909,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2401.090909090909,
+        "cpu": 0.2590909090909091,
+        "memory": 109019136.0,
+        "up": 1.0,
+        "p50": 0.0246343085106383,
+        "p95": 0.13847826086956525,
+        "p99": 0.19316149068322983
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 1070,
+          "canary:200": 131
+        },
+        "calibration": {
+          "canary:200": 1077,
+          "stable:200": 122
+        },
+        "public_requests": 1201,
+        "public_canary_ratio": 0.10907577019150708
+      }
+    },
+    {
+      "at": "2026-11-06T03:06:01.347077+00:00",
+      "event": "analysis",
+      "percent": 10,
+      "elapsed": 40.1,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2374.9090909090905,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2374.9090909090905,
+        "cpu": 0.24254545454545454,
+        "memory": 108511232.0,
+        "up": 1.0,
+        "p50": 0.023296009771986974,
+        "p95": 0.130973154362416,
+        "p99": 0.18941610738255021
+      },
+      "canary": {
+        "requests": 2405.5857592232305,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2405.5857592232305,
+        "cpu": 0.26183246358892304,
+        "memory": 109150208.0,
+        "up": 1.0,
+        "p50": 0.025934385382059805,
+        "p95": 0.1442415730337079,
+        "p99": 0.19379213483146085
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 1436,
+          "canary:200": 168
+        },
+        "calibration": {
+          "canary:200": 1438,
+          "stable:200": 165
+        },
+        "public_requests": 1604,
+        "public_canary_ratio": 0.10473815461346633
+      }
+    },
+    {
+      "at": "2026-11-06T03:06:11.401540+00:00",
+      "event": "analysis",
+      "percent": 10,
+      "elapsed": 50.2,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2374.9090909090905,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2374.9090909090905,
+        "cpu": 0.24254545454545456,
+        "memory": 108511232.0,
+        "up": 1.0,
+        "p50": 0.023220647773279354,
+        "p95": 0.13003401360544198,
+        "p99": 0.1892721088435373
+      },
+      "canary": {
+        "requests": 2395.6363636363635,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2395.6363636363635,
+        "cpu": 0.26200000000000007,
+        "memory": 109150208.0,
+        "up": 1.0,
+        "p50": 0.028753644314868803,
+        "p95": 0.1418823529411763,
+        "p99": 0.19355294117647034
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 1784,
+          "canary:200": 220
+        },
+        "calibration": {
+          "canary:200": 1795,
+          "stable:200": 206
+        },
+        "public_requests": 2004,
+        "public_canary_ratio": 0.10978043912175649
+      }
+    },
+    {
+      "at": "2026-11-06T03:06:21.441721+00:00",
+      "event": "analysis",
+      "percent": 10,
+      "elapsed": 60.2,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2372.7272727272725,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2372.7272727272725,
+        "cpu": 0.23981818181818182,
+        "memory": 108511232.0,
+        "up": 1.0,
+        "p50": 0.022885071090047397,
+        "p95": 0.10290178571428586,
+        "p99": 0.18058035714285703
+      },
+      "canary": {
+        "requests": 2416.363636363636,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2416.363636363636,
+        "cpu": 0.2634545454545455,
+        "memory": 109150208.0,
+        "up": 1.0,
+        "p50": 0.0274290780141844,
+        "p95": 0.12089285714285712,
+        "p99": 0.18417857142857133
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 2145,
+          "canary:200": 261
+        },
+        "calibration": {
+          "canary:200": 2153,
+          "stable:200": 251
+        },
+        "public_requests": 2406,
+        "public_canary_ratio": 0.1084788029925187
+      }
+    },
+    {
+      "at": "2026-11-06T03:06:31.482555+00:00",
+      "event": "analysis",
+      "percent": 10,
+      "elapsed": 70.3,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2368.363636363636,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2368.363636363636,
+        "cpu": 0.23745454545454542,
+        "memory": 108511232.0,
+        "up": 1.0,
+        "p50": 0.022260918674698794,
+        "p95": 0.09938581314878889,
+        "p99": 0.17932380952380947
+      },
+      "canary": {
+        "requests": 2422.9090909090905,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2422.9090909090905,
+        "cpu": 0.26290909090909104,
+        "memory": 109281280.0,
+        "up": 1.0,
+        "p50": 0.02420076726342711,
+        "p95": 0.10343478260869558,
+        "p99": 0.1806869565217392
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 2505,
+          "canary:200": 303
+        },
+        "calibration": {
+          "canary:200": 2525,
+          "stable:200": 280
+        },
+        "public_requests": 2808,
+        "public_canary_ratio": 0.10790598290598291
+      }
+    },
+    {
+      "at": "2026-11-06T03:06:41.527836+00:00",
+      "event": "analysis",
+      "percent": 10,
+      "elapsed": 80.3,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2379.272727272727,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2379.272727272727,
+        "cpu": 0.23927272727272728,
+        "memory": 108511232.0,
+        "up": 1.0,
+        "p50": 0.022243637724550902,
+        "p95": 0.1134523809523811,
+        "p99": 0.1826904761904763
+      },
+      "canary": {
+        "requests": 2412.0,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2412.0,
+        "cpu": 0.2612727272727273,
+        "memory": 109281280.0,
+        "up": 1.0,
+        "p50": 0.023761410788381745,
+        "p95": 0.11811111111111086,
+        "p99": 0.1836222222222222
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 2867,
+          "canary:200": 342
+        },
+        "calibration": {
+          "canary:200": 2886,
+          "stable:200": 319
+        },
+        "public_requests": 3209,
+        "public_canary_ratio": 0.10657525708943597
+      }
+    },
+    {
+      "at": "2026-11-06T03:06:51.568381+00:00",
+      "event": "analysis",
+      "percent": 10,
+      "elapsed": 90.4,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2381.4545454545455,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2381.4545454545455,
+        "cpu": 0.24218181818181805,
+        "memory": 108773376.0,
+        "up": 1.0,
+        "p50": 0.022526778882938026,
+        "p95": 0.14402564102564105,
+        "p99": 0.18880512820512824
+      },
+      "canary": {
+        "requests": 2384.7272727272725,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2384.7272727272725,
+        "cpu": 0.25927272727272727,
+        "memory": 109412352.0,
+        "up": 1.0,
+        "p50": 0.023788898233809926,
+        "p95": 0.14239361702127645,
+        "p99": 0.18890425531914895
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 3209,
+          "canary:200": 371
+        },
+        "calibration": {
+          "canary:200": 3213,
+          "stable:200": 361
+        },
+        "public_requests": 3580,
+        "public_canary_ratio": 0.10363128491620112
+      }
+    },
+    {
+      "at": "2026-11-06T03:07:01.604896+00:00",
+      "event": "analysis",
+      "percent": 10,
+      "elapsed": 100.4,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2369.4545454545455,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2369.4545454545455,
+        "cpu": 0.24290909090909096,
+        "memory": 108904448.0,
+        "up": 1.0,
+        "p50": 0.023840271877655056,
+        "p95": 0.1719230769230769,
+        "p99": 0.19976923076923084
+      },
+      "canary": {
+        "requests": 2352.0,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2352.0,
+        "cpu": 0.2567272727272728,
+        "memory": 109936640.0,
+        "up": 1.0,
+        "p50": 0.024196663740122915,
+        "p95": 0.16910447761194025,
+        "p99": 0.2149565217391293
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 3585,
+          "canary:200": 397
+        },
+        "calibration": {
+          "canary:200": 3571,
+          "stable:200": 404
+        },
+        "public_requests": 3982,
+        "public_canary_ratio": 0.09969864389753892
+      }
+    },
+    {
+      "at": "2026-11-06T03:07:11.644244+00:00",
+      "event": "analysis",
+      "percent": 10,
+      "elapsed": 110.4,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2388.0,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2388.0,
+        "cpu": 0.2456363636363637,
+        "memory": 108904448.0,
+        "up": 1.0,
+        "p50": 0.023901354784081286,
+        "p95": 0.17227272727272724,
+        "p99": 0.1997210031347962
+      },
+      "canary": {
+        "requests": 2343.272727272727,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2343.272727272727,
+        "cpu": 0.2563636363636364,
+        "memory": 109936640.0,
+        "up": 1.0,
+        "p50": 0.023436196830692244,
+        "p95": 0.1706761565836299,
+        "p99": 0.21530434782608712
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 3943,
+          "canary:200": 438
+        },
+        "calibration": {
+          "canary:200": 3935,
+          "stable:200": 438
+        },
+        "public_requests": 4381,
+        "public_canary_ratio": 0.09997717416115043
+      }
+    },
+    {
+      "at": "2026-11-06T03:07:21.689535+00:00",
+      "event": "analysis",
+      "percent": 10,
+      "elapsed": 120.5,
+      "decision": "promote",
+      "reasons": [
+        "SLO and comparable samples passed"
+      ],
+      "stable": {
+        "requests": 2380.363636363636,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2380.363636363636,
+        "cpu": 0.24818181818181814,
+        "memory": 108904448.0,
+        "up": 1.0,
+        "p50": 0.0242304347826087,
+        "p95": 0.17338368580060423,
+        "p99": 0.19975226586102718
+      },
+      "canary": {
+        "requests": 2342.181818181818,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2342.181818181818,
+        "cpu": 0.25581818181818183,
+        "memory": 109936640.0,
+        "up": 1.0,
+        "p50": 0.023418750000000002,
+        "p95": 0.1719897959183673,
+        "p99": 0.2153478260869557
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 4300,
+          "canary:200": 482
+        },
+        "calibration": {
+          "canary:200": 4298,
+          "stable:200": 476
+        },
+        "public_requests": 4782,
+        "public_canary_ratio": 0.10079464659138436
+      }
+    },
+    {
+      "at": "2026-11-06T03:07:24.233655+00:00",
+      "event": "stage",
+      "percent": 50
+    },
+    {
+      "at": "2026-11-06T03:07:34.278595+00:00",
+      "event": "analysis",
+      "percent": 50,
+      "elapsed": 10.0,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2353.090909090909,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2353.090909090909,
+        "cpu": 0.24599999999999989,
+        "memory": 109035520.0,
+        "up": 1.0,
+        "p50": 0.02439279359430605,
+        "p95": 0.1760096153846154,
+        "p99": 0.2346363636363638
+      },
+      "canary": {
+        "requests": 2342.181818181818,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2342.181818181818,
+        "cpu": 0.255090909090909,
+        "memory": 109936640.0,
+        "up": 1.0,
+        "p50": 0.023893442622950824,
+        "p95": 0.1728649635036495,
+        "p99": 0.23719354838709555
+      },
+      "traffic": {
+        "public": {
+          "canary:200": 201,
+          "stable:200": 200
+        },
+        "calibration": {
+          "canary:200": 180,
+          "stable:200": 221
+        },
+        "public_requests": 401,
+        "public_canary_ratio": 0.5012468827930174
+      }
+    },
+    {
+      "at": "2026-11-06T03:07:44.318696+00:00",
+      "event": "analysis",
+      "percent": 50,
+      "elapsed": 20.1,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2362.9090909090905,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2362.9090909090905,
+        "cpu": 0.24290909090909088,
+        "memory": 109035520.0,
+        "up": 1.0,
+        "p50": 0.022913354531001594,
+        "p95": 0.1662331838565023,
+        "p99": 0.2343636363636363
+      },
+      "canary": {
+        "requests": 2372.7272727272725,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2372.7272727272725,
+        "cpu": 0.2550909090909091,
+        "memory": 109936640.0,
+        "up": 1.0,
+        "p50": 0.022528801843317972,
+        "p95": 0.16200495049504962,
+        "p99": 0.23416666666666677
+      },
+      "traffic": {
+        "public": {
+          "canary:200": 412,
+          "stable:200": 391
+        },
+        "calibration": {
+          "canary:200": 381,
+          "stable:200": 421
+        },
+        "public_requests": 803,
+        "public_canary_ratio": 0.5130759651307597
+      }
+    },
+    {
+      "at": "2026-11-06T03:07:54.357471+00:00",
+      "event": "analysis",
+      "percent": 50,
+      "elapsed": 30.1,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2377.090909090909,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2377.090909090909,
+        "cpu": 0.2412727272727273,
+        "memory": 109035520.0,
+        "up": 1.0,
+        "p50": 0.021193493150684934,
+        "p95": 0.10400990099009885,
+        "p99": 0.19030693069306948
+      },
+      "canary": {
+        "requests": 2396.7272727272725,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2396.7272727272725,
+        "cpu": 0.2550909090909091,
+        "memory": 109936640.0,
+        "up": 1.0,
+        "p50": 0.02120918367346939,
+        "p95": 0.10655963302752307,
+        "p99": 0.18718348623853226
+      },
+      "traffic": {
+        "public": {
+          "canary:200": 598,
+          "stable:200": 607
+        },
+        "calibration": {
+          "canary:200": 572,
+          "stable:200": 630
+        },
+        "public_requests": 1205,
+        "public_canary_ratio": 0.4962655601659751
+      }
+    },
+    {
+      "at": "2026-11-06T03:08:04.399365+00:00",
+      "event": "analysis",
+      "percent": 50,
+      "elapsed": 40.1,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2381.4545454545455,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2381.4545454545455,
+        "cpu": 0.24072727272727276,
+        "memory": 109166592.0,
+        "up": 1.0,
+        "p50": 0.020736065573770494,
+        "p95": 0.10381188118811883,
+        "p99": 0.1902673267326733
+      },
+      "canary": {
+        "requests": 2396.7272727272725,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2396.7272727272725,
+        "cpu": 0.25363636363636366,
+        "memory": 109936640.0,
+        "up": 1.0,
+        "p50": 0.020819107025607356,
+        "p95": 0.09985641891891892,
+        "p99": 0.1861683168316833
+      },
+      "traffic": {
+        "public": {
+          "canary:200": 797,
+          "stable:200": 804
+        },
+        "calibration": {
+          "canary:200": 767,
+          "stable:200": 833
+        },
+        "public_requests": 1601,
+        "public_canary_ratio": 0.4978138663335415
+      }
+    },
+    {
+      "at": "2026-11-06T03:08:14.440347+00:00",
+      "event": "analysis",
+      "percent": 50,
+      "elapsed": 50.2,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2377.090909090909,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2377.090909090909,
+        "cpu": 0.23981818181818176,
+        "memory": 109166592.0,
+        "up": 1.0,
+        "p50": 0.020509646302250807,
+        "p95": 0.09858540925266901,
+        "p99": 0.18900000000000017
+      },
+      "canary": {
+        "requests": 2397.8181818181815,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2397.8181818181815,
+        "cpu": 0.2547272727272727,
+        "memory": 109936640.0,
+        "up": 1.0,
+        "p50": 0.020795677799607074,
+        "p95": 0.09711604095563137,
+        "p99": 0.18355294117647086
+      },
+      "traffic": {
+        "public": {
+          "canary:200": 979,
+          "stable:200": 1028
+        },
+        "calibration": {
+          "canary:200": 988,
+          "stable:200": 1017
+        },
+        "public_requests": 2007,
+        "public_canary_ratio": 0.4877927254608869
+      }
+    },
+    {
+      "at": "2026-11-06T03:08:24.491683+00:00",
+      "event": "analysis",
+      "percent": 50,
+      "elapsed": 60.2,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2412.131570812953,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2412.131570812953,
+        "cpu": 0.24292234121861206,
+        "memory": 109166592.0,
+        "up": 1.0,
+        "p50": 0.020364062500000002,
+        "p95": 0.09630993150684926,
+        "p99": 0.17515730337078644
+      },
+      "canary": {
+        "requests": 2380.363636363636,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2380.363636363636,
+        "cpu": 0.2534545454545454,
+        "memory": 109936640.0,
+        "up": 1.0,
+        "p50": 0.02043686224489796,
+        "p95": 0.09479238754325262,
+        "p99": 0.17237974683544285
+      },
+      "traffic": {
+        "public": {
+          "canary:200": 1188,
+          "stable:200": 1217
+        },
+        "calibration": {
+          "canary:200": 1191,
+          "stable:200": 1211
+        },
+        "public_requests": 2405,
+        "public_canary_ratio": 0.493970893970894
+      }
+    },
+    {
+      "at": "2026-11-06T03:08:34.538357+00:00",
+      "event": "analysis",
+      "percent": 50,
+      "elapsed": 70.3,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2414.1818181818185,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2414.181818181818,
+        "cpu": 0.24363636363636373,
+        "memory": 109166592.0,
+        "up": 1.0,
+        "p50": 0.020419020715630887,
+        "p95": 0.09798566878980888,
+        "p99": 0.17741836734693867
+      },
+      "canary": {
+        "requests": 2382.5454545454545,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2382.5454545454545,
+        "cpu": 0.2545454545454545,
+        "memory": 109936640.0,
+        "up": 1.0,
+        "p50": 0.02037365421152628,
+        "p95": 0.09533112582781456,
+        "p99": 0.17303703703703732
+      },
+      "traffic": {
+        "public": {
+          "canary:200": 1392,
+          "stable:200": 1417
+        },
+        "calibration": {
+          "canary:200": 1386,
+          "stable:200": 1423
+        },
+        "public_requests": 2809,
+        "public_canary_ratio": 0.4955500177999288
+      }
+    },
+    {
+      "at": "2026-11-06T03:08:44.576936+00:00",
+      "event": "analysis",
+      "percent": 50,
+      "elapsed": 80.3,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2413.090909090909,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2413.090909090909,
+        "cpu": 0.24527272727272742,
+        "memory": 109297664.0,
+        "up": 1.0,
+        "p50": 0.020553435114503818,
+        "p95": 0.09929230769230768,
+        "p99": 0.17913207547169824
+      },
+      "canary": {
+        "requests": 2377.090909090909,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2377.090909090909,
+        "cpu": 0.25363636363636366,
+        "memory": 109936640.0,
+        "up": 1.0,
+        "p50": 0.020194946974422957,
+        "p95": 0.09768750000000001,
+        "p99": 0.17730208333333353
+      },
+      "traffic": {
+        "public": {
+          "canary:200": 1598,
+          "stable:200": 1611
+        },
+        "calibration": {
+          "canary:200": 1577,
+          "stable:200": 1633
+        },
+        "public_requests": 3209,
+        "public_canary_ratio": 0.4979744468681832
+      }
+    },
+    {
+      "at": "2026-11-06T03:08:54.609137+00:00",
+      "event": "analysis",
+      "percent": 50,
+      "elapsed": 90.4,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2392.363636363636,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2392.363636363636,
+        "cpu": 0.24345454545454545,
+        "memory": 109297664.0,
+        "up": 1.0,
+        "p50": 0.021445720250521924,
+        "p95": 0.11877777777777779,
+        "p99": 0.18375555555555562
+      },
+      "canary": {
+        "requests": 2400.0,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2400.0,
+        "cpu": 0.25654545454545463,
+        "memory": 109936640.0,
+        "up": 1.0,
+        "p50": 0.021096166778749162,
+        "p95": 0.10677966101694927,
+        "p99": 0.18135593220338994
+      },
+      "traffic": {
+        "public": {
+          "canary:200": 1789,
+          "stable:200": 1822
+        },
+        "calibration": {
+          "canary:200": 1777,
+          "stable:200": 1831
+        },
+        "public_requests": 3611,
+        "public_canary_ratio": 0.4954306286347272
+      }
+    },
+    {
+      "at": "2026-11-06T03:09:04.643007+00:00",
+      "event": "analysis",
+      "percent": 50,
+      "elapsed": 100.4,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2418.5454545454545,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2418.5454545454545,
+        "cpu": 0.24636363636363617,
+        "memory": 109297664.0,
+        "up": 1.0,
+        "p50": 0.022436424831712792,
+        "p95": 0.10102678571428549,
+        "p99": 0.18020535714285724
+      },
+      "canary": {
+        "requests": 2366.181818181818,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2366.181818181818,
+        "cpu": 0.25381818181818183,
+        "memory": 109936640.0,
+        "up": 1.0,
+        "p50": 0.022258854559155994,
+        "p95": 0.10650862068965498,
+        "p99": 0.18130172413793108
+      },
+      "traffic": {
+        "public": {
+          "canary:200": 1977,
+          "stable:200": 2034
+        },
+        "calibration": {
+          "canary:200": 1984,
+          "stable:200": 2025
+        },
+        "public_requests": 4011,
+        "public_canary_ratio": 0.49289454001495886
+      }
+    },
+    {
+      "at": "2026-11-06T03:09:14.686999+00:00",
+      "event": "analysis",
+      "percent": 50,
+      "elapsed": 110.4,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2444.7272727272725,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2444.7272727272725,
+        "cpu": 0.2507272727272727,
+        "memory": 109297664.0,
+        "up": 1.0,
+        "p50": 0.023307600950118766,
+        "p95": 0.1295283018867924,
+        "p99": 0.1859056603773584
+      },
+      "canary": {
+        "requests": 2335.6363636363635,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2335.6363636363635,
+        "cpu": 0.2523636363636365,
+        "memory": 109936640.0,
+        "up": 1.0,
+        "p50": 0.023054878048780487,
+        "p95": 0.1261724137931034,
+        "p99": 0.18523448275862076
+      },
+      "traffic": {
+        "public": {
+          "canary:200": 2170,
+          "stable:200": 2241
+        },
+        "calibration": {
+          "canary:200": 2173,
+          "stable:200": 2236
+        },
+        "public_requests": 4411,
+        "public_canary_ratio": 0.4919519383359782
+      }
+    },
+    {
+      "at": "2026-11-06T03:09:24.731115+00:00",
+      "event": "analysis",
+      "percent": 50,
+      "elapsed": 120.5,
+      "decision": "promote",
+      "reasons": [
+        "SLO and comparable samples passed"
+      ],
+      "stable": {
+        "requests": 2465.4545454545455,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2465.4545454545455,
+        "cpu": 0.2527272727272727,
+        "memory": 109297664.0,
+        "up": 1.0,
+        "p50": 0.02323185011709602,
+        "p95": 0.1306748466257668,
+        "p99": 0.18613496932515328
+      },
+      "canary": {
+        "requests": 2324.7272727272725,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2324.7272727272725,
+        "cpu": 0.25054545454545457,
+        "memory": 109936640.0,
+        "up": 1.0,
+        "p50": 0.02312192118226601,
+        "p95": 0.12548951048951051,
+        "p99": 0.1850979020979021
+      },
+      "traffic": {
+        "public": {
+          "canary:200": 2353,
+          "stable:200": 2459
+        },
+        "calibration": {
+          "canary:200": 2370,
+          "stable:200": 2440
+        },
+        "public_requests": 4812,
+        "public_canary_ratio": 0.48898586866167915
+      }
+    },
+    {
+      "at": "2026-11-06T03:09:27.307126+00:00",
+      "event": "stage",
+      "percent": 100
+    },
+    {
+      "at": "2026-11-06T03:09:37.337147+00:00",
+      "event": "analysis",
+      "percent": 100,
+      "elapsed": 10.0,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2405.4545454545455,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2405.4545454545455,
+        "cpu": 0.24690909090909086,
+        "memory": 109297664.0,
+        "up": 1.0,
+        "p50": 0.024305795847750868,
+        "p95": 0.13942307692307676,
+        "p99": 0.18788461538461546
+      },
+      "canary": {
+        "requests": 2378.181818181818,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2378.181818181818,
+        "cpu": 0.2594545454545456,
+        "memory": 110067712.0,
+        "up": 1.0,
+        "p50": 0.02578616352201258,
+        "p95": 0.1373563218390804,
+        "p99": 0.18747126436781605
+      },
+      "traffic": {
+        "public": {
+          "canary:200": 400
+        },
+        "calibration": {
+          "stable:200": 401
+        },
+        "public_requests": 400,
+        "public_canary_ratio": 1.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:09:47.378676+00:00",
+      "event": "analysis",
+      "percent": 100,
+      "elapsed": 20.0,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2397.8181818181815,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2397.8181818181815,
+        "cpu": 0.24690909090909086,
+        "memory": 109297664.0,
+        "up": 1.0,
+        "p50": 0.02485135135135135,
+        "p95": 0.13497041420118333,
+        "p99": 0.18699408284023677
+      },
+      "canary": {
+        "requests": 2388.0,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2388.0,
+        "cpu": 0.26236363636363624,
+        "memory": 110067712.0,
+        "up": 1.0,
+        "p50": 0.030245098039215688,
+        "p95": 0.13485119047619043,
+        "p99": 0.186970238095238
+      },
+      "traffic": {
+        "public": {
+          "canary:200": 800
+        },
+        "calibration": {
+          "stable:200": 803
+        },
+        "public_requests": 800,
+        "public_canary_ratio": 1.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:09:57.423806+00:00",
+      "event": "analysis",
+      "percent": 100,
+      "elapsed": 30.1,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2380.363636363636,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2380.363636363636,
+        "cpu": 0.2443636363636363,
+        "memory": 109297664.0,
+        "up": 1.0,
+        "p50": 0.022977795400475814,
+        "p95": 0.12475862068965526,
+        "p99": 0.18495172413793096
+      },
+      "canary": {
+        "requests": 2416.363636363636,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2416.363636363636,
+        "cpu": 0.2645454545454545,
+        "memory": 110067712.0,
+        "up": 1.0,
+        "p50": 0.02635703363914374,
+        "p95": 0.12465986394557815,
+        "p99": 0.18493197278911552
+      },
+      "traffic": {
+        "public": {
+          "canary:200": 1201
+        },
+        "calibration": {
+          "stable:200": 1204
+        },
+        "public_requests": 1201,
+        "public_canary_ratio": 1.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:10:07.476831+00:00",
+      "event": "analysis",
+      "percent": 100,
+      "elapsed": 40.1,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2368.363636363636,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2368.363636363636,
+        "cpu": 0.24145454545454548,
+        "memory": 109297664.0,
+        "up": 1.0,
+        "p50": 0.021972426470588235,
+        "p95": 0.1171374045801526,
+        "p99": 0.18342748091603053
+      },
+      "canary": {
+        "requests": 2418.5454545454545,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2418.5454545454545,
+        "cpu": 0.26472727272727276,
+        "memory": 110067712.0,
+        "up": 1.0,
+        "p50": 0.02421153846153846,
+        "p95": 0.11967391304347823,
+        "p99": 0.18393478260869578
+      },
+      "traffic": {
+        "public": {
+          "canary:200": 1602
+        },
+        "calibration": {
+          "stable:200": 1606
+        },
+        "public_requests": 1602,
+        "public_canary_ratio": 1.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:10:17.523158+00:00",
+      "event": "analysis",
+      "percent": 100,
+      "elapsed": 50.2,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2352.0,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2352.0,
+        "cpu": 0.23781818181818176,
+        "memory": 109297664.0,
+        "up": 1.0,
+        "p50": 0.021492537313432834,
+        "p95": 0.09911854103343462,
+        "p99": 0.17886274509803904
+      },
+      "canary": {
+        "requests": 2443.6363636363635,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2443.6363636363635,
+        "cpu": 0.2661818181818182,
+        "memory": 110067712.0,
+        "up": 1.0,
+        "p50": 0.023725490196078433,
+        "p95": 0.10743801652892564,
+        "p99": 0.1814876033057852
+      },
+      "traffic": {
+        "public": {
+          "canary:200": 2004
+        },
+        "calibration": {
+          "stable:200": 2007
+        },
+        "public_requests": 2004,
+        "public_canary_ratio": 1.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:10:27.569766+00:00",
+      "event": "analysis",
+      "percent": 100,
+      "elapsed": 60.2,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2396.7272727272725,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2396.7272727272725,
+        "cpu": 0.24272727272727287,
+        "memory": 109297664.0,
+        "up": 1.0,
+        "p50": 0.021163617886178862,
+        "p95": 0.0974599358974359,
+        "p99": 0.17662765957446808
+      },
+      "canary": {
+        "requests": 2394.5454545454545,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2394.5454545454545,
+        "cpu": 0.26018181818181824,
+        "memory": 110198784.0,
+        "up": 1.0,
+        "p50": 0.02285128805620609,
+        "p95": 0.09925548589341687,
+        "p99": 0.1790952380952381
+      },
+      "traffic": {
+        "public": {
+          "canary:200": 2404
+        },
+        "calibration": {
+          "stable:200": 2406
+        },
+        "public_requests": 2404,
+        "public_canary_ratio": 1.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:10:37.608778+00:00",
+      "event": "analysis",
+      "percent": 100,
+      "elapsed": 70.3,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2397.8181818181815,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2397.8181818181815,
+        "cpu": 0.24054545454545462,
+        "memory": 109297664.0,
+        "up": 1.0,
+        "p50": 0.02027102803738318,
+        "p95": 0.09297535211267605,
+        "p99": 0.16860000000000022
+      },
+      "canary": {
+        "requests": 2400.0,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2400.0,
+        "cpu": 0.25799999999999995,
+        "memory": 110198784.0,
+        "up": 1.0,
+        "p50": 0.02101468624833111,
+        "p95": 0.09500000000000004,
+        "p99": 0.17283950617283966
+      },
+      "traffic": {
+        "public": {
+          "canary:200": 2808
+        },
+        "calibration": {
+          "stable:200": 2809
+        },
+        "public_requests": 2808,
+        "public_canary_ratio": 1.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:10:47.647708+00:00",
+      "event": "analysis",
+      "percent": 100,
+      "elapsed": 80.3,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2394.5454545454545,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2394.5454545454545,
+        "cpu": 0.24200000000000002,
+        "memory": 109297664.0,
+        "up": 1.0,
+        "p50": 0.020689935064935064,
+        "p95": 0.09663978494623654,
+        "p99": 0.17758426966292154
+      },
+      "canary": {
+        "requests": 2397.8181818181815,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2395.2,
+        "cpu": 0.25819999999999993,
+        "memory": 110198784.0,
+        "up": 1.0,
+        "p50": 0.02074659009332376,
+        "p95": 0.09830115830115829,
+        "p99": 0.17806593406593405
+      },
+      "traffic": {
+        "public": {
+          "canary:200": 3204
+        },
+        "calibration": {
+          "stable:200": 3204
+        },
+        "public_requests": 3204,
+        "public_canary_ratio": 1.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:10:57.688777+00:00",
+      "event": "analysis",
+      "percent": 100,
+      "elapsed": 90.4,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2389.090909090909,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2389.090909090909,
+        "cpu": 0.243818181818182,
+        "memory": 109297664.0,
+        "up": 1.0,
+        "p50": 0.020791721419185283,
+        "p95": 0.10401785714285698,
+        "p99": 0.18223214285714265
+      },
+      "canary": {
+        "requests": 2393.4545454545455,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2393.4545454545455,
+        "cpu": 0.2610909090909093,
+        "memory": 110198784.0,
+        "up": 1.0,
+        "p50": 0.021403326403326407,
+        "p95": 0.12451388888888887,
+        "p99": 0.18545833333333342
+      },
+      "traffic": {
+        "public": {
+          "canary:200": 3605
+        },
+        "calibration": {
+          "stable:200": 3606
+        },
+        "public_requests": 3605,
+        "public_canary_ratio": 1.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:11:07.729387+00:00",
+      "event": "analysis",
+      "percent": 100,
+      "elapsed": 100.4,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2391.272727272727,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2391.272727272727,
+        "cpu": 0.24672727272727285,
+        "memory": 109297664.0,
+        "up": 1.0,
+        "p50": 0.021392931392931393,
+        "p95": 0.12145985401459848,
+        "p99": 0.18545985401459855
+      },
+      "canary": {
+        "requests": 2391.272727272727,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2391.272727272727,
+        "cpu": 0.26018181818181824,
+        "memory": 110198784.0,
+        "up": 1.0,
+        "p50": 0.021870036101083033,
+        "p95": 0.1224285714285714,
+        "p99": 0.18505714285714273
+      },
+      "traffic": {
+        "public": {
+          "canary:200": 4005
+        },
+        "calibration": {
+          "stable:200": 4008
+        },
+        "public_requests": 4005,
+        "public_canary_ratio": 1.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:11:17.776438+00:00",
+      "event": "analysis",
+      "percent": 100,
+      "elapsed": 110.4,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2392.363636363636,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2392.3636363636365,
+        "cpu": 0.24836363636363634,
+        "memory": 109297664.0,
+        "up": 1.0,
+        "p50": 0.02168146306818182,
+        "p95": 0.11719230769230797,
+        "p99": 0.18466923076923067
+      },
+      "canary": {
+        "requests": 2394.5454545454545,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2394.5454545454545,
+        "cpu": 0.25999999999999995,
+        "memory": 110198784.0,
+        "up": 1.0,
+        "p50": 0.02202520087655223,
+        "p95": 0.11944444444444414,
+        "p99": 0.1844814814814814
+      },
+      "traffic": {
+        "public": {
+          "canary:200": 4407
+        },
+        "calibration": {
+          "stable:200": 4409
+        },
+        "public_requests": 4407,
+        "public_canary_ratio": 1.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:11:27.808447+00:00",
+      "event": "analysis",
+      "percent": 100,
+      "elapsed": 120.5,
+      "decision": "promote",
+      "reasons": [
+        "SLO and comparable samples passed"
+      ],
+      "stable": {
+        "requests": 2390.181818181818,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2390.181818181818,
+        "cpu": 0.25054545454545457,
+        "memory": 109297664.0,
+        "up": 1.0,
+        "p50": 0.022817862714508582,
+        "p95": 0.13016233766233767,
+        "p99": 0.18707142857142875
+      },
+      "canary": {
+        "requests": 2391.272727272727,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2391.272727272727,
+        "cpu": 0.2612727272727271,
+        "memory": 110198784.0,
+        "up": 1.0,
+        "p50": 0.022904238618524333,
+        "p95": 0.1312658227848101,
+        "p99": 0.18675949367088596
+      },
+      "traffic": {
+        "public": {
+          "canary:200": 4808
+        },
+        "calibration": {
+          "stable:200": 4808
+        },
+        "public_requests": 4808,
+        "public_canary_ratio": 1.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:11:27.809651+00:00",
+      "event": "promoted",
+      "percent": 100
+    },
+    {
+      "at": "2026-11-06T03:11:28.436241+00:00",
+      "event": "start",
+      "scenario": "regression",
+      "policy": {
+        "window_seconds": 60,
+        "minimum_requests": 1000,
+        "abort_minimum_requests": 100,
+        "maximum_5xx_ratio": 0.01,
+        "maximum_4xx_ratio": 0.01,
+        "maximum_error_delta": 0.005,
+        "maximum_p95_seconds": 0.5,
+        "maximum_p99_seconds": 1.0,
+        "maximum_p95_ratio": 1.5,
+        "p95_tolerance_seconds": 0.05,
+        "maximum_cpu_cores": 0.85,
+        "maximum_memory_bytes": 429496729.6,
+        "minimum_business_success_ratio": 0.99,
+        "stages": [
+          {
+            "percent": 0,
+            "bake_seconds": 60,
+            "timeout_seconds": 300
+          },
+          {
+            "percent": 10,
+            "bake_seconds": 120,
+            "timeout_seconds": 300
+          },
+          {
+            "percent": 50,
+            "bake_seconds": 120,
+            "timeout_seconds": 300
+          },
+          {
+            "percent": 100,
+            "bake_seconds": 120,
+            "timeout_seconds": 300
+          }
+        ]
+      },
+      "image": "sha256:a15cd6c22388b963583f2ebe94dc35739dd2a980b946848457f7051f74bf5b8c",
+      "revision": "269a6ae1369aa086d1f85309edae20864c4fb989"
+    },
+    {
+      "at": "2026-11-06T03:11:30.630038+00:00",
+      "event": "stage",
+      "percent": 0
+    },
+    {
+      "at": "2026-11-06T03:11:33.045765+00:00",
+      "event": "stage",
+      "percent": 0
+    },
+    {
+      "at": "2026-11-06T03:11:43.099524+00:00",
+      "event": "analysis",
+      "percent": 0,
+      "elapsed": 10.0,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2272.363636363636,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2272.363636363636,
+        "cpu": 0.2379999999999998,
+        "memory": 109297664.0,
+        "up": 1.0,
+        "p50": 0.022301181102362205,
+        "p95": 0.13626623376623356,
+        "p99": 0.1903701298701298
+      },
+      "canary": {
+        "requests": 2274.545454545454,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2272.363636363636,
+        "cpu": 0.24400000000000002,
+        "memory": 110198784.0,
+        "up": 1.0,
+        "p50": 0.02262742718446602,
+        "p95": 0.13844936708860747,
+        "p99": 0.1912341772151897
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 401
+        },
+        "calibration": {
+          "canary:200": 400
+        },
+        "public_requests": 401,
+        "public_canary_ratio": 0.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:11:53.145514+00:00",
+      "event": "analysis",
+      "percent": 0,
+      "elapsed": 20.1,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2270.181818181818,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2270.181818181818,
+        "cpu": 0.23545454545454525,
+        "memory": 109297664.0,
+        "up": 1.0,
+        "p50": 0.02159546805349183,
+        "p95": 0.1132300884955753,
+        "p99": 0.18689380530973448
+      },
+      "canary": {
+        "requests": 2272.363636363636,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2270.181818181818,
+        "cpu": 0.23690909090909065,
+        "memory": 110198784.0,
+        "up": 1.0,
+        "p50": 0.021524390243902444,
+        "p95": 0.11390350877192953,
+        "p99": 0.18699122807017535
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 800
+        },
+        "calibration": {
+          "canary:200": 798
+        },
+        "public_requests": 800,
+        "public_canary_ratio": 0.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:12:03.193797+00:00",
+      "event": "analysis",
+      "percent": 0,
+      "elapsed": 30.1,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2272.363636363636,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2272.363636363636,
+        "cpu": 0.23836363636363633,
+        "memory": 109297664.0,
+        "up": 1.0,
+        "p50": 0.021799471299093653,
+        "p95": 0.1378797468354428,
+        "p99": 0.19061392405063282
+      },
+      "canary": {
+        "requests": 2275.6363636363635,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2273.4545454545455,
+        "cpu": 0.2392727272727272,
+        "memory": 110198784.0,
+        "up": 1.0,
+        "p50": 0.02160104011887073,
+        "p95": 0.13358108108108113,
+        "p99": 0.18995945945945947
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 1205
+        },
+        "calibration": {
+          "canary:200": 1202
+        },
+        "public_requests": 1205,
+        "public_canary_ratio": 0.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:12:13.236988+00:00",
+      "event": "analysis",
+      "percent": 0,
+      "elapsed": 40.2,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2271.272727272727,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2271.272727272727,
+        "cpu": 0.23963636363636348,
+        "memory": 109297664.0,
+        "up": 1.0,
+        "p50": 0.022373217115689382,
+        "p95": 0.14229411764705882,
+        "p99": 0.19128235294117654
+      },
+      "canary": {
+        "requests": 2273.454545454545,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2271.272727272727,
+        "cpu": 0.2409090909090909,
+        "memory": 110198784.0,
+        "up": 1.0,
+        "p50": 0.02189024390243903,
+        "p95": 0.14119760479041898,
+        "p99": 0.19111377245508984
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 1606
+        },
+        "calibration": {
+          "canary:200": 1604
+        },
+        "public_requests": 1606,
+        "public_canary_ratio": 0.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:12:23.278973+00:00",
+      "event": "analysis",
+      "percent": 0,
+      "elapsed": 50.2,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2271.1488464265585,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2271.1488464265585,
+        "cpu": 0.23925967674490478,
+        "memory": 109428736.0,
+        "up": 1.0,
+        "p50": 0.02132342277012328,
+        "p95": 0.1323448275862069,
+        "p99": 0.18977931034482762
+      },
+      "canary": {
+        "requests": 2273.454545454545,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2271.272727272727,
+        "cpu": 0.23909090909090944,
+        "memory": 110198784.0,
+        "up": 1.0,
+        "p50": 0.02109530583214794,
+        "p95": 0.13581699346405218,
+        "p99": 0.19030065359477127
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 2007
+        },
+        "calibration": {
+          "canary:200": 2005
+        },
+        "public_requests": 2007,
+        "public_canary_ratio": 0.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:12:33.322526+00:00",
+      "event": "analysis",
+      "percent": 0,
+      "elapsed": 60.2,
+      "decision": "promote",
+      "reasons": [
+        "SLO and comparable samples passed"
+      ],
+      "stable": {
+        "requests": 2396.7272727272725,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2396.7272727272725,
+        "cpu": 0.2527272727272728,
+        "memory": 109428736.0,
+        "up": 1.0,
+        "p50": 0.021029116465863456,
+        "p95": 0.11211999999999991,
+        "p99": 0.182424
+      },
+      "canary": {
+        "requests": 2395.6363636363635,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2395.6363636363635,
+        "cpu": 0.25363636363636344,
+        "memory": 110198784.0,
+        "up": 1.0,
+        "p50": 0.020871287128712872,
+        "p95": 0.11880597014925354,
+        "p99": 0.18435820895522365
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 2406
+        },
+        "calibration": {
+          "canary:200": 2405
+        },
+        "public_requests": 2406,
+        "public_canary_ratio": 0.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:12:35.843649+00:00",
+      "event": "stage",
+      "percent": 10
+    },
+    {
+      "at": "2026-11-06T03:12:45.887928+00:00",
+      "event": "analysis",
+      "percent": 10,
+      "elapsed": 10.0,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2393.4545454545455,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2393.4545454545455,
+        "cpu": 0.25327272727272715,
+        "memory": 109428736.0,
+        "up": 1.0,
+        "p50": 0.022465909090909092,
+        "p95": 0.13626582278481003,
+        "p99": 0.19181012658227842
+      },
+      "canary": {
+        "requests": 2386.9090909090905,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2386.9090909090905,
+        "cpu": 0.2567272727272725,
+        "memory": 110198784.0,
+        "up": 1.0,
+        "p50": 0.0224980959634425,
+        "p95": 0.14205714285714283,
+        "p99": 0.19206857142857153
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 365,
+          "canary:200": 37
+        },
+        "calibration": {
+          "canary:200": 362,
+          "stable:200": 40
+        },
+        "public_requests": 402,
+        "public_canary_ratio": 0.09203980099502487
+      }
+    },
+    {
+      "at": "2026-11-06T03:12:55.902328+00:00",
+      "event": "fault_enabled",
+      "error_rate": 0.5
+    },
+    {
+      "at": "2026-11-06T03:12:55.937299+00:00",
+      "event": "analysis",
+      "percent": 10,
+      "elapsed": 20.1,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2388.0,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2388.0,
+        "cpu": 0.2523636363636363,
+        "memory": 109428736.0,
+        "up": 1.0,
+        "p50": 0.02366985845129059,
+        "p95": 0.13642405063291138,
+        "p99": 0.19184177215189865
+      },
+      "canary": {
+        "requests": 2386.9090909090905,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2386.9090909090905,
+        "cpu": 0.25890909090909053,
+        "memory": 110198784.0,
+        "up": 1.0,
+        "p50": 0.024394736842105264,
+        "p95": 0.1457754010695187,
+        "p99": 0.192577540106952
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 728,
+          "canary:200": 76
+        },
+        "calibration": {
+          "canary:200": 719,
+          "stable:200": 85
+        },
+        "public_requests": 804,
+        "public_canary_ratio": 0.0945273631840796
+      }
+    },
+    {
+      "at": "2026-11-06T03:13:05.966286+00:00",
+      "event": "analysis",
+      "percent": 10,
+      "elapsed": 30.1,
+      "decision": "abort",
+      "reasons": [
+        "5xx",
+        "5xx regression against baseline"
+      ],
+      "stable": {
+        "requests": 2396.7272727272725,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2396.7272727272725,
+        "cpu": 0.24654545454545457,
+        "memory": 109428736.0,
+        "up": 1.0,
+        "p50": 0.022435849056603775,
+        "p95": 0.0997213855421687,
+        "p99": 0.18689898989898993
+      },
+      "canary": {
+        "requests": 2436.079836363636,
+        "5xx": 199.736,
+        "4xx": 0.0,
+        "business": 2235.272727272727,
+        "cpu": 0.2401818181818178,
+        "memory": 110198784.0,
+        "up": 1.0,
+        "p50": 0.022725989194722476,
+        "p95": 0.11361514444444433,
+        "p99": 0.1880562109722219
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 1084,
+          "canary:200": 96,
+          "canary:500": 26
+        },
+        "calibration": {
+          "canary:200": 903,
+          "stable:200": 134,
+          "canary:500": 169
+        },
+        "public_requests": 1206,
+        "public_canary_ratio": 0.1011608623548922
+      }
+    },
+    {
+      "at": "2026-11-06T03:13:08.510662+00:00",
+      "event": "stage",
+      "percent": 0
+    },
+    {
+      "at": "2026-11-06T03:13:09.569966+00:00",
+      "event": "rollback_verified",
+      "percent": 0,
+      "stable_requests": 30
+    },
+    {
+      "at": "2026-11-06T03:15:55.214228+00:00",
+      "event": "start",
+      "scenario": "rollback",
+      "policy": {
+        "window_seconds": 60,
+        "minimum_requests": 1000,
+        "abort_minimum_requests": 100,
+        "maximum_5xx_ratio": 0.01,
+        "maximum_4xx_ratio": 0.01,
+        "maximum_error_delta": 0.005,
+        "maximum_p95_seconds": 0.5,
+        "maximum_p99_seconds": 1.0,
+        "maximum_p95_ratio": 1.5,
+        "p95_tolerance_seconds": 0.05,
+        "maximum_cpu_cores": 0.85,
+        "maximum_memory_bytes": 429496729.6,
+        "minimum_business_success_ratio": 0.99,
+        "stages": [
+          {
+            "percent": 0,
+            "bake_seconds": 60,
+            "timeout_seconds": 300
+          },
+          {
+            "percent": 10,
+            "bake_seconds": 120,
+            "timeout_seconds": 300
+          },
+          {
+            "percent": 50,
+            "bake_seconds": 120,
+            "timeout_seconds": 300
+          },
+          {
+            "percent": 100,
+            "bake_seconds": 120,
+            "timeout_seconds": 300
+          }
+        ]
+      },
+      "image": "sha256:a15cd6c22388b963583f2ebe94dc35739dd2a980b946848457f7051f74bf5b8c",
+      "revision": "269a6ae1369aa086d1f85309edae20864c4fb989"
+    },
+    {
+      "at": "2026-11-06T03:15:57.411427+00:00",
+      "event": "stage",
+      "percent": 0
+    },
+    {
+      "at": "2026-11-06T03:15:57.845997+00:00",
+      "event": "rollback_verified",
+      "percent": 0,
+      "stable_requests": 30
+    },
+    {
+      "at": "2026-11-06T03:20:13.665966+00:00",
+      "event": "start",
+      "scenario": "rollback",
+      "policy": {
+        "window_seconds": 60,
+        "minimum_requests": 1000,
+        "abort_minimum_requests": 100,
+        "maximum_5xx_ratio": 0.01,
+        "maximum_4xx_ratio": 0.01,
+        "maximum_error_delta": 0.005,
+        "maximum_p95_seconds": 0.5,
+        "maximum_p99_seconds": 1.0,
+        "maximum_p95_ratio": 1.5,
+        "p95_tolerance_seconds": 0.05,
+        "maximum_cpu_cores": 0.85,
+        "maximum_memory_bytes": 429496729.6,
+        "minimum_business_success_ratio": 0.99,
+        "stages": [
+          {
+            "percent": 0,
+            "bake_seconds": 60,
+            "timeout_seconds": 300
+          },
+          {
+            "percent": 10,
+            "bake_seconds": 120,
+            "timeout_seconds": 300
+          },
+          {
+            "percent": 50,
+            "bake_seconds": 120,
+            "timeout_seconds": 300
+          },
+          {
+            "percent": 100,
+            "bake_seconds": 120,
+            "timeout_seconds": 300
+          }
+        ]
+      },
+      "image": "sha256:680ff6764850bc69b47d003742eb297b6c958d0e009a74bdd7e3e1b620775212",
+      "revision": "bf49423d2aa328529f927e8835d9fd78c59c9c05"
+    },
+    {
+      "at": "2026-11-06T03:20:15.863627+00:00",
+      "event": "stage",
+      "percent": 0
+    },
+    {
+      "at": "2026-11-06T03:20:16.367036+00:00",
+      "event": "rollback_verified",
+      "percent": 0,
+      "stable_requests": 30
+    },
+    {
+      "at": "2026-11-06T03:28:25.950404+00:00",
+      "event": "start",
+      "scenario": "promote",
+      "policy": {
+        "window_seconds": 60,
+        "minimum_requests": 1000,
+        "abort_minimum_requests": 100,
+        "maximum_5xx_ratio": 0.01,
+        "maximum_4xx_ratio": 0.01,
+        "maximum_error_delta": 0.005,
+        "maximum_p95_seconds": 0.5,
+        "maximum_p99_seconds": 1.0,
+        "maximum_p95_ratio": 1.5,
+        "p95_tolerance_seconds": 0.05,
+        "maximum_cpu_cores": 0.85,
+        "maximum_memory_bytes": 429496729.6,
+        "minimum_business_success_ratio": 0.99,
+        "stages": [
+          {
+            "percent": 0,
+            "bake_seconds": 60,
+            "timeout_seconds": 300
+          },
+          {
+            "percent": 10,
+            "bake_seconds": 120,
+            "timeout_seconds": 300
+          },
+          {
+            "percent": 50,
+            "bake_seconds": 120,
+            "timeout_seconds": 300
+          },
+          {
+            "percent": 100,
+            "bake_seconds": 120,
+            "timeout_seconds": 300
+          }
+        ]
+      },
+      "image": "sha256:680ff6764850bc69b47d003742eb297b6c958d0e009a74bdd7e3e1b620775212",
+      "revision": "bf49423d2aa328529f927e8835d9fd78c59c9c05"
+    },
+    {
+      "at": "2026-11-06T03:28:28.269632+00:00",
+      "event": "stage",
+      "percent": 0
+    },
+    {
+      "at": "2026-11-06T03:28:30.824992+00:00",
+      "event": "stage",
+      "percent": 0
+    },
+    {
+      "at": "2026-11-06T03:28:40.857978+00:00",
+      "event": "analysis",
+      "percent": 0,
+      "elapsed": 10.0,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 409.09090909090907,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 409.09090909090907,
+        "cpu": 0.04400000000000001,
+        "memory": 106762240.0,
+        "up": 1.0,
+        "p50": 0.03271484375,
+        "p95": 0.15530303030303022,
+        "p99": 0.20624999999999924
+      },
+      "canary": {
+        "requests": 393.6731454545455,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 393.68663636363635,
+        "cpu": 0.0469090909090909,
+        "memory": 108007424.0,
+        "up": 1.0,
+        "p50": 0.029404545717692007,
+        "p95": 0.16826687948129881,
+        "p99": 0.2070138309201169
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 403
+        },
+        "calibration": {
+          "canary:200": 402
+        },
+        "public_requests": 403,
+        "public_canary_ratio": 0.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:28:50.899406+00:00",
+      "event": "analysis",
+      "percent": 0,
+      "elapsed": 20.0,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 846.5454545454545,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 846.5454545454545,
+        "cpu": 0.08999999999999998,
+        "memory": 106893312.0,
+        "up": 1.0,
+        "p50": 0.02877906976744186,
+        "p95": 0.10594594594594557,
+        "p99": 0.18983783783783773
+      },
+      "canary": {
+        "requests": 816.4159999999999,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 816.458,
+        "cpu": 0.09290909090909091,
+        "memory": 108007424.0,
+        "up": 1.0,
+        "p50": 0.024714766222124374,
+        "p95": 0.1294955007596526,
+        "p99": 0.19242971405032436
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 804
+        },
+        "calibration": {
+          "canary:200": 803
+        },
+        "public_requests": 804,
+        "public_canary_ratio": 0.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:29:00.938407+00:00",
+      "event": "analysis",
+      "percent": 0,
+      "elapsed": 30.1,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 1276.079709090909,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1276.1866181818182,
+        "cpu": 0.13472727272727272,
+        "memory": 106893312.0,
+        "up": 1.0,
+        "p50": 0.024697931323283087,
+        "p95": 0.09581234992494132,
+        "p99": 0.18033557099858455
+      },
+      "canary": {
+        "requests": 1243.106909090909,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1243.1921454545454,
+        "cpu": 0.13909090909090907,
+        "memory": 108269568.0,
+        "up": 1.0,
+        "p50": 0.023111501416604417,
+        "p95": 0.10412777226084094,
+        "p99": 0.186439589823773
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 1204
+        },
+        "calibration": {
+          "canary:200": 1204
+        },
+        "public_requests": 1204,
+        "public_canary_ratio": 0.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:29:10.980234+00:00",
+      "event": "analysis",
+      "percent": 0,
+      "elapsed": 40.1,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 1701.4408727272726,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1701.5842363636361,
+        "cpu": 0.17945454545454542,
+        "memory": 106893312.0,
+        "up": 1.0,
+        "p50": 0.023057340680803576,
+        "p95": 0.09303086826781445,
+        "p99": 0.17317285917887243
+      },
+      "canary": {
+        "requests": 1668.1488727272729,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1668.3203636363637,
+        "cpu": 0.18509090909090908,
+        "memory": 108269568.0,
+        "up": 1.0,
+        "p50": 0.022001788202259474,
+        "p95": 0.09655410181831309,
+        "p99": 0.18138186189009847
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 1605
+        },
+        "calibration": {
+          "canary:200": 1606
+        },
+        "public_requests": 1605,
+        "public_canary_ratio": 0.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:29:21.025525+00:00",
+      "event": "analysis",
+      "percent": 0,
+      "elapsed": 50.2,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2121.0292363636363,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2121.2443636363637,
+        "cpu": 0.22418181818181818,
+        "memory": 107286528.0,
+        "up": 1.0,
+        "p50": 0.023823372571770085,
+        "p95": 0.09629645465080958,
+        "p99": 0.18026971937941272
+      },
+      "canary": {
+        "requests": 2091.778909090909,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2091.993818181818,
+        "cpu": 0.23054545454545453,
+        "memory": 108662784.0,
+        "up": 1.0,
+        "p50": 0.02234985889982042,
+        "p95": 0.09746308982541732,
+        "p99": 0.1816132253202709
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 2004
+        },
+        "calibration": {
+          "canary:200": 2005
+        },
+        "public_requests": 2004,
+        "public_canary_ratio": 0.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:29:31.068412+00:00",
+      "event": "analysis",
+      "percent": 0,
+      "elapsed": 60.2,
+      "decision": "promote",
+      "reasons": [
+        "SLO and comparable samples passed"
+      ],
+      "stable": {
+        "requests": 2394.5454545454545,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2394.5454545454545,
+        "cpu": 0.24927272727272728,
+        "memory": 107548672.0,
+        "up": 1.0,
+        "p50": 0.02495231607629428,
+        "p95": 0.09552824267782425,
+        "p99": 0.17039062500000007
+      },
+      "canary": {
+        "requests": 2396.7272727272725,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2396.7272727272725,
+        "cpu": 0.25636363636363635,
+        "memory": 108924928.0,
+        "up": 1.0,
+        "p50": 0.02319255404323459,
+        "p95": 0.09407223796033996,
+        "p99": 0.1687014925373138
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 2405
+        },
+        "calibration": {
+          "canary:200": 2407
+        },
+        "public_requests": 2405,
+        "public_canary_ratio": 0.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:29:33.559622+00:00",
+      "event": "stage",
+      "percent": 10
+    },
+    {
+      "at": "2026-11-06T03:29:43.603554+00:00",
+      "event": "analysis",
+      "percent": 10,
+      "elapsed": 10.0,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2386.9090909090905,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2386.9090909090905,
+        "cpu": 0.24727272727272728,
+        "memory": 107548672.0,
+        "up": 1.0,
+        "p50": 0.02887931034482759,
+        "p95": 0.10690909090909068,
+        "p99": 0.18647272727272723
+      },
+      "canary": {
+        "requests": 2396.7272727272725,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2396.7272727272725,
+        "cpu": 0.2574545454545455,
+        "memory": 109580288.0,
+        "up": 1.0,
+        "p50": 0.02739071038251367,
+        "p95": 0.11757936507936492,
+        "p99": 0.1873253968253968
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 359,
+          "canary:200": 42
+        },
+        "calibration": {
+          "canary:200": 352,
+          "stable:200": 45
+        },
+        "public_requests": 401,
+        "public_canary_ratio": 0.10473815461346633
+      }
+    },
+    {
+      "at": "2026-11-06T03:29:53.642491+00:00",
+      "event": "analysis",
+      "percent": 10,
+      "elapsed": 20.1,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2385.8181818181815,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2385.8181818181815,
+        "cpu": 0.24763636363636357,
+        "memory": 107679744.0,
+        "up": 1.0,
+        "p50": 0.030216346153846156,
+        "p95": 0.12792253521126756,
+        "p99": 0.18952816901408434
+      },
+      "canary": {
+        "requests": 2392.363636363636,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2392.363636363636,
+        "cpu": 0.25945454545454544,
+        "memory": 109580288.0,
+        "up": 1.0,
+        "p50": 0.03120762711864406,
+        "p95": 0.13225490196078438,
+        "p99": 0.18958823529411772
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 716,
+          "canary:200": 84
+        },
+        "calibration": {
+          "canary:200": 712,
+          "stable:200": 87
+        },
+        "public_requests": 800,
+        "public_canary_ratio": 0.105
+      }
+    },
+    {
+      "at": "2026-11-06T03:30:03.684498+00:00",
+      "event": "analysis",
+      "percent": 10,
+      "elapsed": 30.1,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2403.272727272727,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2403.272727272727,
+        "cpu": 0.2492727272727273,
+        "memory": 107810816.0,
+        "up": 1.0,
+        "p50": 0.03339678510998308,
+        "p95": 0.1307718120805368,
+        "p99": 0.18991275167785238
+      },
+      "canary": {
+        "requests": 2373.8181818181815,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2373.8181818181815,
+        "cpu": 0.2585454545454545,
+        "memory": 109580288.0,
+        "up": 1.0,
+        "p50": 0.03269543973941368,
+        "p95": 0.1323684210526317,
+        "p99": 0.18963157894736846
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 1092,
+          "canary:200": 110
+        },
+        "calibration": {
+          "canary:200": 1069,
+          "stable:200": 132
+        },
+        "public_requests": 1202,
+        "public_canary_ratio": 0.09151414309484193
+      }
+    },
+    {
+      "at": "2026-11-06T03:30:13.717264+00:00",
+      "event": "analysis",
+      "percent": 10,
+      "elapsed": 40.1,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2408.7272727272725,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2408.7272727272725,
+        "cpu": 0.24872727272727277,
+        "memory": 107941888.0,
+        "up": 1.0,
+        "p50": 0.028058510638297875,
+        "p95": 0.12662068965517223,
+        "p99": 0.18753103448275843
+      },
+      "canary": {
+        "requests": 2367.272727272727,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2367.272727272727,
+        "cpu": 0.2589090909090909,
+        "memory": 109580288.0,
+        "up": 1.0,
+        "p50": 0.029366438356164388,
+        "p95": 0.12762237762237763,
+        "p99": 0.1883216783216783
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 1454,
+          "canary:200": 149
+        },
+        "calibration": {
+          "canary:200": 1426,
+          "stable:200": 176
+        },
+        "public_requests": 1603,
+        "public_canary_ratio": 0.09295071740486588
+      }
+    },
+    {
+      "at": "2026-11-06T03:30:23.754620+00:00",
+      "event": "analysis",
+      "percent": 10,
+      "elapsed": 50.2,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2421.8181818181815,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2421.8181818181815,
+        "cpu": 0.248,
+        "memory": 108072960.0,
+        "up": 1.0,
+        "p50": 0.02328810853950519,
+        "p95": 0.11507936507936473,
+        "p99": 0.18555555555555536
+      },
+      "canary": {
+        "requests": 2361.8181818181815,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2361.8181818181815,
+        "cpu": 0.2581818181818182,
+        "memory": 109580288.0,
+        "up": 1.0,
+        "p50": 0.02377226463104326,
+        "p95": 0.12057692307692298,
+        "p99": 0.18719230769230766
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 1820,
+          "canary:200": 185
+        },
+        "calibration": {
+          "canary:200": 1786,
+          "stable:200": 215
+        },
+        "public_requests": 2005,
+        "public_canary_ratio": 0.09226932668329177
+      }
+    },
+    {
+      "at": "2026-11-06T03:30:33.812791+00:00",
+      "event": "analysis",
+      "percent": 10,
+      "elapsed": 60.2,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2419.6363636363635,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2419.6363636363635,
+        "cpu": 0.24690909090909094,
+        "memory": 108204032.0,
+        "up": 1.0,
+        "p50": 0.02186519258202568,
+        "p95": 0.10834710743801668,
+        "p99": 0.1816694214876033
+      },
+      "canary": {
+        "requests": 2371.6363636363635,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2371.6363636363635,
+        "cpu": 0.25963636363636367,
+        "memory": 109711360.0,
+        "up": 1.0,
+        "p50": 0.02207777777777778,
+        "p95": 0.12195652173913031,
+        "p99": 0.1849710144927536
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 2185,
+          "canary:200": 218
+        },
+        "calibration": {
+          "canary:200": 2160,
+          "stable:200": 242
+        },
+        "public_requests": 2403,
+        "public_canary_ratio": 0.09071993341656263
+      }
+    },
+    {
+      "at": "2026-11-06T03:30:43.859057+00:00",
+      "event": "analysis",
+      "percent": 10,
+      "elapsed": 70.3,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2401.090909090909,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2401.090909090909,
+        "cpu": 0.24654545454545457,
+        "memory": 108204032.0,
+        "up": 1.0,
+        "p50": 0.022155743740795285,
+        "p95": 0.10836134453781508,
+        "p99": 0.18234453781512583
+      },
+      "canary": {
+        "requests": 2388.0,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2388.0,
+        "cpu": 0.2601818181818181,
+        "memory": 109711360.0,
+        "up": 1.0,
+        "p50": 0.021974835886214444,
+        "p95": 0.11784090909090887,
+        "p99": 0.18417424242424218
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 2547,
+          "canary:200": 256
+        },
+        "calibration": {
+          "canary:200": 2539,
+          "stable:200": 263
+        },
+        "public_requests": 2803,
+        "public_canary_ratio": 0.09133071708883339
+      }
+    },
+    {
+      "at": "2026-11-06T03:30:53.902075+00:00",
+      "event": "analysis",
+      "percent": 10,
+      "elapsed": 80.3,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2372.7272727272725,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2372.7272727272725,
+        "cpu": 0.2434545454545456,
+        "memory": 108204032.0,
+        "up": 1.0,
+        "p50": 0.021985672299779577,
+        "p95": 0.10464601769911532,
+        "p99": 0.18163716814159303
+      },
+      "canary": {
+        "requests": 2414.181818181818,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2414.181818181818,
+        "cpu": 0.2616363636363636,
+        "memory": 109711360.0,
+        "up": 1.0,
+        "p50": 0.02273791250959325,
+        "p95": 0.12223404255319124,
+        "p99": 0.18501418439716294
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 2899,
+          "canary:200": 306
+        },
+        "calibration": {
+          "canary:200": 2906,
+          "stable:200": 297
+        },
+        "public_requests": 3205,
+        "public_canary_ratio": 0.09547581903276131
+      }
+    },
+    {
+      "at": "2026-11-06T03:31:03.938501+00:00",
+      "event": "analysis",
+      "percent": 10,
+      "elapsed": 90.4,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2360.7272727272725,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2360.7272727272725,
+        "cpu": 0.24254545454545445,
+        "memory": 108204032.0,
+        "up": 1.0,
+        "p50": 0.02223981900452489,
+        "p95": 0.11354838709677414,
+        "p99": 0.18335483870967734
+      },
+      "canary": {
+        "requests": 2426.181818181818,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2426.181818181818,
+        "cpu": 0.26218181818181807,
+        "memory": 109711360.0,
+        "up": 1.0,
+        "p50": 0.02387687188019967,
+        "p95": 0.12653333333333344,
+        "p99": 0.18584000000000028
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 3256,
+          "canary:200": 350
+        },
+        "calibration": {
+          "canary:200": 3258,
+          "stable:200": 347
+        },
+        "public_requests": 3606,
+        "public_canary_ratio": 0.09706045479755962
+      }
+    },
+    {
+      "at": "2026-11-06T03:31:13.976642+00:00",
+      "event": "analysis",
+      "percent": 10,
+      "elapsed": 100.4,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2366.181818181818,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2366.181818181818,
+        "cpu": 0.24418181818181817,
+        "memory": 108204032.0,
+        "up": 1.0,
+        "p50": 0.02254240555127217,
+        "p95": 0.12917266187050355,
+        "p99": 0.19158992805755418
+      },
+      "canary": {
+        "requests": 2404.363636363636,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2404.363636363636,
+        "cpu": 0.26000000000000006,
+        "memory": 109711360.0,
+        "up": 1.0,
+        "p50": 0.02508264462809917,
+        "p95": 0.1406896551724136,
+        "p99": 0.19135632183908038
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 3621,
+          "canary:200": 380
+        },
+        "calibration": {
+          "canary:200": 3613,
+          "stable:200": 384
+        },
+        "public_requests": 4001,
+        "public_canary_ratio": 0.094976255936016
+      }
+    },
+    {
+      "at": "2026-11-06T03:31:24.018793+00:00",
+      "event": "analysis",
+      "percent": 10,
+      "elapsed": 110.4,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2352.0,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2352.0,
+        "cpu": 0.24327272727272717,
+        "memory": 108204032.0,
+        "up": 1.0,
+        "p50": 0.023243243243243242,
+        "p95": 0.1311267605633801,
+        "p99": 0.19185915492957728
+      },
+      "canary": {
+        "requests": 2426.181818181818,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2426.181818181818,
+        "cpu": 0.2618181818181818,
+        "memory": 109711360.0,
+        "up": 1.0,
+        "p50": 0.029952830188679253,
+        "p95": 0.1433695652173914,
+        "p99": 0.19171739130434806
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 3980,
+          "canary:200": 421
+        },
+        "calibration": {
+          "canary:200": 3982,
+          "stable:200": 417
+        },
+        "public_requests": 4401,
+        "public_canary_ratio": 0.09566007725516928
+      }
+    },
+    {
+      "at": "2026-11-06T03:31:34.053608+00:00",
+      "event": "analysis",
+      "percent": 10,
+      "elapsed": 120.5,
+      "decision": "promote",
+      "reasons": [
+        "SLO and comparable samples passed"
+      ],
+      "stable": {
+        "requests": 2346.5454545454545,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2346.5454545454545,
+        "cpu": 0.2412727272727273,
+        "memory": 108335104.0,
+        "up": 1.0,
+        "p50": 0.022633124510571652,
+        "p95": 0.11648305084745753,
+        "p99": 0.18939830508474562
+      },
+      "canary": {
+        "requests": 2416.363636363636,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2416.363636363636,
+        "cpu": 0.25999999999999995,
+        "memory": 109711360.0,
+        "up": 1.0,
+        "p50": 0.029774746192893407,
+        "p95": 0.13328025477707012,
+        "p99": 0.18971337579617825
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 4337,
+          "canary:200": 465
+        },
+        "calibration": {
+          "canary:200": 4344,
+          "stable:200": 454
+        },
+        "public_requests": 4802,
+        "public_canary_ratio": 0.09683465222823823
+      }
+    },
+    {
+      "at": "2026-11-06T03:31:36.597618+00:00",
+      "event": "stage",
+      "percent": 50
+    },
+    {
+      "at": "2026-11-06T03:31:46.642811+00:00",
+      "event": "analysis",
+      "percent": 50,
+      "elapsed": 10.0,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2332.363636363636,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2332.363636363636,
+        "cpu": 0.23854545454545462,
+        "memory": 108859392.0,
+        "up": 1.0,
+        "p50": 0.02258634222919937,
+        "p95": 0.14562130177514776,
+        "p99": 0.1962248520710057
+      },
+      "canary": {
+        "requests": 2428.363636363636,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2428.363636363636,
+        "cpu": 0.2618181818181818,
+        "memory": 109711360.0,
+        "up": 1.0,
+        "p50": 0.028993055555555557,
+        "p95": 0.1436516853932584,
+        "p99": 0.19367415730337073
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 177,
+          "canary:200": 194
+        },
+        "calibration": {
+          "canary:200": 178,
+          "stable:200": 191
+        },
+        "public_requests": 371,
+        "public_canary_ratio": 0.522911051212938
+      }
+    },
+    {
+      "at": "2026-11-06T03:31:56.687006+00:00",
+      "event": "analysis",
+      "percent": 50,
+      "elapsed": 20.1,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2259.272727272727,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2259.272727272727,
+        "cpu": 0.23272727272727267,
+        "memory": 109252608.0,
+        "up": 1.0,
+        "p50": 0.024625706214689267,
+        "p95": 0.22111538461538469,
+        "p99": 0.2848384615384616
+      },
+      "canary": {
+        "requests": 2298.5454545454545,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2298.5454545454545,
+        "cpu": 0.25145454545454543,
+        "memory": 109973504.0,
+        "up": 1.0,
+        "p50": 0.034714912280701754,
+        "p95": 0.21040178571428567,
+        "p99": 0.28565178571428546
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 327,
+          "canary:200": 347
+        },
+        "calibration": {
+          "canary:200": 338,
+          "stable:200": 332
+        },
+        "public_requests": 674,
+        "public_canary_ratio": 0.5148367952522255
+      }
+    },
+    {
+      "at": "2026-11-06T03:32:06.737756+00:00",
+      "event": "analysis",
+      "percent": 50,
+      "elapsed": 30.1,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2130.5454545454545,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2130.5454545454545,
+        "cpu": 0.22145454545454557,
+        "memory": 109252608.0,
+        "up": 1.0,
+        "p50": 0.04190613026819924,
+        "p95": 0.25704444444444446,
+        "p99": 0.2917644444444443
+      },
+      "canary": {
+        "requests": 2240.7272727272725,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2240.7272727272725,
+        "cpu": 0.248181818181818,
+        "memory": 110104576.0,
+        "up": 1.0,
+        "p50": 0.044686234817813766,
+        "p95": 0.2602100840336135,
+        "p99": 0.29473109243697493
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 469,
+          "canary:200": 518
+        },
+        "calibration": {
+          "canary:200": 489,
+          "stable:200": 491
+        },
+        "public_requests": 987,
+        "public_canary_ratio": 0.524822695035461
+      }
+    },
+    {
+      "at": "2026-11-06T03:32:16.784917+00:00",
+      "event": "analysis",
+      "percent": 50,
+      "elapsed": 40.1,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2006.181818181818,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2006.181818181818,
+        "cpu": 0.21072727272727265,
+        "memory": 109514752.0,
+        "up": 1.0,
+        "p50": 0.09298469387755103,
+        "p95": 0.2743732193732194,
+        "p99": 0.29533048433048437
+      },
+      "canary": {
+        "requests": 2143.6363636363635,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2143.6363636363635,
+        "cpu": 0.2389090909090909,
+        "memory": 110235648.0,
+        "up": 1.0,
+        "p50": 0.08644278606965174,
+        "p95": 0.2767994858611825,
+        "p99": 0.2970051413881748
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 611,
+          "canary:200": 667
+        },
+        "calibration": {
+          "canary:200": 633,
+          "stable:200": 642
+        },
+        "public_requests": 1278,
+        "public_canary_ratio": 0.5219092331768388
+      }
+    },
+    {
+      "at": "2026-11-06T03:32:26.831339+00:00",
+      "event": "analysis",
+      "percent": 50,
+      "elapsed": 50.2,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 1900.3636363636363,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1900.3636363636363,
+        "cpu": 0.20145454545454541,
+        "memory": 109514752.0,
+        "up": 1.0,
+        "p50": 0.1424198250728863,
+        "p95": 0.28221987315010566,
+        "p99": 0.29695137420718815
+      },
+      "canary": {
+        "requests": 2033.4545454545453,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2033.4545454545453,
+        "cpu": 0.22799999999999998,
+        "memory": 110497792.0,
+        "up": 1.0,
+        "p50": 0.14190620272314677,
+        "p95": 0.2846927374301676,
+        "p99": 0.2985772811918064
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 743,
+          "canary:200": 822
+        },
+        "calibration": {
+          "canary:200": 777,
+          "stable:200": 785
+        },
+        "public_requests": 1565,
+        "public_canary_ratio": 0.5252396166134186
+      }
+    },
+    {
+      "at": "2026-11-06T03:32:36.876098+00:00",
+      "event": "analysis",
+      "percent": 50,
+      "elapsed": 60.2,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 1803.2727272727273,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1803.2727272727273,
+        "cpu": 0.1916363636363635,
+        "memory": 109514752.0,
+        "up": 1.0,
+        "p50": 0.17424242424242425,
+        "p95": 0.287736,
+        "p99": 0.2983152
+      },
+      "canary": {
+        "requests": 1869.8181818181818,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1869.8181818181818,
+        "cpu": 0.21381818181818177,
+        "memory": 110628864.0,
+        "up": 1.0,
+        "p50": 0.17983425414364643,
+        "p95": 0.28984195402298846,
+        "p99": 0.2996925287356321
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 892,
+          "canary:200": 961
+        },
+        "calibration": {
+          "canary:200": 919,
+          "stable:200": 930
+        },
+        "public_requests": 1853,
+        "public_canary_ratio": 0.5186184565569347
+      }
+    },
+    {
+      "at": "2026-11-06T03:32:46.917932+00:00",
+      "event": "analysis",
+      "percent": 50,
+      "elapsed": 70.3,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 1717.090909090909,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1717.090909090909,
+        "cpu": 0.18418181818181822,
+        "memory": 109514752.0,
+        "up": 1.0,
+        "p50": 0.1904580152671756,
+        "p95": 0.2897025495750708,
+        "p99": 0.29862039660056655
+      },
+      "canary": {
+        "requests": 1817.4545454545453,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1817.4545454545453,
+        "cpu": 0.2074545454545455,
+        "memory": 110628864.0,
+        "up": 1.0,
+        "p50": 0.19895697522816166,
+        "p95": 0.29168108776266993,
+        "p99": 0.29991841779975276
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 1025,
+          "canary:200": 1119
+        },
+        "calibration": {
+          "canary:200": 1073,
+          "stable:200": 1069
+        },
+        "public_requests": 2144,
+        "public_canary_ratio": 0.5219216417910447
+      }
+    },
+    {
+      "at": "2026-11-06T03:32:56.964757+00:00",
+      "event": "analysis",
+      "percent": 50,
+      "elapsed": 80.3,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 1706.181818181818,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1706.181818181818,
+        "cpu": 0.18381818181818194,
+        "memory": 109645824.0,
+        "up": 1.0,
+        "p50": 0.19621689785624213,
+        "p95": 0.29167346938775507,
+        "p99": 0.3159999999999997
+      },
+      "canary": {
+        "requests": 1756.2678399360036,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1756.2678399360036,
+        "cpu": 0.20071632456411456,
+        "memory": 110628864.0,
+        "up": 1.0,
+        "p50": 0.20459492140266022,
+        "p95": 0.29220072551390563,
+        "p99": 0.29998790810157194
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 1168,
+          "canary:200": 1251
+        },
+        "calibration": {
+          "canary:200": 1200,
+          "stable:200": 1227
+        },
+        "public_requests": 2419,
+        "public_canary_ratio": 0.5171558495245969
+      }
+    },
+    {
+      "at": "2026-11-06T03:33:07.010985+00:00",
+      "event": "analysis",
+      "percent": 50,
+      "elapsed": 90.4,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 1701.8181818181818,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1701.8181818181818,
+        "cpu": 0.1827272727272728,
+        "memory": 109645824.0,
+        "up": 1.0,
+        "p50": 0.20066050198150595,
+        "p95": 0.2933949801849406,
+        "p99": 0.38857142857142857
+      },
+      "canary": {
+        "requests": 1737.8181818181818,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1737.8181818181818,
+        "cpu": 0.1996363636363637,
+        "memory": 110628864.0,
+        "up": 1.0,
+        "p50": 0.20424354243542436,
+        "p95": 0.29241697416974166,
+        "p99": 0.3229999999999975
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 1314,
+          "canary:200": 1400
+        },
+        "calibration": {
+          "canary:200": 1352,
+          "stable:200": 1366
+        },
+        "public_requests": 2714,
+        "public_canary_ratio": 0.5158437730287398
+      }
+    },
+    {
+      "at": "2026-11-06T03:33:17.061302+00:00",
+      "event": "analysis",
+      "percent": 50,
+      "elapsed": 100.4,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 1703.9999999999998,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1703.9999999999998,
+        "cpu": 0.18181818181818168,
+        "memory": 109645824.0,
+        "up": 1.0,
+        "p50": 0.19883870967741937,
+        "p95": 0.29351752021563343,
+        "p99": 0.3958666666666673
+      },
+      "canary": {
+        "requests": 1741.090909090909,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1741.090909090909,
+        "cpu": 0.1996363636363637,
+        "memory": 110628864.0,
+        "up": 1.0,
+        "p50": 0.20275,
+        "p95": 0.292525,
+        "p99": 0.34040000000000004
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 1461,
+          "canary:200": 1544
+        },
+        "calibration": {
+          "canary:200": 1505,
+          "stable:200": 1506
+        },
+        "public_requests": 3005,
+        "public_canary_ratio": 0.513810316139767
+      }
+    },
+    {
+      "at": "2026-11-06T03:33:27.104807+00:00",
+      "event": "analysis",
+      "percent": 50,
+      "elapsed": 110.5,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 1719.2727272727273,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1719.2727272727273,
+        "cpu": 0.18509090909090908,
+        "memory": 109645824.0,
+        "up": 1.0,
+        "p50": 0.19395886889460154,
+        "p95": 0.2947353361945636,
+        "p99": 0.4249523809523809
+      },
+      "canary": {
+        "requests": 1753.090909090909,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1753.090909090909,
+        "cpu": 0.20218181818181813,
+        "memory": 110628864.0,
+        "up": 1.0,
+        "p50": 0.19588772845953004,
+        "p95": 0.29283892617449664,
+        "p99": 0.38096296296296295
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 1607,
+          "canary:200": 1696
+        },
+        "calibration": {
+          "canary:200": 1648,
+          "stable:200": 1662
+        },
+        "public_requests": 3303,
+        "public_canary_ratio": 0.5134726006660612
+      }
+    },
+    {
+      "at": "2026-11-06T03:33:37.147426+00:00",
+      "event": "analysis",
+      "percent": 50,
+      "elapsed": 120.5,
+      "decision": "promote",
+      "reasons": [
+        "SLO and comparable samples passed"
+      ],
+      "stable": {
+        "requests": 1739.9999999999998,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1739.9999999999998,
+        "cpu": 0.1876363636363635,
+        "memory": 109645824.0,
+        "up": 1.0,
+        "p50": 0.19593023255813954,
+        "p95": 0.2947859116022099,
+        "p99": 0.42404761904761945
+      },
+      "canary": {
+        "requests": 1722.5454545454545,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1722.5454545454545,
+        "cpu": 0.19836363636363616,
+        "memory": 110628864.0,
+        "up": 1.0,
+        "p50": 0.19736486486486488,
+        "p95": 0.293133423180593,
+        "p99": 0.387214285714285
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 1749,
+          "canary:200": 1833
+        },
+        "calibration": {
+          "canary:200": 1783,
+          "stable:200": 1808
+        },
+        "public_requests": 3582,
+        "public_canary_ratio": 0.5117252931323283
+      }
+    },
+    {
+      "at": "2026-11-06T03:33:39.836630+00:00",
+      "event": "stage",
+      "percent": 100
+    },
+    {
+      "at": "2026-11-06T03:33:49.873768+00:00",
+      "event": "analysis",
+      "percent": 100,
+      "elapsed": 10.0,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 1718.181818181818,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1718.181818181818,
+        "cpu": 0.18454545454545465,
+        "memory": 109645824.0,
+        "up": 1.0,
+        "p50": 0.19391805377720872,
+        "p95": 0.29487087517934,
+        "p99": 0.4267441860465122
+      },
+      "canary": {
+        "requests": 1748.8226630543484,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1748.8226630543484,
+        "cpu": 0.2016473625834137,
+        "memory": 110891008.0,
+        "up": 1.0,
+        "p50": 0.20058064516129034,
+        "p95": 0.293658064516129,
+        "p99": 0.3965806451612903
+      },
+      "traffic": {
+        "public": {
+          "canary:200": 288
+        },
+        "calibration": {
+          "stable:200": 290,
+          "canary:200": 3
+        },
+        "public_requests": 288,
+        "public_canary_ratio": 1.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:33:59.916278+00:00",
+      "event": "analysis",
+      "percent": 100,
+      "elapsed": 20.0,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 1732.3636363636363,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1732.3636363636363,
+        "cpu": 0.18672727272727266,
+        "memory": 109645824.0,
+        "up": 1.0,
+        "p50": 0.19181818181818183,
+        "p95": 0.2937553956834532,
+        "p99": 0.41177777777777835
+      },
+      "canary": {
+        "requests": 1753.090909090909,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1753.090909090909,
+        "cpu": 0.20181818181818195,
+        "memory": 110891008.0,
+        "up": 1.0,
+        "p50": 0.2024497487437186,
+        "p95": 0.2932977386934673,
+        "p99": 0.38096296296296295
+      },
+      "traffic": {
+        "public": {
+          "canary:200": 588
+        },
+        "calibration": {
+          "stable:200": 587,
+          "canary:200": 3
+        },
+        "public_requests": 588,
+        "public_canary_ratio": 1.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:34:09.967572+00:00",
+      "event": "analysis",
+      "percent": 100,
+      "elapsed": 30.1,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 1726.9090909090908,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1726.9090909090908,
+        "cpu": 0.1869090909090912,
+        "memory": 109645824.0,
+        "up": 1.0,
+        "p50": 0.19559620596205965,
+        "p95": 0.2936432506887052,
+        "p99": 0.4040606060606064
+      },
+      "canary": {
+        "requests": 1761.8181818181818,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1761.8181818181818,
+        "cpu": 0.20399999999999996,
+        "memory": 110891008.0,
+        "up": 1.0,
+        "p50": 0.19882271468144047,
+        "p95": 0.29327922077922075,
+        "p99": 0.38862068965517266
+      },
+      "traffic": {
+        "public": {
+          "canary:200": 887
+        },
+        "calibration": {
+          "stable:200": 880,
+          "canary:200": 3
+        },
+        "public_requests": 887,
+        "public_canary_ratio": 1.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:34:20.014902+00:00",
+      "event": "analysis",
+      "percent": 100,
+      "elapsed": 40.1,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 1737.8181818181818,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1737.8181818181818,
+        "cpu": 0.18636363636363634,
+        "memory": 109645824.0,
+        "up": 1.0,
+        "p50": 0.1970967741935484,
+        "p95": 0.29233377659574467,
+        "p99": 0.3551818181818169
+      },
+      "canary": {
+        "requests": 1742.181818181818,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1742.181818181818,
+        "cpu": 0.20054545454545455,
+        "memory": 110891008.0,
+        "up": 1.0,
+        "p50": 0.20232120451693852,
+        "p95": 0.2924905897114178,
+        "p99": 0.3402999999999997
+      },
+      "traffic": {
+        "public": {
+          "canary:200": 1182
+        },
+        "calibration": {
+          "stable:200": 1175,
+          "canary:200": 3
+        },
+        "public_requests": 1182,
+        "public_canary_ratio": 1.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:34:30.066295+00:00",
+      "event": "analysis",
+      "percent": 100,
+      "elapsed": 50.2,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 1718.181818181818,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1718.181818181818,
+        "cpu": 0.18418181818181834,
+        "memory": 109645824.0,
+        "up": 1.0,
+        "p50": 0.19482758620689655,
+        "p95": 0.2933310055865922,
+        "p99": 0.39838709677419437
+      },
+      "canary": {
+        "requests": 1767.1763358362273,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1767.1763358362273,
+        "cpu": 0.20253440721415225,
+        "memory": 110891008.0,
+        "up": 1.0,
+        "p50": 0.2,
+        "p95": 0.2932225063938619,
+        "p99": 0.3842857142857141
+      },
+      "traffic": {
+        "public": {
+          "canary:200": 1469
+        },
+        "calibration": {
+          "stable:200": 1465,
+          "canary:200": 3
+        },
+        "public_requests": 1469,
+        "public_canary_ratio": 1.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:34:40.113802+00:00",
+      "event": "analysis",
+      "percent": 100,
+      "elapsed": 60.2,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 1753.090909090909,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1753.090909090909,
+        "cpu": 0.18800000000000006,
+        "memory": 109645824.0,
+        "up": 1.0,
+        "p50": 0.1932449494949495,
+        "p95": 0.29223829201101925,
+        "p99": 0.3660833333333332
+      },
+      "canary": {
+        "requests": 1753.090909090909,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1753.090909090909,
+        "cpu": 0.20018181818181827,
+        "memory": 110891008.0,
+        "up": 1.0,
+        "p50": 0.19469309462915602,
+        "p95": 0.2926154891304348,
+        "p99": 0.376384615384616
+      },
+      "traffic": {
+        "public": {
+          "canary:200": 1762
+        },
+        "calibration": {
+          "stable:200": 1757,
+          "canary:200": 3
+        },
+        "public_requests": 1762,
+        "public_canary_ratio": 1.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:34:50.157788+00:00",
+      "event": "analysis",
+      "percent": 100,
+      "elapsed": 70.3,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 1754.181818181818,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1754.181818181818,
+        "cpu": 0.1876363636363635,
+        "memory": 109776896.0,
+        "up": 1.0,
+        "p50": 0.19422835633626098,
+        "p95": 0.29269493844049244,
+        "p99": 0.3808888888888895
+      },
+      "canary": {
+        "requests": 1750.9090909090908,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1750.9090909090908,
+        "cpu": 0.19981818181818173,
+        "memory": 110891008.0,
+        "up": 1.0,
+        "p50": 0.1947401774397972,
+        "p95": 0.29325342465753423,
+        "p99": 0.3964516129032252
+      },
+      "traffic": {
+        "public": {
+          "canary:200": 2050
+        },
+        "calibration": {
+          "stable:200": 2051,
+          "canary:200": 3
+        },
+        "public_requests": 2050,
+        "public_canary_ratio": 1.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:35:00.202687+00:00",
+      "event": "analysis",
+      "percent": 100,
+      "elapsed": 80.3,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 1750.9090909090908,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1750.9090909090908,
+        "cpu": 0.18745454545454548,
+        "memory": 109776896.0,
+        "up": 1.0,
+        "p50": 0.19344951923076925,
+        "p95": 0.29223066298342537,
+        "p99": 0.36624999999999985
+      },
+      "canary": {
+        "requests": 1730.181818181818,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1730.181818181818,
+        "cpu": 0.1972727272727274,
+        "memory": 110891008.0,
+        "up": 1.0,
+        "p50": 0.2012970168612192,
+        "p95": 0.2938651102464332,
+        "p99": 0.40087499999999954
+      },
+      "traffic": {
+        "public": {
+          "canary:200": 2329
+        },
+        "calibration": {
+          "stable:200": 2344,
+          "canary:200": 3
+        },
+        "public_requests": 2329,
+        "public_canary_ratio": 1.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:35:10.229578+00:00",
+      "event": "analysis",
+      "percent": 100,
+      "elapsed": 90.4,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 1789.090909090909,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1789.090909090909,
+        "cpu": 0.1905454545454546,
+        "memory": 109776896.0,
+        "up": 1.0,
+        "p50": 0.1856958762886598,
+        "p95": 0.2912663755458515,
+        "p99": 0.35090909090909095
+      },
+      "canary": {
+        "requests": 1767.2727272727273,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1767.2727272727273,
+        "cpu": 0.19963636363636394,
+        "memory": 110891008.0,
+        "up": 1.0,
+        "p50": 0.19522431259044865,
+        "p95": 0.2929238985313751,
+        "p99": 0.38428571428571456
+      },
+      "traffic": {
+        "public": {
+          "canary:200": 2689
+        },
+        "calibration": {
+          "stable:200": 2704,
+          "canary:200": 3
+        },
+        "public_requests": 2689,
+        "public_canary_ratio": 1.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:35:20.277291+00:00",
+      "event": "analysis",
+      "percent": 100,
+      "elapsed": 100.4,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 1909.090909090909,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1909.090909090909,
+        "cpu": 0.2016363636363637,
+        "memory": 109776896.0,
+        "up": 1.0,
+        "p50": 0.15397301349325337,
+        "p95": 0.28720508166969144,
+        "p99": 0.2999092558983666
+      },
+      "canary": {
+        "requests": 1888.3636363636363,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 1888.3636363636363,
+        "cpu": 0.21145454545454537,
+        "memory": 110891008.0,
+        "up": 1.0,
+        "p50": 0.16051752921535895,
+        "p95": 0.28951320132013203,
+        "p99": 0.3494782608695658
+      },
+      "traffic": {
+        "public": {
+          "canary:200": 3087
+        },
+        "calibration": {
+          "stable:200": 3100,
+          "canary:200": 3
+        },
+        "public_requests": 3087,
+        "public_canary_ratio": 1.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:35:30.328035+00:00",
+      "event": "analysis",
+      "percent": 100,
+      "elapsed": 110.4,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2032.3636363636363,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2032.3636363636363,
+        "cpu": 0.2141818181818182,
+        "memory": 109776896.0,
+        "up": 1.0,
+        "p50": 0.10990909090909089,
+        "p95": 0.2802927400468383,
+        "p99": 0.29774473067915674
+      },
+      "canary": {
+        "requests": 2011.7460952415586,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2011.7460952415586,
+        "cpu": 0.2241940469480156,
+        "memory": 110891008.0,
+        "up": 1.0,
+        "p50": 0.11172839506172841,
+        "p95": 0.28402515723270444,
+        "p99": 0.2994884696016772
+      },
+      "traffic": {
+        "public": {
+          "canary:200": 3490
+        },
+        "calibration": {
+          "stable:200": 3503,
+          "canary:200": 3
+        },
+        "public_requests": 3490,
+        "public_canary_ratio": 1.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:35:40.362620+00:00",
+      "event": "analysis",
+      "percent": 100,
+      "elapsed": 120.5,
+      "decision": "promote",
+      "reasons": [
+        "SLO and comparable samples passed"
+      ],
+      "stable": {
+        "requests": 2150.181818181818,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2150.181818181818,
+        "cpu": 0.22363636363636383,
+        "memory": 109776896.0,
+        "up": 1.0,
+        "p50": 0.059308510638297895,
+        "p95": 0.26694055944055933,
+        "p99": 0.294506993006993
+      },
+      "canary": {
+        "requests": 2133.8181818181815,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2133.8181818181815,
+        "cpu": 0.23490909090909093,
+        "memory": 110891008.0,
+        "up": 1.0,
+        "p50": 0.04936260623229462,
+        "p95": 0.27337423312883435,
+        "p99": 0.2973742331288344
+      },
+      "traffic": {
+        "public": {
+          "canary:200": 3893
+        },
+        "calibration": {
+          "stable:200": 3906,
+          "canary:200": 3
+        },
+        "public_requests": 3893,
+        "public_canary_ratio": 1.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:35:40.362837+00:00",
+      "event": "promoted",
+      "percent": 100
+    },
+    {
+      "at": "2026-11-06T03:35:41.404128+00:00",
+      "event": "start",
+      "scenario": "regression",
+      "policy": {
+        "window_seconds": 60,
+        "minimum_requests": 1000,
+        "abort_minimum_requests": 100,
+        "maximum_5xx_ratio": 0.01,
+        "maximum_4xx_ratio": 0.01,
+        "maximum_error_delta": 0.005,
+        "maximum_p95_seconds": 0.5,
+        "maximum_p99_seconds": 1.0,
+        "maximum_p95_ratio": 1.5,
+        "p95_tolerance_seconds": 0.05,
+        "maximum_cpu_cores": 0.85,
+        "maximum_memory_bytes": 429496729.6,
+        "minimum_business_success_ratio": 0.99,
+        "stages": [
+          {
+            "percent": 0,
+            "bake_seconds": 60,
+            "timeout_seconds": 300
+          },
+          {
+            "percent": 10,
+            "bake_seconds": 120,
+            "timeout_seconds": 300
+          },
+          {
+            "percent": 50,
+            "bake_seconds": 120,
+            "timeout_seconds": 300
+          },
+          {
+            "percent": 100,
+            "bake_seconds": 120,
+            "timeout_seconds": 300
+          }
+        ]
+      },
+      "image": "sha256:680ff6764850bc69b47d003742eb297b6c958d0e009a74bdd7e3e1b620775212",
+      "revision": "bf49423d2aa328529f927e8835d9fd78c59c9c05"
+    },
+    {
+      "at": "2026-11-06T03:35:43.597681+00:00",
+      "event": "stage",
+      "percent": 0
+    },
+    {
+      "at": "2026-11-06T03:35:46.167676+00:00",
+      "event": "stage",
+      "percent": 0
+    },
+    {
+      "at": "2026-11-06T03:35:56.211695+00:00",
+      "event": "analysis",
+      "percent": 0,
+      "elapsed": 10.0,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2178.5454545454545,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2178.5454545454545,
+        "cpu": 0.22381818181818158,
+        "memory": 109776896.0,
+        "up": 1.0,
+        "p50": 0.03864213197969543,
+        "p95": 0.20402912621359198,
+        "p99": 0.28158252427184466
+      },
+      "canary": {
+        "requests": 2176.363636363636,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2174.181818181818,
+        "cpu": 0.23709090909090894,
+        "memory": 110891008.0,
+        "up": 1.0,
+        "p50": 0.032478401727861775,
+        "p95": 0.21113636363636382,
+        "p99": 0.2836818181818185
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 402
+        },
+        "calibration": {
+          "canary:200": 402
+        },
+        "public_requests": 402,
+        "public_canary_ratio": 0.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:36:06.262552+00:00",
+      "event": "analysis",
+      "percent": 0,
+      "elapsed": 20.1,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2256.0,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2256.0,
+        "cpu": 0.23072727272727267,
+        "memory": 109776896.0,
+        "up": 1.0,
+        "p50": 0.03275162337662338,
+        "p95": 0.14826530612244898,
+        "p99": 0.1904693877551022
+      },
+      "canary": {
+        "requests": 2249.454545454545,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2247.272727272727,
+        "cpu": 0.2449090909090906,
+        "memory": 110891008.0,
+        "up": 1.0,
+        "p50": 0.02492746615087041,
+        "p95": 0.1514646464646464,
+        "p99": 0.19312121212121203
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 801
+        },
+        "calibration": {
+          "canary:200": 801
+        },
+        "public_requests": 801,
+        "public_canary_ratio": 0.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:36:16.300386+00:00",
+      "event": "analysis",
+      "percent": 0,
+      "elapsed": 30.1,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2253.8181818181815,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2253.8181818181815,
+        "cpu": 0.229272727272727,
+        "memory": 109776896.0,
+        "up": 1.0,
+        "p50": 0.028367875647668395,
+        "p95": 0.14582887700534752,
+        "p99": 0.19002139037433152
+      },
+      "canary": {
+        "requests": 2252.7272727272725,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2250.5454545454545,
+        "cpu": 0.245818181818182,
+        "memory": 110891008.0,
+        "up": 1.0,
+        "p50": 0.026637453874538752,
+        "p95": 0.14769021739130422,
+        "p99": 0.1925815217391304
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 1203
+        },
+        "calibration": {
+          "canary:200": 1203
+        },
+        "public_requests": 1203,
+        "public_canary_ratio": 0.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:36:26.336057+00:00",
+      "event": "analysis",
+      "percent": 0,
+      "elapsed": 40.1,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2257.090909090909,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2257.090909090909,
+        "cpu": 0.2280000000000001,
+        "memory": 109776896.0,
+        "up": 1.0,
+        "p50": 0.024354764107308052,
+        "p95": 0.1406725146198831,
+        "p99": 0.18907017543859653
+      },
+      "canary": {
+        "requests": 2251.6363636363635,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2249.4545454545455,
+        "cpu": 0.2445454545454546,
+        "memory": 110891008.0,
+        "up": 1.0,
+        "p50": 0.0245617342130066,
+        "p95": 0.14595505617977544,
+        "p99": 0.19233707865168548
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 1605
+        },
+        "calibration": {
+          "canary:200": 1604
+        },
+        "public_requests": 1605,
+        "public_canary_ratio": 0.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:36:36.375809+00:00",
+      "event": "analysis",
+      "percent": 0,
+      "elapsed": 50.2,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2257.090909090909,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2257.090909090909,
+        "cpu": 0.22799999999999984,
+        "memory": 109776896.0,
+        "up": 1.0,
+        "p50": 0.023659771126760563,
+        "p95": 0.13659374999999999,
+        "p99": 0.18831875000000003
+      },
+      "canary": {
+        "requests": 2251.6363636363635,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2249.4545454545455,
+        "cpu": 0.24400000000000002,
+        "memory": 110891008.0,
+        "up": 1.0,
+        "p50": 0.02379464285714286,
+        "p95": 0.14239520958083846,
+        "p99": 0.1918323353293414
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 2006
+        },
+        "calibration": {
+          "canary:200": 2005
+        },
+        "public_requests": 2006,
+        "public_canary_ratio": 0.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:36:46.413791+00:00",
+      "event": "analysis",
+      "percent": 0,
+      "elapsed": 60.2,
+      "decision": "promote",
+      "reasons": [
+        "SLO and comparable samples passed"
+      ],
+      "stable": {
+        "requests": 2395.6363636363635,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2395.6363636363635,
+        "cpu": 0.24199999999999977,
+        "memory": 109776896.0,
+        "up": 1.0,
+        "p50": 0.023228915662650604,
+        "p95": 0.12479452054794493,
+        "p99": 0.18495890410958887
+      },
+      "canary": {
+        "requests": 2392.363636363636,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2392.363636363636,
+        "cpu": 0.25818181818181823,
+        "memory": 110891008.0,
+        "up": 1.0,
+        "p50": 0.023242753623188405,
+        "p95": 0.1374127906976743,
+        "p99": 0.18841279069767433
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 2405
+        },
+        "calibration": {
+          "canary:200": 2404
+        },
+        "public_requests": 2405,
+        "public_canary_ratio": 0.0
+      }
+    },
+    {
+      "at": "2026-11-06T03:36:48.908667+00:00",
+      "event": "stage",
+      "percent": 10
+    },
+    {
+      "at": "2026-11-06T03:36:58.954149+00:00",
+      "event": "analysis",
+      "percent": 10,
+      "elapsed": 10.0,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2394.5454545454545,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2394.5454545454545,
+        "cpu": 0.24200000000000002,
+        "memory": 109776896.0,
+        "up": 1.0,
+        "p50": 0.022801321928460343,
+        "p95": 0.13764880952380948,
+        "p99": 0.1899107142857144
+      },
+      "canary": {
+        "requests": 2391.272727272727,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2391.272727272727,
+        "cpu": 0.25854545454545474,
+        "memory": 110891008.0,
+        "up": 1.0,
+        "p50": 0.023885135135135134,
+        "p95": 0.14447916666666671,
+        "p99": 0.19014583333333332
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 366,
+          "canary:200": 37
+        },
+        "calibration": {
+          "canary:200": 353,
+          "stable:200": 49
+        },
+        "public_requests": 403,
+        "public_canary_ratio": 0.09181141439205956
+      }
+    },
+    {
+      "at": "2026-11-06T03:37:08.967057+00:00",
+      "event": "fault_enabled",
+      "error_rate": 0.5
+    },
+    {
+      "at": "2026-11-06T03:37:08.991556+00:00",
+      "event": "analysis",
+      "percent": 10,
+      "elapsed": 20.1,
+      "decision": "pause",
+      "reasons": [
+        "bake time or minimum sample incomplete"
+      ],
+      "stable": {
+        "requests": 2391.272727272727,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2391.272727272727,
+        "cpu": 0.24200000000000002,
+        "memory": 109776896.0,
+        "up": 1.0,
+        "p50": 0.021895803183791605,
+        "p95": 0.13543209876543222,
+        "p99": 0.18955555555555562
+      },
+      "canary": {
+        "requests": 2392.363636363636,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2392.363636363636,
+        "cpu": 0.25781818181818167,
+        "memory": 110891008.0,
+        "up": 1.0,
+        "p50": 0.02246022727272727,
+        "p95": 0.1429679144385027,
+        "p99": 0.18987700534759364
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 730,
+          "canary:200": 75
+        },
+        "calibration": {
+          "canary:200": 720,
+          "stable:200": 84,
+          "canary:500": 1
+        },
+        "public_requests": 805,
+        "public_canary_ratio": 0.09316770186335403
+      }
+    },
+    {
+      "at": "2026-11-06T03:37:19.021039+00:00",
+      "event": "analysis",
+      "percent": 10,
+      "elapsed": 30.1,
+      "decision": "abort",
+      "reasons": [
+        "5xx",
+        "5xx regression against baseline"
+      ],
+      "stable": {
+        "requests": 2395.636363636364,
+        "5xx": 0.0,
+        "4xx": 0.0,
+        "business": 2395.6363636363635,
+        "cpu": 0.23945454545454523,
+        "memory": 109776896.0,
+        "up": 1.0,
+        "p50": 0.020715679895901104,
+        "p95": 0.12619718309859135,
+        "p99": 0.18805633802816873
+      },
+      "canary": {
+        "requests": 2374.8681818181817,
+        "5xx": 181.07039999999998,
+        "4xx": 0.0,
+        "business": 2192.7272727272725,
+        "cpu": 0.2376363636363635,
+        "memory": 110891008.0,
+        "up": 1.0,
+        "p50": 0.020798280859375,
+        "p95": 0.13300278164556956,
+        "p99": 0.1881194253164557
+      },
+      "traffic": {
+        "public": {
+          "stable:200": 1099,
+          "canary:200": 93,
+          "canary:500": 14
+        },
+        "calibration": {
+          "canary:200": 901,
+          "stable:200": 116,
+          "canary:500": 189
+        },
+        "public_requests": 1206,
+        "public_canary_ratio": 0.08872305140961857
+      }
+    },
+    {
+      "at": "2026-11-06T03:37:21.373626+00:00",
+      "event": "stage",
+      "percent": 0
+    },
+    {
+      "at": "2026-11-06T03:37:22.619724+00:00",
+      "event": "rollback_verified",
+      "percent": 0,
+      "stable_requests": 30
+    }
+  ]
+}

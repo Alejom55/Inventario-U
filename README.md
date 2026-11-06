@@ -8,6 +8,10 @@ La entrega canary incorpora stable v2 y canary v3 en OCI Compute, con Nginx,
 Prometheus, Grafana y una puerta de promoción y rollback. La operación completa,
 los comandos y límites están en [la guía canary](docs/canary-operacion.md).
 
+La [validación real en OCI](docs/evidencias-canary/README.md) incluye promoción
+hasta 100 por ciento, aborto automático con inventario intacto, Grafana autenticado
+y ejecución del workflow manual. CI aprobó 176 pruebas y 93,33 por ciento de cobertura.
+
 ```mermaid
 flowchart LR
   U[Cliente o carga concurrente] --> N[Nginx en OCI Compute puerto 8000]

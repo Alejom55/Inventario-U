@@ -1,40 +1,49 @@
-# Evidencias locales de Canary Deployment
+# Evidencias de Canary Deployment en OCI
 
-El ensayo se ejecutó en Docker Desktop el 5 de noviembre de 2026, hora de
-Colombia. Los eventos conservan fecha UTC. Esta carpeta demuestra ejecución
-local; la instalación y demostración en OCI siguen pendientes.
+La solución se probó en Docker Desktop y en la VM real de OCI el 5 de noviembre
+de 2026, hora de Colombia. Los eventos conservan fecha UTC. El resumen de nube
+registra revisión instalada, imagen SHA256, promoción, aborto, integridad del
+inventario, resultados de GitHub Actions y apagado dentro del tiempo autorizado.
 
-`local-summary.json` contiene el resultado, identidades de imagen, hash del
-árbol de aplicación y los porcentajes observados. Los JSONL conservan las
-decisiones completas de promoción y de regresión, sin claves ni contraseñas.
+## Validación en OCI
 
-La promoción recorrió 0, 10, 50 y 100 por ciento con los tiempos completos de
-la política versionada y al menos 1000 solicitudes por track en cada ventana
-aprobada. El dashboard provisionado tiene 18 paneles; se comprobó su API,
-la conexión con Prometheus y que las 18 consultas retornan datos. No se hizo
-una revisión visual autenticada del dashboard en navegador.
+`oci-summary.json` presenta los resultados finales. `oci-promote.json` y
+`oci-regression.json` conservan decisiones y métricas completas. Para revisar
+el último ensayo, tomar el último evento `start` del escenario correspondiente;
+los eventos anteriores permanecen para conservar trazabilidad.
 
-En la regresión, la puerta detectó 8,15 por ciento de 5xx canary y 0 por ciento
-stable, regresó a 0 público canary y verificó 30 consultas stable. Desde la
-decisión hasta completar la verificación transcurrieron 4,43 segundos. El
-inventario consultado antes y después fue idéntico. La inyección se desactivó
-al terminar y los smoke checks volvieron a aprobarse.
+La promoción recorre 0, 10, 50 y 100 por ciento con tiempos completos,
+al menos 1000 peticiones por track en cada ventana aprobada y comparación de
+errores, percentiles, CPU, memoria y consultas de inventario. Todas las etapas
+de un ensayo conservan la misma imagen de aplicación por ID SHA256.
 
-Cada escenario registra su propia imagen; todas las etapas de un escenario
-reutilizan el mismo ID inmutable. Las dos imágenes ensayadas contienen el mismo
-árbol `app`; se construyeron antes y después del ajuste de versión del paquete.
+La regresión configura 50 por ciento de errores únicamente en canary durante
+la etapa 10. La puerta detecta la violación, vuelve a 0 público canary y verifica
+30 consultas stable. La ventana de 60 segundos incluye peticiones saludables
+anteriores; por eso la primera alerta no muestra necesariamente 50 por ciento.
+El inventario conserva el mismo hash.
 
-Las revisiones registradas en los JSONL preceden a la normalización de dos
-mensajes GitMoji del historial local. Esa normalización no cambió archivos.
-El resumen incluye la correspondencia de revisiones y el hash de aplicación
-comprobado contra la rama entregada.
+`oci-install.json` documenta la instalación inicial y `oci-final-install.json`
+la revisión final. `oci-api-contract.json` comprueba versiones de respuesta,
+ampliación de stock en v3, login real de Grafana, dashboard autenticado y
+conexión con Prometheus. El tablero tiene 18 paneles. Grafana se validó por
+HTTP y API autenticada; no incluye revisión visual autenticada.
 
-Validación adicional: 173 pruebas aprobadas, cobertura de aplicación de 93,33
-por ciento, sintaxis Bash aprobada, YAML de workflows y Compose válido, y
-`promtool check config` aprobado. Los scripts de host se comprobaron con la
-sintaxis Python 3.9; falta ejecutarlos en el intérprete real de Oracle Linux.
-Los chequeos Terraform y el workflow remoto se comprobarán en GitHub Actions
-después de publicar la rama.
+`github-validation.json` contiene los enlaces a CI y al workflow manual Canary.
+La validación de código aprobó 176 pruebas con cobertura de aplicación de
+93,33 por ciento, cinco pruebas Terraform, sintaxis Bash y ensayo HTTP Docker.
+El workflow manual también ejecutó rollback real en la VM usando Run Command.
 
-La lectura actual de OCI confirmó `inventario-u-s3` detenida, forma E5 y Run
-Command habilitado. No se reactivó la instancia ni se aplicó Terraform.
+Las credenciales no forman parte de esta carpeta, del ZIP ni del release.
+El acceso privado del operador se recuperó por HTTPS desde el bucket privado
+y se retiró esa copia después de guardarla fuera del repositorio.
+
+## Ensayo local previo
+
+`local-summary.json` y los JSONL locales corresponden al ensayo Docker anterior:
+173 pruebas aprobadas y promoción y rollback comprobados. Las revisiones locales
+preceden a la normalización de dos mensajes GitMoji; el resumen contiene la
+correspondencia y el hash de aplicación comprobado.
+
+Las evidencias históricas de `docs/evidencias/` pertenecen a Terraform v2.
+El estado final de la VM y el tiempo de uso están en el resumen de nube.

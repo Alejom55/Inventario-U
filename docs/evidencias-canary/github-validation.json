@@ -1,0 +1,24 @@
+{
+  "quality": {
+    "id": 42154715763,
+    "name": "Validacion OCI",
+    "event": "push",
+    "head_sha": "bf49423d2aa328529f927e8835d9fd78c59c9c05",
+    "conclusion": "success",
+    "html_url": "https://github.com/Alejom55/Inventario-U/actions/runs/42154715763",
+    "created_at": "2026-11-06T03:08:45Z",
+    "updated_at": "2026-11-06T03:11:06Z",
+    "tests_passed": 176,
+    "application_coverage_percent": 93.33
+  },
+  "canary_workflow": {
+    "id": 42155297058,
+    "name": "Canary en OCI",
+    "event": "workflow_dispatch",
+    "head_sha": "bf49423d2aa328529f927e8835d9fd78c59c9c05",
+    "conclusion": "success",
+    "html_url": "https://github.com/Alejom55/Inventario-U/actions/runs/42155297058",
+    "created_at": "2026-11-06T03:14:17Z",
+    "updated_at": "2026-11-06T03:16:21Z"
+  }
+}

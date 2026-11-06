@@ -39,8 +39,9 @@ pública de porcentajes.
 
 ## Escenario de promoción exitosa
 
-Ejecutar `promote` en el workflow `Canary en OCI` usando la misma revisión que
-se instaló. Mostrar primero 0 público y la solicitud interna con track canary.
+Ejecutar `promote` en el workflow `Canary en OCI` indicando en `revision` el SHA
+completo instalado, disponible en `X-App-Revision` y en el resumen de evidencias.
+Mostrar primero 0 público y la solicitud interna con track canary.
 Durante 10 y 50 mostrar el reparto observado en los eventos `analysis`, que
 cuentan únicamente peticiones públicas. Enseñar al lado el volumen, 5xx, 4xx,
 p50, p95, p99, CPU, memoria y consultas completadas de cada track en Grafana.
