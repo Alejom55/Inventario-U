@@ -62,7 +62,7 @@ services:
     image: nginx:1.28-alpine
     restart: unless-stopped
     ports:
-      - '${GATEWAY_BIND:-0.0.0.0}:8000:8000'
+      - '${GATEWAY_BIND:-0.0.0.0}:${GATEWAY_PORT:-8000}:8000'
     volumes:
       - ./runtime:/etc/nginx/conf.d:ro
     depends_on:

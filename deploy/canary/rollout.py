@@ -46,11 +46,12 @@ class Rollout:
         if not re.fullmatch(r"sha256:[a-f0-9]{64}", self.values.get("CANARY_IMAGE", "")):
             raise ValueError("CANARY_IMAGE must be an immutable local sha256 image ID")
         self.env_file, self.evidence = str(Path(env_file).resolve()), Path(evidence)
+        self.project = self.values.get("COMPOSE_PROJECT_NAME", "inventario-oci")
         self.base_url, self.prometheus = base_url.rstrip("/"), prometheus.rstrip("/")
         self.key = self.values["TEAM_API_KEY"]
 
     def compose(self, *args):
-        subprocess.run(["docker", "compose", "--project-name", "inventario-oci", "--env-file", self.env_file,
+        subprocess.run(["docker", "compose", "--project-name", self.project, "--env-file", self.env_file,
                         "-f", str(FOLDER / "compose.yml"), *args], check=True, capture_output=True, text=True)
 
     def event(self, kind, **values):
@@ -161,12 +162,21 @@ def main():
     parser.add_argument("--env-file", default="/opt/inventario/canary.env")
     parser.add_argument("--evidence", default=str(FOLDER / "evidence/rollout.jsonl"))
     parser.add_argument("--rps", type=int, default=80)
+    parser.add_argument("--base-url", default="http://127.0.0.1:8000")
+    parser.add_argument("--prometheus", default="http://127.0.0.1:9090")
     args = parser.parse_args()
     # One controller at a time; lock is released even on failure.
-    import fcntl
-    with (FOLDER / "runtime/rollout.lock").open("w") as lock:
-        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        Rollout(args.env_file, args.evidence).run(args.scenario, args.rps)
+    with (FOLDER / "runtime/rollout.lock").open("a+") as lock:
+        if os.name == "nt":
+            import msvcrt
+            lock.write("0")
+            lock.flush()
+            lock.seek(0)
+            msvcrt.locking(lock.fileno(), msvcrt.LK_NBLCK, 1)
+        else:
+            import fcntl
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        Rollout(args.env_file, args.evidence, args.base_url, args.prometheus).run(args.scenario, args.rps)
 
 
 if __name__ == "__main__":
