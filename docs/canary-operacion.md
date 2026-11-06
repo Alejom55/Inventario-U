@@ -116,6 +116,11 @@ es portable al registro mediante un push por digest si se necesitan varias VMs.
 
 La contraseña de Grafana queda en `/opt/inventario/grafana.password` con permisos
 600. Usuario `admin`. No imprimirla en logs ni guardarla en el repositorio.
+La instalación deja una copia de acceso para el operador en el bucket privado,
+objeto `canary-operator-access/<revision>.json`. Descargarla por HTTPS con las
+credenciales OCI del propietario, conservarla en un archivo local privado y
+retirar esa copia del bucket después de recuperarla. Ese objeto contiene solo
+el acceso de Grafana y nunca se adjunta al release ni a las evidencias públicas.
 Tablero: `/grafana/d/inventory-canary/`. La API key se obtiene del mecanismo
 Vault existente y se conserva en archivos privados del host.
 

@@ -56,6 +56,12 @@ def main(action):
         {"region": values["OCI_REGION"]},
         signer=oci.auth.signers.InstancePrincipalsSecurityTokenSigner(),
     )
+    if action == "install":
+        # Deliver operator access through private Object Storage, never command logs.
+        access = json.dumps({"user": "admin", "password": values["GRAFANA_PASSWORD"]}).encode()
+        client.put_object(values["OCI_NAMESPACE"], values["OCI_BUCKET_NAME"],
+                          "canary-operator-access/" + values["APP_REVISION"] + ".json", access,
+                          content_type="application/json")
     key = "canary-evidence/" + values["APP_REVISION"] + "/" + action + ".json"
     client.put_object(values["OCI_NAMESPACE"], values["OCI_BUCKET_NAME"], key, body,
                       content_type="application/json")
