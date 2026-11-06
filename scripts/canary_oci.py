@@ -14,23 +14,9 @@ def command_content(action, revision):
         raise ValueError("Invalid canary action")
     if not re.fullmatch(r"[a-f0-9]{40}", revision):
         raise ValueError("Full Git SHA required")
-    preparation = [
-        "#!/bin/bash", "set -euo pipefail", "sudo -n bash <<'CANARY_SCRIPT'", "set -euo pipefail",
-        "cd /opt/inventario/source",
-    ]
-    if action == "install":
-        preparation += [
-            f"git fetch origin {revision} --depth=1",
-            f"git checkout --detach {revision}",
-            f"bash deploy/canary/install.sh {revision}",
-        ]
-    else:
-        preparation += [
-            f'test "$(cat /opt/inventario/deployed-revision)" = "{revision}"',
-            f'test "$(git rev-parse HEAD)" = "{revision}"',
-            f"/opt/inventario/sdk/bin/python -m deploy.canary.rollout {action}",
-        ]
-    return "\n".join([*preparation, "CANARY_SCRIPT"])
+    # Keep the existing sudo boundary: the agent cannot run an arbitrary root shell.
+    suffix = "" if action == "install" else " " + action
+    return "\n".join(["#!/bin/bash", "set -euo pipefail", f"sudo -n /opt/inventario/deploy.sh {revision}{suffix}"])
 
 
 def main():

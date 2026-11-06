@@ -5,8 +5,8 @@ revision=${1:?Expected full Git SHA}
 [[ $revision =~ ^[a-f0-9]{40}$ ]] || exit 2
 cd /opt/inventario/source
 test "$(git rev-parse HEAD)" = "$revision"
-exec 9>/opt/inventario/deploy.lock
-flock -n 9 || { echo 'Deployment already running' >&2; exit 1; }
+# The existing privileged entry point already holds deploy.lock.
+install -m 0700 deploy/host-deploy.sh /opt/inventario/deploy.sh
 /opt/inventario/sdk/bin/python deploy/runtime_env.py "$revision" /opt/inventario/runtime.env
 
 # Build exactly once. Every traffic stage uses this same content-addressed image.
