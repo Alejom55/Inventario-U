@@ -1,5 +1,11 @@
 # Práctica de sustentación con Postman
 
+Para la red universitaria, usar `http://157.137.207.154` como `base_url`,
+sin `:8000`. Grafana está en
+`http://157.137.207.154/grafana/d/inventory-canary/`.
+OCI permite los puertos 80 y 8000 únicamente desde el CIDR autorizado.
+Si cambia la red de salida, hay que actualizar ese CIDR antes de la práctica.
+
 Postman prueba las peticiones de la API. GitHub Actions ejecuta la promoción
 y el rollback; Grafana muestra las métricas. No se necesita controlar Docker
 desde un endpoint público ni usar credenciales GitHub dentro de Postman.
