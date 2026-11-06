@@ -35,6 +35,11 @@ destination.chmod(0o600)
 # Nginx master reads this file as root before dropping worker privileges.
 (folder / 'proxy.conf').write_text(render(0, values['TEAM_API_KEY']))
 PY
+# The checkout is private under umask 077; non-root monitoring users need these
+# public configuration files, while runtime credentials remain root-only.
+chmod 0644 deploy/canary/prometheus.yml
+find deploy/canary/grafana -type d -exec chmod 0755 {} +
+find deploy/canary/grafana -type f -exec chmod 0644 {} +
 compose=(docker compose --project-name inventario-oci --env-file /opt/inventario/canary.env -f deploy/canary/compose.yml)
 "${compose[@]}" config --quiet
 "${compose[@]}" up -d --wait --wait-timeout 120 db
