@@ -14,17 +14,18 @@ from .integrations.external_api import ExternalApiError
 from .integrations.fastify_client import obtener_articulo
 from .schema import crear_tabla_almacenes, crear_tabla_movimientos, crear_tabla_skus
 from .storage.router import router as storage_router
-from .telemetry import install_telemetry
+from .telemetry import TRACK, VERSION, install_telemetry
+from .canary import install_v3
 
 
 logger = logging.getLogger(__name__)
 API_V2_PREFIX = "/api/v2"
-HEALTH_PATHS = {"/health", f"{API_V2_PREFIX}/health"}
-FUNCTIONAL_PATHS = ("/skus", "/almacenes", "/movimientos", "/inventario/query", API_V2_PREFIX)
+HEALTH_PATHS = {"/health", f"{API_V2_PREFIX}/health", "/api/v3/health"}
+FUNCTIONAL_PATHS = ("/skus", "/almacenes", "/movimientos", "/inventario/query", API_V2_PREFIX, "/api/v3")
 
 app = FastAPI(
     title="Gestor de inventario",
-    version="2.0.0",
+    version=VERSION,
     description="API para la gestión de SKU, almacenes y movimientos de inventario.",
 )
 app.include_router(storage_router, prefix=API_V2_PREFIX)
@@ -32,6 +33,8 @@ app.include_router(storage_router, prefix=API_V2_PREFIX)
 
 @app.on_event("startup")
 def iniciar_api():
+    if TRACK == "canary":
+        return  # Schema belongs to stable; canary never changes existing tables.
     crear_tabla_skus()
     crear_tabla_almacenes()
     crear_tabla_movimientos()
@@ -64,8 +67,8 @@ async def agregar_trace_id(request: Request, call_next):
 @app.get("/health")
 @app.get(f"{API_V2_PREFIX}/health")
 def estado_api(request: Request):
-    if request.url.path.startswith(API_V2_PREFIX):
-        return {"status": "ok", "version": "2.0.0", "service": "inventario-u"}
+    if request.url.path.startswith((API_V2_PREFIX, "/api/v3")):
+        return {"status": "ok", "version": VERSION, "service": "inventario-u"}
     return {"estado": "ok"}
 
 
@@ -654,4 +657,5 @@ def consultar_integracion(
     }
 
 
+install_v3(app, consultar_inventario)
 install_telemetry(app)
