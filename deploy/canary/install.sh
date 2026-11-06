@@ -51,5 +51,6 @@ if ! "${compose[@]}" up -d --wait --wait-timeout 120 gateway; then
   exit 1
 fi
 /opt/inventario/sdk/bin/python -m deploy.canary.rollout rollback
+/opt/inventario/sdk/bin/python -m deploy.canary.smoke
 printf '%s\n' "$revision" > /opt/inventario/deployed-revision
 echo "Canary installed at public 0 percent; PostgreSQL backup saved."
