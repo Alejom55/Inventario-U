@@ -10,6 +10,7 @@ def render(percent, api_key):
         raise ValueError("Invalid API key")
     split = f"{percent}% canary; * stable;" if percent in {10, 50} else f"* {'canary' if percent == 100 else 'stable'};"
     return f'''# Generated stage {percent}; change with rollout.py only.
+map_hash_bucket_size 256;
 upstream stable {{ server stable:8000; keepalive 16; }}
 upstream canary {{ server canary:8000; keepalive 16; }}
 map $http_x_api_key $authorized {{ default 0; "{api_key}" 1; }}

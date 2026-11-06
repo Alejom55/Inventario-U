@@ -11,6 +11,7 @@ def test_split_routes_and_private_preview(stage):
     assert '"1:baseline" stable' in text
     assert "if ($authorized = 0) { return 403; }" in text
     assert "proxy_next_upstream off" in text
+    assert "map_hash_bucket_size 256" in text
     if stage == 0:
         assert "* stable;" in text
         assert "0%" not in text
