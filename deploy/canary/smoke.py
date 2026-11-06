@@ -21,7 +21,7 @@ def request(base_url, key, path, method="GET", body=None, preview=None):
         response = error
     with response:
         raw = response.read()
-        return response.status, dict(response.headers), json.loads(raw) if raw else None
+        return response.status, response.headers, json.loads(raw) if raw else None
 
 
 def verify(base_url, key, seed=False):
