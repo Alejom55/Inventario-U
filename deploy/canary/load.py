@@ -11,8 +11,8 @@ from urllib.request import Request, urlopen
 
 class Load:
     def __init__(self, base_url, key, rps=80, workers=12):
-        if not 1 <= rps <= 200 or not 3 <= workers <= 32:
-            raise ValueError("Load must use 1..200 RPS and 3..32 workers")
+        if not 1 <= rps <= 200 or not 4 <= workers <= 32 or workers % 2:
+            raise ValueError("Load must use 1..200 RPS and an even 4..32 workers")
         self.base_url, self.key = base_url.rstrip("/"), key
         self.rps, self.workers = rps, workers
         self.stop = threading.Event()

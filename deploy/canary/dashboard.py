@@ -8,8 +8,8 @@ def build():
     panels = []
     for index, (title, query, unit) in enumerate([
         ("Peticiones por segundo", 'sum(rate(inventory_http_requests_total{track="TRACK"}[1m]))', "reqps"),
-        ("Errores 5xx", 'sum(rate(inventory_http_requests_total{track="TRACK",status=~"5.."}[1m])) / clamp_min(sum(rate(inventory_http_requests_total{track="TRACK"}[1m])),0.001)', "percentunit"),
-        ("Errores 4xx", 'sum(rate(inventory_http_requests_total{track="TRACK",status=~"4.."}[1m])) / clamp_min(sum(rate(inventory_http_requests_total{track="TRACK"}[1m])),0.001)', "percentunit"),
+        ("Errores 5xx", '(sum(rate(inventory_http_requests_total{track="TRACK",status=~"5.."}[1m])) or vector(0)) / clamp_min(sum(rate(inventory_http_requests_total{track="TRACK"}[1m])),0.001)', "percentunit"),
+        ("Errores 4xx", '(sum(rate(inventory_http_requests_total{track="TRACK",status=~"4.."}[1m])) or vector(0)) / clamp_min(sum(rate(inventory_http_requests_total{track="TRACK"}[1m])),0.001)', "percentunit"),
         *[(f"Latencia p{p}", f'histogram_quantile({p/100}, sum by (le) (rate(inventory_http_duration_seconds_bucket{{track="TRACK"}}[1m])))', "s") for p in (50, 95, 99)],
         ("CPU sobre limite de un core", 'sum(rate(process_cpu_seconds_total{job="inventory",track="TRACK"}[1m]))', "percentunit"),
         ("Memoria sobre limite de 512 MiB", 'sum(process_resident_memory_bytes{job="inventory",track="TRACK"}) / 536870912', "percentunit"),

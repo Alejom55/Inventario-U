@@ -99,7 +99,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(rate(inventory_http_requests_total{track=\"stable\",status=~\"5..\"}[1m])) / clamp_min(sum(rate(inventory_http_requests_total{track=\"stable\"}[1m])),0.001)",
+          "expr": "(sum(rate(inventory_http_requests_total{track=\"stable\",status=~\"5..\"}[1m])) or vector(0)) / clamp_min(sum(rate(inventory_http_requests_total{track=\"stable\"}[1m])),0.001)",
           "legendFormat": "stable"
         }
       ],
@@ -137,7 +137,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(rate(inventory_http_requests_total{track=\"canary\",status=~\"5..\"}[1m])) / clamp_min(sum(rate(inventory_http_requests_total{track=\"canary\"}[1m])),0.001)",
+          "expr": "(sum(rate(inventory_http_requests_total{track=\"canary\",status=~\"5..\"}[1m])) or vector(0)) / clamp_min(sum(rate(inventory_http_requests_total{track=\"canary\"}[1m])),0.001)",
           "legendFormat": "canary"
         }
       ],
@@ -175,7 +175,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(rate(inventory_http_requests_total{track=\"stable\",status=~\"4..\"}[1m])) / clamp_min(sum(rate(inventory_http_requests_total{track=\"stable\"}[1m])),0.001)",
+          "expr": "(sum(rate(inventory_http_requests_total{track=\"stable\",status=~\"4..\"}[1m])) or vector(0)) / clamp_min(sum(rate(inventory_http_requests_total{track=\"stable\"}[1m])),0.001)",
           "legendFormat": "stable"
         }
       ],
@@ -213,7 +213,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(rate(inventory_http_requests_total{track=\"canary\",status=~\"4..\"}[1m])) / clamp_min(sum(rate(inventory_http_requests_total{track=\"canary\"}[1m])),0.001)",
+          "expr": "(sum(rate(inventory_http_requests_total{track=\"canary\",status=~\"4..\"}[1m])) or vector(0)) / clamp_min(sum(rate(inventory_http_requests_total{track=\"canary\"}[1m])),0.001)",
           "legendFormat": "canary"
         }
       ],
