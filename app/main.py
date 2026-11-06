@@ -14,6 +14,7 @@ from .integrations.external_api import ExternalApiError
 from .integrations.fastify_client import obtener_articulo
 from .schema import crear_tabla_almacenes, crear_tabla_movimientos, crear_tabla_skus
 from .storage.router import router as storage_router
+from .telemetry import install_telemetry
 
 
 logger = logging.getLogger(__name__)
@@ -651,3 +652,6 @@ def consultar_integracion(
         "deportista": deportista,
         "articulo": articulo,
     }
+
+
+install_telemetry(app)
