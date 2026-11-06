@@ -1,0 +1,107 @@
+name: inventario-oci
+
+x-api: &api
+  image: ${CANARY_IMAGE:?Use immutable image ID}
+  restart: unless-stopped
+  cpus: 1.0
+  mem_limit: 512m
+  environment: &api-env
+    DATABASE_URL: postgresql://inventario:${POSTGRES_PASSWORD:?required}@db:5432/inventario
+    TEAM_API_KEY: ${TEAM_API_KEY:?required}
+    APP_REVISION: ${APP_REVISION:?required}
+    DEPORTBACK_API_URL: ${DEPORTBACK_API_URL:-}
+    FASTIFY_API_URL: ${FASTIFY_API_URL:-}
+    OCI_REGION: ${OCI_REGION:-sa-bogota-1}
+    OCI_NAMESPACE: ${OCI_NAMESPACE:-}
+    OCI_BUCKET_NAME: ${OCI_BUCKET_NAME:-}
+    OCI_AUTH_MODE: instance_principals
+  depends_on:
+    db:
+      condition: service_healthy
+  healthcheck:
+    test: [CMD, /app/.venv/bin/python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"]
+    interval: 5s
+    timeout: 4s
+    retries: 20
+    start_period: 20s
+  logging:
+    options:
+      max-size: 10m
+      max-file: '3'
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: inventario
+      POSTGRES_USER: inventario
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?required}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U inventario -d inventario]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  stable:
+    <<: *api
+    environment:
+      <<: *api-env
+      APP_TRACK: stable
+  canary:
+    <<: *api
+    environment:
+      <<: *api-env
+      APP_TRACK: canary
+      FAULT_INJECTION_ENABLED: 'true'
+    depends_on:
+      stable:
+        condition: service_healthy
+  gateway:
+    image: nginx:1.28-alpine
+    restart: unless-stopped
+    ports:
+      - '${GATEWAY_BIND:-0.0.0.0}:8000:8000'
+    volumes:
+      - ./runtime:/etc/nginx/conf.d:ro
+    depends_on:
+      stable:
+        condition: service_healthy
+      canary:
+        condition: service_healthy
+      grafana:
+        condition: service_started
+    healthcheck:
+      test: [CMD, wget, -q, -O, /dev/null, 'http://127.0.0.1:8000/api/v2/health']
+      interval: 5s
+      timeout: 4s
+      retries: 20
+  prometheus:
+    image: prom/prometheus:v3.5.0
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:${PROMETHEUS_PORT:-9090}:9090'
+    command: ['--config.file=/etc/prometheus/prometheus.yml', '--storage.tsdb.retention.time=7d']
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+  grafana:
+    image: grafana/grafana:12.1.0
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:?required}
+      GF_USERS_ALLOW_SIGN_UP: 'false'
+      GF_AUTH_ANONYMOUS_ENABLED: 'false'
+      GF_SERVER_ROOT_URL: '%(protocol)s://%(domain)s:%(http_port)s/grafana/'
+      GF_SERVER_SERVE_FROM_SUB_PATH: 'true'
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana_data:/var/lib/grafana
+
+volumes:
+  postgres_data:
+  prometheus_data:
+  grafana_data:

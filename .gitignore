@@ -24,3 +24,5 @@ crash.log
 crash.*.log
 deploy/*.env
 .uv-cache/
+deploy/canary/runtime/
+deploy/canary/evidence/
