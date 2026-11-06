@@ -16,7 +16,10 @@ if [[ $action != install ]]; then
   cd source
   test "$(git rev-parse HEAD)" = "$revision"
   test "$(cat /opt/inventario/deployed-revision)" = "$revision"
-  exec /opt/inventario/sdk/bin/python -m deploy.canary.rollout "$action"
+  status=0
+  /opt/inventario/sdk/bin/python -m deploy.canary.rollout "$action" || status=$?
+  /opt/inventario/sdk/bin/python -m deploy.canary.export "$action" || { if [[ $status == 0 ]]; then status=1; fi; }
+  exit "$status"
 fi
 if [[ ! -d source/.git ]]; then
   git clone --no-checkout https://github.com/Alejom55/Inventario-U.git source
