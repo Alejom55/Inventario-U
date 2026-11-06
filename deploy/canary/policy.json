@@ -1,0 +1,21 @@
+{
+  "window_seconds": 60,
+  "minimum_requests": 1000,
+  "abort_minimum_requests": 100,
+  "maximum_5xx_ratio": 0.01,
+  "maximum_4xx_ratio": 0.01,
+  "maximum_error_delta": 0.005,
+  "maximum_p95_seconds": 0.5,
+  "maximum_p99_seconds": 1.0,
+  "maximum_p95_ratio": 1.5,
+  "p95_tolerance_seconds": 0.05,
+  "maximum_cpu_cores": 0.85,
+  "maximum_memory_bytes": 429496729.6,
+  "minimum_business_success_ratio": 0.99,
+  "stages": [
+    {"percent": 0, "bake_seconds": 60, "timeout_seconds": 300},
+    {"percent": 10, "bake_seconds": 120, "timeout_seconds": 300},
+    {"percent": 50, "bake_seconds": 120, "timeout_seconds": 300},
+    {"percent": 100, "bake_seconds": 120, "timeout_seconds": 300}
+  ]
+}
