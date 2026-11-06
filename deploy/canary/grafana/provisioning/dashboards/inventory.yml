@@ -1,0 +1,7 @@
+apiVersion: 1
+providers:
+  - name: Inventory
+    folder: Canary
+    type: file
+    options:
+      path: /var/lib/grafana/dashboards
