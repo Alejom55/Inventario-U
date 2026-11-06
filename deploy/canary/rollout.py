@@ -116,7 +116,7 @@ class Rollout:
                 for stage in policy["stages"]:
                     percent = stage["percent"]
                     self.stage(percent)
-                    load.reset()
+                    load.reset(percent)
                     start = time.monotonic()
                     injected = False
                     while True:

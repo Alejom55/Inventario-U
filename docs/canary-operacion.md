@@ -65,8 +65,10 @@ límite superior de error al 95 por ciento cerca de 0,3 por ciento.
 
 El generador realiza consultas `QUERY /api/live/inventario/query` con el mismo
 cuerpo y autenticación, hasta 80 RPS y doce trabajadores por defecto. La mitad
-genera una muestra pública y la otra mitad envía sondas balanceadas a cada
-track, incluso durante 0 y 100. No modifica inventario ni llama integraciones.
+genera una muestra pública y la otra mitad compensa el reparto para equilibrar
+la carga total esperada en ambos tracks, incluso durante 0 y 100. Por ejemplo,
+en 0 las sondas van a canary y el público a stable; en 50 las sondas se dividen
+por igual. No modifica inventario ni llama integraciones.
 
 SLO de ambos tracks: 5xx y 4xx no superiores a 1 por ciento, p95 hasta 500 ms,
 p99 hasta un segundo, CPU hasta 0,85 de un core y memoria de proceso hasta

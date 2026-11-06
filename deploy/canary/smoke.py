@@ -21,7 +21,8 @@ def request(base_url, key, path, method="GET", body=None, preview=None):
         response = error
     with response:
         raw = response.read()
-        return response.status, response.headers, json.loads(raw) if raw else None
+        body = json.loads(raw) if raw and "application/json" in response.headers.get("Content-Type", "") else None
+        return response.status, response.headers, body
 
 
 def verify(base_url, key, seed=False):

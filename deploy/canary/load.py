@@ -2,7 +2,7 @@
 
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
-import json
+import random
 import threading
 import time
 from urllib.error import HTTPError, URLError
@@ -19,6 +19,7 @@ class Load:
         self.lock = threading.Lock()
         self.public = Counter()
         self.calibration = Counter()
+        self.percent = 0
 
     def request(self, selection=None):
         headers = {"X-Api-Key": self.key, "Content-Type": "application/json"}
@@ -36,11 +37,11 @@ class Load:
             return response.headers.get("X-App-Track", "unavailable"), response.status
 
     def worker(self, index):
-        # Half the workers send balanced baseline/canary probes, even at 0/100%.
-        mode = ("baseline" if index % 2 == 0 else "true") if index < self.workers // 2 else None
         interval = self.workers / self.rps
         while not self.stop.is_set():
             start = time.monotonic()
+            # Offset the public split: total expected load is equal on both tracks.
+            mode = ("true" if random.random() >= self.percent / 100 else "baseline") if index < self.workers // 2 else None
             track, status = self.request(mode)
             with self.lock:
                 (self.calibration if mode else self.public)[f"{track}:{status}"] += 1
@@ -51,8 +52,9 @@ class Load:
         self.futures = [self.pool.submit(self.worker, i) for i in range(self.workers)]
         return self
 
-    def reset(self):
+    def reset(self, percent=0):
         with self.lock:
+            self.percent = percent
             self.public.clear()
             self.calibration.clear()
 
