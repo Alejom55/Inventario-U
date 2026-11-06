@@ -66,14 +66,14 @@ class Rollout:
         content = render(percent, self.key)
         previous = target.read_text() if target.exists() else None
         temporary = target.with_suffix(".tmp")
-        temporary.write_text(content, encoding="utf-8", newline="\n")
+        temporary.write_bytes(content.encode("utf-8"))
         temporary.replace(target)
         try:
             self.compose("exec", "-T", "gateway", "nginx", "-t")
             self.compose("exec", "-T", "gateway", "nginx", "-s", "reload")
         except Exception:
             if previous is not None:
-                temporary.write_text(previous, encoding="utf-8", newline="\n")
+                temporary.write_bytes(previous.encode("utf-8"))
                 temporary.replace(target)
             raise
         # New workers must be serving before the stage sample starts.
