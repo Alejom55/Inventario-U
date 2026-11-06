@@ -2,6 +2,60 @@
 
 API para administrar inventario entre varios almacenes.
 
+## Canary Deployment en OCI
+
+La entrega canary incorpora stable v2 y canary v3 en OCI Compute, con Nginx,
+Prometheus, Grafana y una puerta de promoción y rollback. La operación completa,
+los comandos y límites están en [la guía canary](docs/canary-operacion.md).
+
+```mermaid
+flowchart LR
+  U[Cliente o carga concurrente] --> N[Nginx en OCI Compute puerto 8000]
+  N -->|api v2 fijo o porcentaje stable| V2[FastAPI stable 2.0.0]
+  N -->|api v3 privado o porcentaje canary| V3[FastAPI canary 3.0.0]
+  V2 --> DB[(PostgreSQL compartido)]
+  V3 --> DB
+  V2 --> O[OCI Object Storage]
+  V3 --> O
+  P[Prometheus] -->|scrape| V2
+  P -->|scrape| V3
+  G[Grafana] --> P
+  C[Controlador SLO] --> P
+  C -->|promover o volver a 0| N
+  A[GitHub Actions y OCI Run Command] --> C
+```
+
+`/api/live/*` distribuye peticiones usando `split_clients` y un identificador
+aleatorio por petición. `/api/v2/*` conserva stable; `/api/v3/*` permite pruebas
+de canary con `X-Api-Key`. En la ruta live, `X-Canary: true` con clave válida
+fuerza una prueba interna incluso con público en 0. No se fijan sesiones.
+Las respuestas de API identifican versión, track y revisión mediante cabeceras.
+
+| Etapa | Público canary | Horneado mínimo | Máximo de espera |
+| --- | --- | --- | --- |
+| 0 | 0 por ciento | 60 segundos | 300 segundos |
+| 1 | 10 por ciento | 120 segundos | 300 segundos |
+| 2 | 50 por ciento | 120 segundos | 300 segundos |
+| 3 | 100 por ciento | 120 segundos | 300 segundos |
+
+Cada etapa exige 1000 solicitudes por track en una ventana de 60 segundos,
+500 solicitudes públicas y SLO de errores, latencia, CPU, memoria y negocio.
+La política versionada decide promoción, pausa o aborto. Una regresión fuerza
+0 público canary y verifica 30 consultas stable; las muestras insuficientes
+jamás aprueban una etapa. La imagen se construye una vez y todas las etapas
+usan el mismo identificador SHA256.
+
+Expand/Contract: v3 amplía la respuesta de inventario con `estado_stock` y
+`unidades_reponer`, sin cambiar columnas, colas, cachés ni claves de objetos.
+V2 mantiene su contrato. Canary no ejecuta DDL. La fase Contract se aplaza
+hasta retirar v2 y cerrar la ventana de rollback; volver a stable no requiere
+restaurar la base ni borrar los movimientos aceptados.
+
+El workflow manual `Canary en OCI` ofrece `install`, `promote`, `regression`
+y `rollback` sobre la VM existente. Una instalación comienza en 0 y guarda
+backup PostgreSQL. El tablero está en `/grafana/d/inventory-canary/` con login.
+La [guía de sustentación](docs/canary-sustentacion.md) cubre ambos escenarios.
+
 ## Entrega 3: infraestructura con Terraform
 
 La [guía de Terraform y OCI](terraform/readme.md) explica cómo crear Compute,
