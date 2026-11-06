@@ -1,0 +1,71 @@
+name: Canary en OCI
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: Accion sobre la VM existente y encendida
+        type: choice
+        options: [install, promote, regression, rollback]
+        default: install
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: inventario-oci-infrastructure
+  cancel-in-progress: false
+
+jobs:
+  quality:
+    uses: ./.github/workflows/validacion-oci.yml
+  canary:
+    needs: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    environment: oci-demo
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - uses: astral-sh/setup-uv@v9.0.0
+      - name: Autenticar runner OCI
+        env:
+          OCI_TENANCY: ${{ secrets.OCI_TENANCY_OCID }}
+          OCI_USER: ${{ secrets.OCI_USER_OCID }}
+          OCI_FINGERPRINT: ${{ secrets.OCI_FINGERPRINT }}
+          OCI_KEY: ${{ secrets.OCI_PRIVATE_KEY }}
+          OCI_REGION: ${{ vars.OCI_REGION || 'sa-bogota-1' }}
+        run: |
+          uv sync --frozen --no-dev
+          uv run python - <<'PY'
+          import os
+          from pathlib import Path
+          os.umask(0o077)
+          folder = Path.home() / '.oci'
+          folder.mkdir(mode=0o700, exist_ok=True)
+          key = folder / 'api_key.pem'
+          key.write_text(os.environ['OCI_KEY'])
+          values = {
+              'tenancy': os.environ['OCI_TENANCY'], 'user': os.environ['OCI_USER'],
+              'fingerprint': os.environ['OCI_FINGERPRINT'], 'region': os.environ['OCI_REGION'],
+              'key_file': str(key),
+          }
+          assert all(v and '\n' not in v and '\r' not in v for v in values.values()), 'Faltan secrets OCI'
+          (folder / 'config').write_text('[DEFAULT]\n' + ''.join(k + '=' + v + '\n' for k, v in values.items()))
+          PY
+      - name: Ejecutar accion canary sin modificar infraestructura
+        env:
+          CANARY_ACTION: ${{ inputs.action }}
+          INSTANCE_ID: ${{ vars.OCI_INSTANCE_ID }}
+          COMPARTMENT_ID: ${{ vars.OCI_COMPARTMENT_ID }}
+        run: |
+          test -n "$INSTANCE_ID" && test -n "$COMPARTMENT_ID"
+          uv run --frozen python -m scripts.canary_oci "$CANARY_ACTION" \
+            --revision "$GITHUB_SHA" --instance-id "$INSTANCE_ID" --compartment-id "$COMPARTMENT_ID"
+          echo "Canary action $CANARY_ACTION completed for $GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
+      - name: Retirar credenciales del runner
+        if: always()
+        run: rm -f "$HOME/.oci/api_key.pem" "$HOME/.oci/config"
