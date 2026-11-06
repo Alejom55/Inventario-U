@@ -1,0 +1,15 @@
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+scrape_configs:
+  - job_name: inventory
+    static_configs:
+      - targets: ['stable:8000']
+        labels:
+          track: stable
+          version: 2.0.0
+      - targets: ['canary:8000']
+        labels:
+          track: canary
+          version: 3.0.0
