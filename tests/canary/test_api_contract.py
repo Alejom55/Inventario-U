@@ -8,6 +8,8 @@ from app.main import app
 
 def test_stable_identity_on_success_auth_and_missing_route(monkeypatch):
     monkeypatch.setenv("TEAM_API_KEY", "test-secret")
+    for name in ("crear_tabla_skus", "crear_tabla_almacenes", "crear_tabla_movimientos"):
+        monkeypatch.setattr("app.main." + name, lambda: None)
     with TestClient(app, raise_server_exceptions=False) as client:
         for path, code in [("/health", 200), ("/api/v2/skus", 401), ("/unknown", 404)]:
             response = client.get(path)
