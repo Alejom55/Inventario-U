@@ -3,9 +3,10 @@ import os
 
 import httpx
 
+from .resilience import CircuitOpen, observe, protection
+
 
 logger = logging.getLogger(__name__)
-TIMEOUT_SECONDS = 5.0
 
 
 class ExternalApiError(Exception):
@@ -28,18 +29,45 @@ def get_json(base_url: str | None, path: str, service: str, trace_id: str):
         headers["X-Api-Key"] = team_api_key
 
     try:
-        with httpx.Client(timeout=TIMEOUT_SECONDS) as client:
+        timeout, breaker = protection(service, base_url)
+    except ValueError:
+        raise ExternalApiError(service, "Configuración de resiliencia inválida") from None
+    ticket = None
+    if breaker:
+        try:
+            ticket = breaker.acquire()
+        except CircuitOpen:
+            observe(service, breaker)
+            logger.warning("Circuito abierto", extra={"trace_id": trace_id, "service": service})
+            raise ExternalApiError(service, f"{service} tiene el circuito abierto") from None
+    observe(service, breaker)
+
+    counts_as_failure = True
+    try:
+        with httpx.Client(timeout=timeout) as client:
             response = client.get(url, headers=headers)
             response.raise_for_status()
-            return response.json()
+            result = response.json()
+        if breaker:
+            breaker.success(ticket)
+        observe(service, breaker)
+        return result
     except httpx.TimeoutException:
         detail = f"{service} agotó el tiempo de espera"
     except httpx.HTTPStatusError as error:
         detail = f"{service} respondió HTTP {error.response.status_code}"
+        counts_as_failure = error.response.status_code >= 500
     except httpx.RequestError:
         detail = f"No fue posible conectar con {service}"
     except ValueError:
         detail = f"{service} devolvió una respuesta JSON inválida"
+
+    if breaker:
+        if counts_as_failure:
+            breaker.failure(ticket)
+        else:
+            breaker.success(ticket)
+    observe(service, breaker)
 
     logger.warning("Fallo al consultar %s: %s", service, detail, extra={"trace_id": trace_id})
     raise ExternalApiError(service, detail)
