@@ -114,8 +114,13 @@ def test_fault_expires_without_operator_cleanup(monkeypatch):
         return []
     faults.install_faults(api)
     client = TestClient(api)
-    headers = {"X-Api-Key": "test-key"}
+    headers = {"X-Api-Key": "test-key", "X-Trace-Id": "fault-expiry-proof"}
+    for invalid in [0, 601]:
+        assert client.post("/api/v3/admin/fault", headers=headers, json={"duration_seconds": invalid}).status_code == 422
     assert client.post("/api/v3/admin/fault", headers=headers, json={"error_rate": 1, "duration_seconds": 1}).status_code == 200
-    assert client.get("/api/v3/skus", headers=headers).status_code == 500
+    injected = client.get("/api/v3/skus", headers=headers)
+    assert injected.status_code == 500
+    assert injected.headers["X-Trace-Id"] == "fault-expiry-proof"
+    assert injected.json()["trace_id"] == "fault-expiry-proof"
     now[0] = 1
     assert client.get("/api/v3/skus", headers=headers).status_code == 200

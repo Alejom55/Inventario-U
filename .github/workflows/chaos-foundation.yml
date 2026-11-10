@@ -26,3 +26,5 @@ jobs:
         run: uv run --frozen --group chaos python -m pytest tests/chaos tests/canary --no-cov
       - name: Validar experimento sin inyectar fallos
         run: uv run --frozen --group chaos python -m scripts.validate_chaos --k6
+      - name: Verificar Toxiproxy real en contenedores sinteticos locales
+        run: uv run --frozen --group chaos python -m scripts.verify_toxiproxy
