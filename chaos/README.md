@@ -169,7 +169,7 @@ registrarse como fallo operativo, no como recuperación exitosa.
 
 Limitación pendiente: Toxiproxy no tiene aquí un watchdog independiente del
 proceso del experimento. Antes de la primera ejecución real en nube hay que
-probar reversión y aborto contra Toxiproxy real y añadir una protección que
+probar el aborto completo y añadir una protección que
 sobreviva a la muerte del controlador. También debe corregirse el apagado de
 la VM para no depender del portátil. No iniciar recursos cloud con el guard
 local anterior como única protección.
@@ -179,8 +179,22 @@ local anterior como única protección.
 Comprobado localmente: timeout real frente a una dependencia HTTP lenta de
 loopback, propagación de trace ID, apertura y recuperación del circuito,
 exclusión de respuestas tardías, fallos con caducidad y validaciones del gate.
-Las pruebas de providers usan respuestas controladas; no prueban todavía una
-inyección real con Toxiproxy, una plataforma cloud ni tres APIs desplegadas.
+Las pruebas unitarias de providers usan respuestas controladas. Además,
+`scripts/verify_toxiproxy.py` verificó Toxiproxy 2.12.0 real contra un nginx
+sintético en una red Docker temporal: aproximadamente 15 ms sin fallo, 1500 ms
+con el toxic y 31 ms después de eliminarlo y verificar su ausencia. Este es
+un chequeo de transporte/reversión, no un resultado R0/R1 del flujo completo
+ni evidencia entre tres nubes. Los contenedores y la red se eliminaron al acabar.
+
+```powershell
+uv run --frozen --group chaos python -m scripts.verify_toxiproxy
+```
+
+La suite completa pasó localmente: 207 pruebas, 94.21% de cobertura de `app`.
+La base de PostgreSQL usada en las pruebas fue exclusiva del proyecto y quedó
+detenida después de ejecutarlas. El experimento pasó la validación real de
+Chaos Toolkit y k6 pudo inspeccionar el perfil sin enviar carga. El workflow
+local aún necesita publicarse y ejecutarse en GitHub para tener evidencia CI.
 
 Pendientes para completar la rúbrica:
 
