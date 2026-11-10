@@ -22,6 +22,9 @@ services:
       DEPORTBACK_API_URL: ${DEPORTBACK_API_URL:-}
       FASTIFY_API_URL: ${FASTIFY_API_URL:-}
       TEAM_API_KEY: ${TEAM_API_KEY:-}
+      RESILIENCE_MODE: ${RESILIENCE_MODE:-baseline}
+      DEPORTBACK_TIMEOUT_SECONDS: ${DEPORTBACK_TIMEOUT_SECONDS:-0.5}
+      FASTIFY_TIMEOUT_SECONDS: ${FASTIFY_TIMEOUT_SECONDS:-0.5}
     depends_on:
       db:
         condition: service_healthy
