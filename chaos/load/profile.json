@@ -1,0 +1,8 @@
+{
+  "scenarios": {
+    "warmup": {"executor": "constant-arrival-rate", "rate": 10, "timeUnit": "1s", "duration": "30s", "preAllocatedVUs": 20, "maxVUs": 20, "gracefulStop": "5s"},
+    "measurement": {"executor": "constant-arrival-rate", "rate": 20, "timeUnit": "1s", "startTime": "30s", "duration": "120s", "preAllocatedVUs": 20, "maxVUs": 20, "gracefulStop": "5s"},
+    "recovery": {"executor": "constant-arrival-rate", "rate": 10, "timeUnit": "1s", "startTime": "150s", "duration": "30s", "preAllocatedVUs": 20, "maxVUs": 20, "gracefulStop": "5s"}
+  },
+  "thresholds": {"dropped_iterations": ["count==0"]}
+}

@@ -12,6 +12,9 @@ dependencies = [
 ]
 
 [dependency-groups]
+chaos = [
+    "chaostoolkit>=1,<2",
+]
 dev = [
     "pytest>=8.0.0",
     "pytest-cov>=6.0.0",
