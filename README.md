@@ -139,6 +139,13 @@ La guía con PostgreSQL y Docker se completará más adelante. El comando final 
 docker compose up --build
 ```
 
+## Seguimiento 4: Ingeniería del Caos
+
+La base experimental se documenta en [chaos/README.md](chaos/README.md).
+Incluye modos baseline/protected, un perfil k6 y un experimento declarativo.
+La integración real entre nubes, Kubernetes y los resultados antes/después
+siguen pendientes de coordinación y medición del grupo.
+
 ## Configuración de base de datos
 
 1. Copia `.env.example` como `.env`.
