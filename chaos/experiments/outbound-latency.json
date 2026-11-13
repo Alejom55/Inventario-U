@@ -10,6 +10,7 @@
     "expected_upstream": {"type": "env", "key": "CHAOS_EXPECTED_UPSTREAM"},
     "round": {"type": "env", "key": "CHAOS_ROUND"},
     "run_id": {"type": "env", "key": "CHAOS_RUN_ID"},
+    "lease_db": {"type": "env", "key": "CHAOS_LEASE_DB"},
     "window_ack": {"type": "env", "key": "CHAOS_WINDOW_ACK"},
     "window_start_utc": {"type": "env", "key": "CHAOS_WINDOW_START_UTC"},
     "window_end_utc": {"type": "env", "key": "CHAOS_WINDOW_END_UTC"},

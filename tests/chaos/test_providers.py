@@ -7,9 +7,11 @@ from chaos_lab import providers
 
 
 @pytest.fixture
-def configuration():
+def configuration(tmp_path):
     now = datetime.now(timezone.utc)
-    return {"window_ack": "GROUP_SYNTHETIC_ONLY", "toxiproxy_url": "http://127.0.0.1:8474", "prometheus_url": "http://localhost:9090", "proxy_name": "chaos-deportback", "expected_upstream": "peer.test:8000", "round": "R0", "run_id": "a"*32, "window_start_utc": (now-timedelta(minutes=1)).isoformat(), "window_end_utc": (now+timedelta(minutes=10)).isoformat(), "max_p95_seconds": "0.5"}
+    c = {"window_ack": "GROUP_SYNTHETIC_ONLY", "toxiproxy_url": "http://127.0.0.1:8474", "prometheus_url": "http://localhost:9090", "proxy_name": "chaos-deportback", "expected_upstream": "peer.test:8000", "round": "R0", "run_id": "a"*32, "window_start_utc": (now-timedelta(minutes=1)).isoformat(), "window_end_utc": (now+timedelta(minutes=10)).isoformat(), "max_p95_seconds": "0.5", "lease_db": str(tmp_path / "lease.sqlite3")}
+    providers.lease.heartbeat(c)
+    return c
 
 
 @pytest.mark.parametrize('field,value', [('window_ack', ''), ('toxiproxy_url','http://public.example'), ('toxiproxy_url','http://user:password@localhost:8474'), ('prometheus_url','http://localhost:9090?x=1'), ('proxy_name','stable'), ('round','unknown'), ('max_p95_seconds','nan')])

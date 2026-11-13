@@ -20,11 +20,13 @@ def main():
         "CHAOS_PROXY_NAME": "chaos-deportback",
         "CHAOS_EXPECTED_UPSTREAM": "synthetic.invalid:8000",
         "CHAOS_ROUND": "R0", "CHAOS_RUN_ID": "0" * 32,
+        "CHAOS_LEASE_DB": str(Path(__file__).resolve().parents[1] / "chaos/results/offline-validation-only.sqlite3"),
         "CHAOS_WINDOW_ACK": "GROUP_SYNTHETIC_ONLY",
         "CHAOS_WINDOW_START_UTC": now.isoformat(),
         "CHAOS_WINDOW_END_UTC": (now + timedelta(minutes=10)).isoformat(),
         "CHAOS_MAX_P95_SECONDS": "0.5",
         "CHAOS_TARGET_URL": "http://synthetic.invalid",
+        "EXPECTED_APP_REVISION": "0"*40,
         "TEAM_API_KEY": "synthetic-inspection-only",
         "SKU_ID": "1", "ALMACEN_ID": "1", "DEPORTISTA_ID": "synthetic", "ARTICULO_ID": "1",
     }
