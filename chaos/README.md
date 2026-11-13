@@ -10,13 +10,13 @@ OCI, Nginx, Prometheus, Grafana y los controles canary. No se elimina ni
 reconstruye la infraestructura de las entregas anteriores. El flujo experimental
 no necesita agregar colas, caché ni escritura en Object Storage.
 
-| Responsabilidad propuesta | API | Nube | Fallo | Métrica objetivo | Estado |
+| Responsabilidad | API | Nube | Fallo | Métrica objetivo | Estado |
 | --- | --- | --- | --- | --- | --- |
-| Coordinador: Alejandro | Inventario-U | Oracle OCI | Latencia saliente hacia deportBack | p95 E2E | Propuesta, falta acuerdo |
+| Coordinador: Alejandro | Inventario-U | Oracle OCI | Latencia saliente hacia deportBack | p95 E2E | Coordinador y latencia confirmados; umbral pendiente |
 | Compañero A | deportBack | Por confirmar | Dependencia indisponible | Por acordar | Repositorio y URL pendientes |
 | Compañero B | api-fastify | Por confirmar | Agotamiento de recurso | Por acordar | Repositorio y URL pendientes |
 
-Falta confirmar quién tendrá Kubernetes. La API completa de ese integrante
+El grupo indicó GKE y Chaos Mesh; falta confirmar qué API se desplegará allí e instalar y validar Chaos Mesh. La API completa de ese integrante
 debe tener al menos dos réplicas, liveness/readiness y requests/limits. Un
 simulador local no cuenta como una de las APIs completas ni como nube real.
 
@@ -43,7 +43,7 @@ sequenceDiagram
 ```
 
 El flujo actual consulta secuencialmente las dos dependencias desde Inventario-U.
-El grupo debe confirmar este contrato de coordinación y las rutas propietarias
+Inventario-U está confirmado como coordinador. El grupo debe confirmar las rutas propietarias
 antes de afirmar que cumple el recorrido real entre las tres nubes.
 
 El radio de impacto se limita a un proxy `chaos-*` aislado, con upstream
@@ -55,7 +55,7 @@ coordinador experimental. No cambiar la URL de una API usada por otros equipos.
 Hipótesis propuesta: con `chaos/load/profile.json`, al inyectar 1500 ms en la
 respuesta de una dependencia durante 60 s, p95 E2E permanece bajo el umbral U
 acordado. El gate también exige al menos 100 peticiones en 30 s y 99% de flujos
-HTTP 2xx. U es una variable obligatoria: no se inventa una línea base numérica.
+completos de negocio. U es una variable obligatoria: no se inventa una línea base numérica.
 
 1. Medir y guardar el estado estable sin fallos. Registrar p95, éxito,
    throughput, volumen y los trace IDs del flujo; acordar U con el grupo.
@@ -140,14 +140,15 @@ Para HTTPS conservar hostname, SNI y validación de certificados: no desactivar
 TLS para hacer funcionar un proxy. Esa adaptación está pendiente de conocer
 las URLs reales.
 
-Iniciar el perfil y esperar muestras estables. Con una carga común en marcha,
-ejecutar el experimento durante su ventana y conservar el journal:
+Ejecución integrada recomendada en el host Linux dedicado: `uv run --frozen --group chaos python -m chaos_lab.gate`. Ver [operación y configuración](OPERACION.md). El gate verifica contratos y watchdog antes de enviar carga.
+
+Para diagnóstico manual, iniciar el perfil y esperar muestras estables. Con una carga común en marcha, ejecutar el experimento y conservar el journal:
 
 ```powershell
 New-Item -ItemType Directory -Path chaos/results -Force
 k6 run chaos/load/flow.js
 # En otra terminal, tras estabilizar el flujo y sin cambiar el perfil:
-uv run --frozen --group chaos python -m chaostoolkit --no-version-check --no-log-file run chaos/experiments/outbound-latency.json --journal-path chaos/results/journal-R0.json
+uv run --frozen --group chaos python -m chaostoolkit --no-version-check --no-log-file run --rollback-strategy always --journal-path chaos/results/journal-R0.json chaos/experiments/outbound-latency.json
 ```
 
 Para R1 cambiar el modo del proceso, la etiqueta de ronda y el run ID. Los
@@ -167,12 +168,17 @@ ausencia, incluso si venció la ventana. No usa `/reset` ni toca los demás
 proxies. Una API de control inaccesible deja la reversión sin confirmar y debe
 registrarse como fallo operativo, no como recuperación exitosa.
 
-Limitación pendiente: Toxiproxy no tiene aquí un watchdog independiente del
-proceso del experimento. Antes de la primera ejecución real en nube hay que
-probar el aborto completo y añadir una protección que
-sobreviva a la muerte del controlador. También debe corregirse el apagado de
-la VM para no depender del portátil. No iniciar recursos cloud con el guard
-local anterior como única protección.
+El watchdog independiente `chaos_lab.watchdog` usa una lease SQLite persistente
+por proxy y un heartbeat de máximo 10 s. Sin heartbeat saludable no se inyecta.
+La lease dura 75 s; al caducar elimina únicamente el toxic de su run ID y verifica
+su ausencia. Corre como servicio separado en el host Toxiproxy, con reinicio
+supervisado y almacenamiento persistente; nunca como hijo del job del experimento.
+Se probó localmente matando el controlador con el toxic activo y una lease de
+prueba de 2 s. La prueba real con la lease de 75 s en nube sigue pendiente.
+Si falla también el host o el control de Toxiproxy no se garantiza recuperación;
+registrar ese fallo operativo. Debe corregirse además el apagado de la VM para
+no depender del portátil. No iniciar recursos cloud con el guard local anterior
+como única protección.
 
 ## Comprobado y pendiente
 
@@ -181,8 +187,8 @@ loopback, propagación de trace ID, apertura y recuperación del circuito,
 exclusión de respuestas tardías, fallos con caducidad y validaciones del gate.
 Las pruebas unitarias de providers usan respuestas controladas. Además,
 `scripts/verify_toxiproxy.py` verificó Toxiproxy 2.12.0 real contra un nginx
-sintético en una red Docker temporal: aproximadamente 15 ms sin fallo, 1500 ms
-con el toxic y 31 ms después de eliminarlo y verificar su ausencia. Este es
+sintético en una red Docker temporal: aproximadamente 32 ms sin fallo, 1500 ms
+con el toxic y 16 ms después de eliminarlo y verificar su ausencia. Este es
 un chequeo de transporte/reversión, no un resultado R0/R1 del flujo completo
 ni evidencia entre tres nubes. Los contenedores y la red se eliminaron al acabar.
 
@@ -190,7 +196,7 @@ ni evidencia entre tres nubes. Los contenedores y la red se eliminaron al acabar
 uv run --frozen --group chaos python -m scripts.verify_toxiproxy
 ```
 
-La suite completa pasó localmente: 207 pruebas, 94.21% de cobertura de `app`.
+La suite completa pasó localmente: 257 pruebas, 94.48% de cobertura de `app`.
 La base de PostgreSQL usada en las pruebas fue exclusiva del proyecto y quedó
 detenida después de ejecutarlas. El experimento pasó la validación real de
 Chaos Toolkit y k6 pudo inspeccionar el perfil sin enviar carga. El workflow
@@ -199,13 +205,13 @@ local aún necesita publicarse y ejecutarse en GitHub para tener evidencia CI.
 Pendientes para completar la rúbrica:
 
 - Repositorios, proveedores, URLs, IDs y ventana autorizada de los compañeros.
-- Elegir y verificar el despliegue Kubernetes de la API completa.
+- Confirmar la API en GKE, sus dos réplicas y probes/recursos, e instalar y validar Chaos Mesh.
 - Acordar propietarios, métricas e hipótesis de indisponibilidad y recursos.
-- Instrumentar el flujo completo con trazas consultables y logs estructurados.
-- Añadir el tablero específico de rondas con las ventanas de inyección.
+- Validar en las tres nubes los logs JSON y el mismo trace ID. El coordinador ya emite logs correlacionados y métricas de flujo por ronda.
+- Desplegar y verificar con datos reales el tablero `inventory-chaos` ya versionado; marcar las ventanas reales de inyección.
 - Ejecutar las dos rondas reales, comprobar recuperación y aplicar mejoras
   adicionales si el gate sigue fallando.
-- Ejecutar un chaos gate real desde CI/CD. El workflow de validación local
+- Configurar y ejecutar un chaos gate real desde CI/CD; el workflow manual `chaos-gate.yml` ya está preparado para un runner Linux dedicado y no publicado. El workflow de validación local
   solo verifica código/contratos, no satisface esa evidencia cloud.
 - Elaborar el informe de máximo seis páginas con datos reales, capturas,
   variación porcentual, hallazgos y backlog. Declarar uso de IA y propuestas
