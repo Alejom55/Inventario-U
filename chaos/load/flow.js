@@ -12,6 +12,9 @@ const runId = __ENV.CHAOS_RUN_ID || '';
 if (!['R0', 'R1'].includes(round) || !base || !__ENV.TEAM_API_KEY) {
   throw new Error('Declare CHAOS_TARGET_URL, CHAOS_ROUND=R0|R1 y TEAM_API_KEY');
 }
+if (!/^[a-f0-9]{40}$/.test(__ENV.EXPECTED_APP_REVISION || '')) {
+  throw new Error('Declare EXPECTED_APP_REVISION con el SHA instalado');
+}
 for (const key of ['SKU_ID', 'ALMACEN_ID', 'DEPORTISTA_ID', 'ARTICULO_ID']) {
   if (!__ENV[key]) throw new Error(`Falta identificador sintetico: ${key}`);
 }
@@ -28,6 +31,13 @@ const parameters = {
   deportista_id: __ENV.DEPORTISTA_ID, articulo_id: __ENV.ARTICULO_ID,
 };
 const query = Object.entries(parameters).map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join('&');
+function identityAt(entity, selector) {
+  for (const field of (selector || 'id').split('.')) {
+    if (!entity || typeof entity !== 'object') return undefined;
+    entity = entity[field];
+  }
+  return typeof entity === 'string' || typeof entity === 'number' ? String(entity) : undefined;
+}
 
 export default function () {
   if (Date.now() < windowStart || Date.now() >= windowEnd) {
@@ -43,7 +53,12 @@ export default function () {
   try { body = response.json(); } catch (_) { /* A non-JSON error is an incomplete flow. */ }
   const ok = check(response, {
     'flujo completo y correlacionado': r => r.status === 200 && body.trace_id === trace &&
-      body.inventario !== undefined && body.deportista !== undefined && body.articulo !== undefined,
+      body.inventario !== undefined && body.deportista !== undefined && body.articulo !== undefined &&
+      String(body.inventario?.sku_id) === __ENV.SKU_ID && String(body.inventario?.almacen_id) === __ENV.ALMACEN_ID &&
+      identityAt(body.deportista, __ENV.DEPORTBACK_ID_FIELD) === __ENV.DEPORTISTA_ID &&
+      identityAt(body.articulo, __ENV.FASTIFY_ID_FIELD) === __ENV.ARTICULO_ID &&
+      r.headers['X-Chaos-Round'] === round && r.headers['X-App-Revision'] === __ENV.EXPECTED_APP_REVISION &&
+      r.headers['X-Resilience-Mode'] === (round === 'R0' ? 'baseline' : 'protected'),
   });
   complete.add(ok, { round, phase: exec.scenario.name });
   duration.add(response.timings.duration, { round, phase: exec.scenario.name });
@@ -51,7 +66,8 @@ export default function () {
 
 export function handleSummary(data) {
   return { [`chaos/results/k6-${round}.json`]: JSON.stringify({
-    round, run_id: runId, instrument: 'k6', profile: options, captured_at_utc: new Date().toISOString(),
+    round, run_id: runId, expected_revision: __ENV.EXPECTED_APP_REVISION,
+    instrument: 'k6', profile: options, captured_at_utc: new Date().toISOString(),
     metrics: data.metrics,
   }, null, 2) };
 }
