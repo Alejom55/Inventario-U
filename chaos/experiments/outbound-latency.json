@@ -1,0 +1,35 @@
+{
+  "version": "1.0.0",
+  "title": "Latencia saliente de Inventario-U hacia deportBack",
+  "description": "Hipotesis propuesta: con el perfil versionado, una demora de 1500 ms durante 60 s mantiene p95 E2E dentro del umbral acordado, sin ocultar errores del flujo. R0 puede refutarla; R1 debe repetir exactamente el fallo y la carga. Propietario, proveedor remoto y umbral requieren acuerdo del grupo.",
+  "tags": ["inventario-u", "latency", "draft-team-approval", "synthetic-only"],
+  "configuration": {
+    "toxiproxy_url": {"type": "env", "key": "CHAOS_TOXIPROXY_URL"},
+    "prometheus_url": {"type": "env", "key": "CHAOS_PROMETHEUS_URL"},
+    "proxy_name": {"type": "env", "key": "CHAOS_PROXY_NAME"},
+    "expected_upstream": {"type": "env", "key": "CHAOS_EXPECTED_UPSTREAM"},
+    "round": {"type": "env", "key": "CHAOS_ROUND"},
+    "run_id": {"type": "env", "key": "CHAOS_RUN_ID"},
+    "lease_db": {"type": "env", "key": "CHAOS_LEASE_DB"},
+    "window_ack": {"type": "env", "key": "CHAOS_WINDOW_ACK"},
+    "window_start_utc": {"type": "env", "key": "CHAOS_WINDOW_START_UTC"},
+    "window_end_utc": {"type": "env", "key": "CHAOS_WINDOW_END_UTC"},
+    "max_p95_seconds": {"type": "env", "key": "CHAOS_MAX_P95_SECONDS"}
+  },
+  "steady-state-hypothesis": {
+    "title": "Al menos 100 muestras en 30 s, exito >=99% y p95 E2E dentro del objetivo acordado",
+    "probes": [{
+      "type": "probe", "name": "flow-objective", "tolerance": true,
+      "provider": {"type": "python", "module": "chaos_lab.providers", "func": "within_objective"}
+    }]
+  },
+  "method": [{
+    "type": "action", "name": "inject-bounded-outbound-latency",
+    "provider": {"type": "python", "module": "chaos_lab.providers", "func": "inject_latency"},
+    "pauses": {"after": 60}
+  }],
+  "rollbacks": [{
+    "type": "action", "name": "remove-only-this-experiment-toxic-and-verify",
+    "provider": {"type": "python", "module": "chaos_lab.providers", "func": "remove_latency"}
+  }]
+}

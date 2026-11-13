@@ -41,8 +41,8 @@ run "small_private_infrastructure" {
     error_message = "No usar Virtual Private Vault ni clave HSM de pago."
   }
   assert {
-    condition     = length(oci_core_security_list.api.ingress_security_rules) == 1 && one(oci_core_security_list.api.ingress_security_rules).tcp_options[0].min == 8000
-    error_message = "Solo permitir el puerto API; no SSH ni PostgreSQL."
+    condition     = length(oci_core_security_list.api.ingress_security_rules) == 2 && toset([for rule in oci_core_security_list.api.ingress_security_rules : rule.tcp_options[0].min]) == toset([80, 8000]) && alltrue([for rule in oci_core_security_list.api.ingress_security_rules : rule.source == var.api_allowed_cidr && rule.tcp_options[0].min == rule.tcp_options[0].max])
+    error_message = "Solo permitir HTTP y API desde el CIDR autorizado; no SSH ni PostgreSQL."
   }
   assert {
     condition     = !strcontains(oci_core_instance.api.metadata["inventory_config"], "POSTGRES_PASSWORD")

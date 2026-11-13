@@ -2,9 +2,9 @@ import hmac
 import logging
 import os
 from datetime import datetime
-from uuid import uuid4
+from typing import Annotated
 
-from fastapi import Depends, FastAPI, HTTPException, Request, Response, status
+from fastapi import Depends, FastAPI, HTTPException, Query, Request, Response, status
 from fastapi.responses import JSONResponse
 from psycopg import errors
 
@@ -14,16 +14,21 @@ from .integrations.external_api import ExternalApiError
 from .integrations.fastify_client import obtener_articulo
 from .schema import crear_tabla_almacenes, crear_tabla_movimientos, crear_tabla_skus
 from .storage.router import router as storage_router
+from .telemetry import TRACK, VERSION, install_telemetry
+from .canary import install_v3
+from .faults import install_faults
+from .observability import configure_logging, correlation_id
 
 
+configure_logging()
 logger = logging.getLogger(__name__)
 API_V2_PREFIX = "/api/v2"
-HEALTH_PATHS = {"/health", f"{API_V2_PREFIX}/health"}
-FUNCTIONAL_PATHS = ("/skus", "/almacenes", "/movimientos", "/inventario/query", API_V2_PREFIX)
+HEALTH_PATHS = {"/health", f"{API_V2_PREFIX}/health", "/api/v3/health"}
+FUNCTIONAL_PATHS = ("/skus", "/almacenes", "/movimientos", "/inventario/query", API_V2_PREFIX, "/api/v3")
 
 app = FastAPI(
     title="Gestor de inventario",
-    version="2.0.0",
+    version=VERSION,
     description="API para la gestión de SKU, almacenes y movimientos de inventario.",
 )
 app.include_router(storage_router, prefix=API_V2_PREFIX)
@@ -31,6 +36,8 @@ app.include_router(storage_router, prefix=API_V2_PREFIX)
 
 @app.on_event("startup")
 def iniciar_api():
+    if TRACK == "canary":
+        return  # Schema belongs to stable; canary never changes existing tables.
     crear_tabla_skus()
     crear_tabla_almacenes()
     crear_tabla_movimientos()
@@ -38,7 +45,7 @@ def iniciar_api():
 
 @app.middleware("http")
 async def agregar_trace_id(request: Request, call_next):
-    trace_id = request.headers.get("X-Trace-Id") or str(uuid4())
+    trace_id = correlation_id(request.headers.get("X-Trace-Id"))
     request.state.trace_id = trace_id
     logger.info("Solicitud recibida", extra={"trace_id": trace_id, "path": request.url.path})
 
@@ -63,8 +70,8 @@ async def agregar_trace_id(request: Request, call_next):
 @app.get("/health")
 @app.get(f"{API_V2_PREFIX}/health")
 def estado_api(request: Request):
-    if request.url.path.startswith(API_V2_PREFIX):
-        return {"status": "ok", "version": "2.0.0", "service": "inventario-u"}
+    if request.url.path.startswith((API_V2_PREFIX, "/api/v3")):
+        return {"status": "ok", "version": VERSION, "service": "inventario-u"}
     return {"estado": "ok"}
 
 
@@ -613,14 +620,15 @@ def consultar_inventario(filtros: dict, db=Depends(get_db)):
 @app.get(f"{API_V2_PREFIX}/integracion")
 def consultar_integracion(
     request: Request,
-    sku_id: int,
-    almacen_id: int,
-    deportista_id: str,
-    articulo_id: int,
+    sku_id: Annotated[int, Query(gt=0)],
+    almacen_id: Annotated[int, Query(gt=0)],
+    deportista_id: Annotated[str, Query(pattern=r"^[A-Za-z0-9_-]{1,128}$")],
+    articulo_id: Annotated[int, Query(gt=0)],
     db=Depends(get_db),
 ):
     """Combina entidades propietarias sin persistir datos externos."""
     trace_id = request.state.trace_id
+    request.state.flow_complete = False
     inventario = consultar_inventario(
         {"sku_id": sku_id, "almacen_id": almacen_id},
         db,
@@ -632,7 +640,11 @@ def consultar_integracion(
         # Se usan rutas propietarias V1: las V2 externas ya integran a otros
         # servicios y producirían una dependencia circular.
         deportista = obtener_deportista(deportista_id, trace_id)
+        if not isinstance(deportista, dict) or not deportista:
+            raise ExternalApiError("deportBack", "Contrato de entidad inválido")
         articulo = obtener_articulo(articulo_id, trace_id)
+        if not isinstance(articulo, dict) or not articulo:
+            raise ExternalApiError("api-fastify", "Contrato de entidad inválido")
     except ExternalApiError as error:
         logger.warning(
             "Integración externa fallida: %s",
@@ -644,10 +656,16 @@ def consultar_integracion(
             detail={"service": error.service, "message": error.detail, "trace_id": trace_id},
         )
 
-    logger.info("Integración completada", extra={"trace_id": trace_id})
+    request.state.flow_complete = True
+    logger.info("Integración completada", extra={"trace_id": trace_id, "event": "flow_complete"})
     return {
         "trace_id": trace_id,
         "inventario": inventario["resultados"][0],
         "deportista": deportista,
         "articulo": articulo,
     }
+
+
+install_v3(app, consultar_inventario)
+install_faults(app)
+install_telemetry(app)

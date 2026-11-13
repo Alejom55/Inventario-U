@@ -4,3 +4,4 @@
 *.tf text eol=lf
 *.hcl text eol=lf
 *.yml text eol=lf
+*.json text eol=lf

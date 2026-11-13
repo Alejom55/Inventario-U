@@ -1,20 +1,21 @@
 name: Canary en OCI
-run-name: Canary ${{ inputs.action }} - ${{ inputs.revision }}
+run-name: Canary ${{ inputs.action || github.event_name }} - ${{ inputs.revision || github.sha }}
 
 on:
+  push:
+    paths: ['.github/workflows/canary-oci.yml']
   workflow_dispatch:
     inputs:
       action:
         description: Accion sobre la VM existente y encendida
         type: choice
-        options: [promote, regression, rollback]
-        default: promote
+        options: [install, promote, regression, rollback]
+        default: install
         required: true
       revision:
         description: SHA ya instalado para promote, regression o rollback
         type: string
         default: ''
-        required: true
 
 permissions:
   contents: read
@@ -24,14 +25,17 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  quality:
+    if: github.event_name == 'push' || inputs.action == 'install'
+    uses: ./.github/workflows/validacion-oci.yml
   canary:
+    needs: quality
+    if: ${{ github.event_name == 'workflow_dispatch' && !cancelled() && (needs.quality.result == 'success' || inputs.action != 'install') }}
     runs-on: ubuntu-latest
     timeout-minutes: 50
     environment: oci-demo
     steps:
       - uses: actions/checkout@v6
-        with:
-          ref: ${{ inputs.revision }}
       - uses: actions/setup-python@v6
         with:
           python-version: '3.13'
@@ -64,7 +68,7 @@ jobs:
       - name: Ejecutar accion canary sin modificar infraestructura
         env:
           CANARY_ACTION: ${{ inputs.action }}
-          CANARY_REVISION: ${{ inputs.revision }}
+          CANARY_REVISION: ${{ inputs.action == 'install' && github.sha || inputs.revision || github.sha }}
           INSTANCE_ID: ${{ vars.OCI_INSTANCE_ID }}
           COMPARTMENT_ID: ${{ vars.OCI_COMPARTMENT_ID }}
         run: |

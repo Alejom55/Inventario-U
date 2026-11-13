@@ -1,0 +1,542 @@
+{
+  "info": {
+    "_postman_id": "0c1ee2c1-278e-4406-a745-42cf89631217",
+    "name": "Inventario U Canary OCI",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Practica HTTP de v2/v3 y canary. Promocion y rollback se controlan en GitHub Actions. No contiene credenciales."
+  },
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "key",
+        "value": "X-Api-Key",
+        "type": "string"
+      },
+      {
+        "key": "value",
+        "value": "{{team_api_key}}",
+        "type": "string"
+      },
+      {
+        "key": "in",
+        "value": "header",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "installed_revision",
+      "value": ""
+    },
+    {
+      "key": "public_stable",
+      "value": 0
+    },
+    {
+      "key": "public_canary",
+      "value": 0
+    },
+    {
+      "key": "public_total",
+      "value": 0
+    },
+    {
+      "key": "canary_5xx",
+      "value": 0
+    },
+    {
+      "key": "stable_5xx",
+      "value": 0
+    }
+  ],
+  "item": [
+    {
+      "name": "01 Comprobaciones iniciales",
+      "item": [
+        {
+          "name": "01 Stable v2 y revision instalada",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/v2/health",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { if (pm.response.code !== 200) throw new Error('HTTP ' + pm.response.code); });",
+                  "",
+                  "const track = pm.response.headers.get('X-App-Track');",
+                  "const version = pm.response.headers.get('X-App-Version');",
+                  "pm.test('La instancia identifica version y track', function () {",
+                  "  if (!['stable', 'canary'].includes(track)) throw new Error('Track ausente o invalido');",
+                  "  if (version !== (track === 'stable' ? '2.0.0' : '3.0.0')) throw new Error('Version y track no coinciden');",
+                  "  if (!pm.response.headers.get('X-App-Revision')) throw new Error('Falta revision');",
+                  "});",
+                  "",
+                  "pm.test('Stable atiende la ruta v2', function () {",
+                  "  if (track !== 'stable') throw new Error('Se esperaba stable');",
+                  "});",
+                  "pm.collectionVariables.set('installed_revision', pm.response.headers.get('X-App-Revision'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "02 Canary interno incluso con publico en 0",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Canary",
+                "value": "true"
+              }
+            ],
+            "url": "{{base_url}}/api/live/health",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { if (pm.response.code !== 200) throw new Error('HTTP ' + pm.response.code); });",
+                  "",
+                  "const track = pm.response.headers.get('X-App-Track');",
+                  "const version = pm.response.headers.get('X-App-Version');",
+                  "pm.test('La instancia identifica version y track', function () {",
+                  "  if (!['stable', 'canary'].includes(track)) throw new Error('Track ausente o invalido');",
+                  "  if (version !== (track === 'stable' ? '2.0.0' : '3.0.0')) throw new Error('Version y track no coinciden');",
+                  "  if (!pm.response.headers.get('X-App-Revision')) throw new Error('Falta revision');",
+                  "});",
+                  "",
+                  "pm.test('La cabecera selecciona canary', function () { if (track !== 'canary') throw new Error('Se esperaba canary'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "03 Inventario v2 contrato anterior",
+          "request": {
+            "method": "QUERY",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/v2/inventario/query",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { if (pm.response.code !== 200) throw new Error('HTTP ' + pm.response.code); });",
+                  "",
+                  "const track = pm.response.headers.get('X-App-Track');",
+                  "const version = pm.response.headers.get('X-App-Version');",
+                  "pm.test('La instancia identifica version y track', function () {",
+                  "  if (!['stable', 'canary'].includes(track)) throw new Error('Track ausente o invalido');",
+                  "  if (version !== (track === 'stable' ? '2.0.0' : '3.0.0')) throw new Error('Version y track no coinciden');",
+                  "  if (!pm.response.headers.get('X-App-Revision')) throw new Error('Falta revision');",
+                  "});",
+                  "",
+                  "pm.test('V2 conserva su contrato', function () {",
+                  "  const rows = pm.response.json().resultados;",
+                  "  if (!Array.isArray(rows)) throw new Error('Falta resultados');",
+                  "  if (rows.some(row => 'estado_stock' in row || 'unidades_reponer' in row)) throw new Error('V2 recibio campos exclusivos de v3');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "04 Inventario v3 cambio funcional y compatibilidad",
+          "request": {
+            "method": "QUERY",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/v3/inventario/query",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { if (pm.response.code !== 200) throw new Error('HTTP ' + pm.response.code); });",
+                  "",
+                  "const track = pm.response.headers.get('X-App-Track');",
+                  "const version = pm.response.headers.get('X-App-Version');",
+                  "pm.test('La instancia identifica version y track', function () {",
+                  "  if (!['stable', 'canary'].includes(track)) throw new Error('Track ausente o invalido');",
+                  "  if (version !== (track === 'stable' ? '2.0.0' : '3.0.0')) throw new Error('Version y track no coinciden');",
+                  "  if (!pm.response.headers.get('X-App-Revision')) throw new Error('Falta revision');",
+                  "});",
+                  "",
+                  "const candidate = pm.response.json().resultados;",
+                  "pm.test('V3 calcula estado y reposicion', function () {",
+                  "  if (!Array.isArray(candidate) || candidate.length === 0) throw new Error('Se necesita inventario para demostrar el cambio');",
+                  "  for (const row of candidate) {",
+                  "    const state = row.stock_disponible === 0 ? 'agotado' : row.stock_disponible <= row.stock_minimo ? 'bajo' : 'normal';",
+                  "    if (row.estado_stock !== state || row.unidades_reponer !== Math.max(0, row.stock_minimo - row.stock_disponible)) throw new Error('Calculo de stock incorrecto');",
+                  "  }",
+                  "});",
+                  "pm.sendRequest({url: pm.variables.replaceIn('{{base_url}}') + '/api/v2/inventario/query', method: 'QUERY',",
+                  "  header: {'X-Api-Key': pm.variables.get('team_api_key'), 'Content-Type': 'application/json'},",
+                  "  body: {mode: 'raw', raw: '{}'}}, function (error, baseline) {",
+                  "  pm.test('V3 conserva todos los campos de v2', function () {",
+                  "    if (error || baseline.code !== 200) throw new Error('No se pudo consultar baseline');",
+                  "    const rows = baseline.json().resultados;",
+                  "    if (rows.length !== candidate.length) throw new Error('Cantidad de filas diferente');",
+                  "    for (const old of rows) {",
+                  "      const current = candidate.find(row => row.sku_id === old.sku_id && row.almacen_id === old.almacen_id);",
+                  "      if (!current || Object.keys(old).some(key => JSON.stringify(old[key]) !== JSON.stringify(current[key]))) throw new Error('Contrato o inventario diferente');",
+                  "    }",
+                  "  });",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Canary privado rechaza peticion sin clave",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/v3/health",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Proxy rechaza preview sin clave', function () { if (pm.response.code !== 403) throw new Error('Se esperaba 403'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "05 Reiniciar contadores publicos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/v2/health",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "for (const key of ['public_stable', 'public_canary', 'public_total', 'canary_5xx', 'stable_5xx']) pm.collectionVariables.set(key, 0);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { if (pm.response.code !== 200) throw new Error('HTTP ' + pm.response.code); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02 Reparto publico y regresion",
+      "item": [
+        {
+          "name": "Enviar lectura publica y contar track",
+          "request": {
+            "method": "QUERY",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/live/inventario/query",
+            "description": "Ejecutar SOLO esta carpeta en Runner con 100 iteraciones. No sustituye la carga concurrente ni la decision SLO del controlador. Durante regresion, 500 canary es un fallo intencional que se registra.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const track = pm.response.headers.get('X-App-Track');",
+                  "const version = pm.response.headers.get('X-App-Version');",
+                  "pm.test('La instancia identifica version y track', function () {",
+                  "  if (!['stable', 'canary'].includes(track)) throw new Error('Track ausente o invalido');",
+                  "  if (version !== (track === 'stable' ? '2.0.0' : '3.0.0')) throw new Error('Version y track no coinciden');",
+                  "  if (!pm.response.headers.get('X-App-Revision')) throw new Error('Falta revision');",
+                  "});",
+                  "",
+                  "pm.test('Respuesta publica observable', function () {",
+                  "  if (![200, 500].includes(pm.response.code)) throw new Error('HTTP inesperado: ' + pm.response.code);",
+                  "  if (pm.response.code === 500 && track !== 'canary') throw new Error('Fallo inesperado en stable');",
+                  "});",
+                  "if (['stable', 'canary'].includes(track)) {",
+                  "  const variable = 'public_' + track;",
+                  "  pm.collectionVariables.set(variable, Number(pm.collectionVariables.get(variable) || 0) + 1);",
+                  "  pm.collectionVariables.set('public_total', Number(pm.collectionVariables.get('public_total') || 0) + 1);",
+                  "  if (pm.response.code >= 500) pm.collectionVariables.set(track + '_5xx', Number(pm.collectionVariables.get(track + '_5xx') || 0) + 1);",
+                  "  const total = Number(pm.collectionVariables.get('public_total'));",
+                  "  const canary = Number(pm.collectionVariables.get('public_canary') || 0);",
+                  "  console.log('Muestra publica', {total, stable: total - canary, canary, canary_percent: 100 * canary / total});",
+                  "  pm.test('Muestra acumulada: ' + canary + ' canary de ' + total, function () {});",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "03 Fallos manuales opcionales",
+      "item": [
+        {
+          "name": "Activar 50 por ciento de fallos canary",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/v3/admin/fault",
+            "description": "Solo demostracion controlada. Requiere allow_faults=true. Este endpoint no inicia el quality gate; el workflow regression coordina la demostracion automatica completa.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"error_rate\": 0.5,\n  \"latency_ms\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.environment.get('allow_faults') !== 'true') { console.log('Fallo omitido: allow_faults no esta activado'); pm.execution.skipRequest(); }"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { if (pm.response.code !== 200) throw new Error('HTTP ' + pm.response.code); });",
+                  "",
+                  "const track = pm.response.headers.get('X-App-Track');",
+                  "const version = pm.response.headers.get('X-App-Version');",
+                  "pm.test('La instancia identifica version y track', function () {",
+                  "  if (!['stable', 'canary'].includes(track)) throw new Error('Track ausente o invalido');",
+                  "  if (version !== (track === 'stable' ? '2.0.0' : '3.0.0')) throw new Error('Version y track no coinciden');",
+                  "  if (!pm.response.headers.get('X-App-Revision')) throw new Error('Falta revision');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Desactivar fallos canary",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/v3/admin/fault",
+            "description": "Ejecutar al terminar cualquier prueba manual de fallos.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"error_rate\": 0,\n  \"latency_ms\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { if (pm.response.code !== 200) throw new Error('HTTP ' + pm.response.code); });",
+                  "",
+                  "const track = pm.response.headers.get('X-App-Track');",
+                  "const version = pm.response.headers.get('X-App-Version');",
+                  "pm.test('La instancia identifica version y track', function () {",
+                  "  if (!['stable', 'canary'].includes(track)) throw new Error('Track ausente o invalido');",
+                  "  if (version !== (track === 'stable' ? '2.0.0' : '3.0.0')) throw new Error('Version y track no coinciden');",
+                  "  if (!pm.response.headers.get('X-App-Revision')) throw new Error('Falta revision');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "04 Grafana por API",
+      "item": [
+        {
+          "name": "01 Iniciar sesion Grafana",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/grafana/login",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user\": \"{{grafana_user}}\",\n  \"password\": \"{{grafana_password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { if (pm.response.code !== 200) throw new Error('HTTP ' + pm.response.code); });",
+                  "pm.test('Login aprobado', function () { if (pm.response.json().message !== 'Logged in') throw new Error('Login no confirmado'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "02 Dashboard autenticado",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/grafana/api/dashboards/uid/inventory-canary",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { if (pm.response.code !== 200) throw new Error('HTTP ' + pm.response.code); });",
+                  "pm.test('Dashboard de 18 paneles', function () { if (pm.response.json().dashboard.panels.length !== 18) throw new Error('Paneles inesperados'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "03 Prometheus conectado",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/grafana/api/datasources/uid/prometheus/health",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { if (pm.response.code !== 200) throw new Error('HTTP ' + pm.response.code); });",
+                  "pm.test('Prometheus OK', function () { if (pm.response.json().status !== 'OK') throw new Error('Datasource no disponible'); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

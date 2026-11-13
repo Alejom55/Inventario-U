@@ -1,0 +1,31 @@
+{
+  "environment": "OCI Compute",
+  "revision": "bf49423d2aa328529f927e8835d9fd78c59c9c05",
+  "responses": {
+    "v2": {
+      "status": 200,
+      "version": "2.0.0",
+      "track": "stable"
+    },
+    "v3": {
+      "status": 200,
+      "version": "3.0.0",
+      "track": "canary"
+    }
+  },
+  "shared_inventory_fields_unchanged": true,
+  "inventory_rows": 1,
+  "v3_stock_example": {
+    "stock_disponible": 10,
+    "stock_minimo": 2,
+    "estado_stock": "normal",
+    "unidades_reponer": 0
+  },
+  "grafana": {
+    "form_login": "passed",
+    "authenticated_dashboard_api": "passed",
+    "panels": 18,
+    "datasource": "OK"
+  },
+  "credentials_in_public_evidence": false
+}

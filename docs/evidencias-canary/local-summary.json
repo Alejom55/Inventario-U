@@ -1,0 +1,128 @@
+{
+  "checked_at_utc": "2026-11-06T02:35:32.796909+00:00",
+  "environment": "local Docker Desktop",
+  "cloud_canary_deployed": false,
+  "unit_and_database_tests": {
+    "passed": 173,
+    "app_coverage_percent": 93.33
+  },
+  "monitoring": {
+    "grafana_panels": 18,
+    "prometheus_datasource": "OK",
+    "panel_queries_returning_data": 18
+  },
+  "app_tree_git_sha": "499454769a13d0841cf856ebc16833e39b1a7160",
+  "promotion": {
+    "image": "sha256:5b305981038093934c119a3ae2ea2805a35b58df6e17ffd65336e1ac21dfbc53",
+    "result": "100 percent promoted",
+    "stages": [
+      {
+        "percent": 0,
+        "elapsed": 60.5,
+        "traffic": {
+          "public": {
+            "stable:200": 2298
+          },
+          "calibration": {
+            "canary:200": 2298
+          },
+          "public_requests": 2298,
+          "public_canary_ratio": 0.0
+        },
+        "stable_window_requests": 2271.479225384126,
+        "canary_window_requests": 2270.2643732499364,
+        "canary_p95_seconds": 0.048347093791281374,
+        "canary_5xx": 0.0
+      },
+      {
+        "percent": 10,
+        "elapsed": 121.1,
+        "traffic": {
+          "public": {
+            "stable:200": 4168,
+            "canary:200": 411
+          },
+          "calibration": {
+            "canary:200": 4109,
+            "stable:200": 471
+          },
+          "public_requests": 4579,
+          "public_canary_ratio": 0.08975758899322997
+        },
+        "stable_window_requests": 2300.852773787661,
+        "canary_window_requests": 2218.019819983635,
+        "canary_p95_seconds": 0.049352915194346286,
+        "canary_5xx": 0.0
+      },
+      {
+        "percent": 50,
+        "elapsed": 121.0,
+        "traffic": {
+          "public": {
+            "canary:200": 2314,
+            "stable:200": 2250
+          },
+          "calibration": {
+            "canary:200": 2282,
+            "stable:200": 2284
+          },
+          "public_requests": 4564,
+          "public_canary_ratio": 0.507011393514461
+        },
+        "stable_window_requests": 2224.525420030548,
+        "canary_window_requests": 2281.256818677722,
+        "canary_p95_seconds": 0.04877733236151604,
+        "canary_5xx": 0.0
+      },
+      {
+        "percent": 100,
+        "elapsed": 121.1,
+        "traffic": {
+          "public": {
+            "canary:200": 4567
+          },
+          "calibration": {
+            "stable:200": 4574
+          },
+          "public_requests": 4567,
+          "public_canary_ratio": 1.0
+        },
+        "stable_window_requests": 2260.5691426493318,
+        "canary_window_requests": 2259.4781343758527,
+        "canary_p95_seconds": 0.04804517663043478,
+        "canary_5xx": 0.0
+      }
+    ]
+  },
+  "regression": {
+    "image": "sha256:419daef414ebecc516df0d9163d278db9ff79f611bf186201bcafe2df1375347",
+    "stage": 10,
+    "injected_error_rate": 0.5,
+    "measured_canary_5xx_ratio": 0.0815429918518668,
+    "measured_stable_5xx_ratio": 0.0,
+    "reasons": [
+      "5xx",
+      "5xx regression against baseline"
+    ],
+    "public_canary_after_rollback_percent": 0,
+    "stable_verification_requests": 30,
+    "seconds_decision_to_verified": 4.427665
+  },
+  "inventory_unchanged_after_rollback": true,
+  "inventory_snapshot_sha256": "062746f74ccf97ee4dd65099c883d2484181f433038446d2ff82bfb4ccbb7963",
+  "oci_read_only_check": {
+    "instance": "inventario-u-s3",
+    "state": "STOPPED",
+    "shape": "VM.Standard.E5.Flex",
+    "run_command_enabled": true
+  },
+  "pending": [
+    "GitHub publication and CI execution",
+    "OCI installation and live demonstration",
+    "release from final tag"
+  ],
+  "recorded_revision_to_current_history": {
+    "7ba8d1b56cc0cec41c9ba5cf09aeddcb8c263541": "3fa0ff456aab59bc00b717a7a587e0dc8b30b282",
+    "4bb2aaa87fb6af7c2046ba8792ecd48bea672f94": "54b4e05c15618c05f801192549ffdf97fd813a6d"
+  }
+}

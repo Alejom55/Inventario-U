@@ -1,0 +1,74 @@
+name: Chaos gate del flujo de tres APIs
+
+on:
+  workflow_dispatch:
+    inputs:
+      round:
+        description: R0 sin protecciones; R1 con protecciones
+        type: choice
+        options: [R0, R1]
+        required: true
+      window_start_utc:
+        description: Inicio acordado ISO 8601 UTC
+        required: true
+      window_end_utc:
+        description: Fin acordado ISO 8601 UTC (minimo cuatro minutos disponibles)
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: inventario-group-chaos
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    # Provision separately on the dedicated proxy/Prometheus host.
+    # This job never starts cloud resources or the independent watchdog.
+    runs-on: [self-hosted, Linux, inventario-chaos]
+    timeout-minutes: 8
+    environment: chaos-group
+    env:
+      CHAOS_TARGET_URL: ${{ vars.CHAOS_TARGET_URL }}
+      DEPORTBACK_API_URL: ${{ vars.DEPORTBACK_API_URL }}
+      FASTIFY_API_URL: ${{ vars.FASTIFY_API_URL }}
+      DEPORTBACK_ENTITY_PATH: ${{ vars.DEPORTBACK_ENTITY_PATH }}
+      FASTIFY_ENTITY_PATH: ${{ vars.FASTIFY_ENTITY_PATH }}
+      DEPORTBACK_ID_FIELD: ${{ vars.DEPORTBACK_ID_FIELD }}
+      FASTIFY_ID_FIELD: ${{ vars.FASTIFY_ID_FIELD }}
+      TEAM_API_KEY: ${{ secrets.TEAM_API_KEY }}
+      SKU_ID: ${{ vars.SKU_ID }}
+      ALMACEN_ID: ${{ vars.ALMACEN_ID }}
+      DEPORTISTA_ID: ${{ vars.DEPORTISTA_ID }}
+      ARTICULO_ID: ${{ vars.ARTICULO_ID }}
+      EXPECTED_APP_REVISION: ${{ github.sha }}
+      CHAOS_ROUND: ${{ inputs.round }}
+      CHAOS_WINDOW_START_UTC: ${{ inputs.window_start_utc }}
+      CHAOS_WINDOW_END_UTC: ${{ inputs.window_end_utc }}
+      CHAOS_WINDOW_ACK: ${{ vars.CHAOS_WINDOW_ACK }}
+      CHAOS_MAX_P95_SECONDS: ${{ vars.CHAOS_MAX_P95_SECONDS }}
+      CHAOS_TOXIPROXY_URL: ${{ vars.CHAOS_TOXIPROXY_URL }}
+      CHAOS_PROMETHEUS_URL: ${{ vars.CHAOS_PROMETHEUS_URL }}
+      CHAOS_PROXY_NAME: ${{ vars.CHAOS_PROXY_NAME }}
+      CHAOS_EXPECTED_UPSTREAM: ${{ vars.CHAOS_EXPECTED_UPSTREAM }}
+      CHAOS_LEASE_DB: ${{ vars.CHAOS_LEASE_DB }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - uses: astral-sh/setup-uv@v9.0.0
+      - run: uv sync --frozen --group dev --group chaos
+      - name: Identificador unico de ejecucion
+        run: echo "CHAOS_RUN_ID=$(python -c 'import uuid; print(uuid.uuid4().hex)')" >> "$GITHUB_ENV"
+      - name: Contratos, estado estable, carga, experimento y reversion
+        run: uv run --frozen --group chaos python -m chaos_lab.gate
+      - name: Conservar solamente informe sin credenciales
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: chaos-${{ inputs.round }}-${{ github.run_id }}
+          path: chaos/results/*/gate-report.json
+          if-no-files-found: warn
+          retention-days: 14

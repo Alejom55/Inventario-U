@@ -1,0 +1,84 @@
+{
+  "environment": "OCI Compute",
+  "region": "sa-bogota-1",
+  "validated_revision": "bf49423d2aa328529f927e8835d9fd78c59c9c05",
+  "validated_image": "sha256:680ff6764850bc69b47d003742eb297b6c958d0e009a74bdd7e3e1b620775212",
+  "app_tree_git_sha": "499454769a13d0841cf856ebc16833e39b1a7160",
+  "stages": [
+    {
+      "percent": 0,
+      "observed_public_canary_percent": 0.0,
+      "bake_seconds_observed": 60.2,
+      "stable_window_requests": 2395,
+      "canary_window_requests": 2397,
+      "canary_p95_ms": 94.07
+    },
+    {
+      "percent": 10,
+      "observed_public_canary_percent": 9.68,
+      "bake_seconds_observed": 120.5,
+      "stable_window_requests": 2347,
+      "canary_window_requests": 2416,
+      "canary_p95_ms": 133.28
+    },
+    {
+      "percent": 50,
+      "observed_public_canary_percent": 51.17,
+      "bake_seconds_observed": 120.5,
+      "stable_window_requests": 1740,
+      "canary_window_requests": 1723,
+      "canary_p95_ms": 293.13
+    },
+    {
+      "percent": 100,
+      "observed_public_canary_percent": 100.0,
+      "bake_seconds_observed": 120.5,
+      "stable_window_requests": 2150,
+      "canary_window_requests": 2134,
+      "canary_p95_ms": 273.37
+    }
+  ],
+  "regression": {
+    "configured_error_rate": 0.5,
+    "stage": 10,
+    "canary_5xx_percent": 7.62,
+    "stable_5xx_percent": 0.0,
+    "decision": "abort",
+    "reasons": [
+      "5xx",
+      "5xx regression against baseline"
+    ],
+    "public_canary_after_abort_percent": 0,
+    "stable_verification_requests": 30,
+    "seconds_decision_to_verified": 3.599
+  },
+  "inventory_unchanged": true,
+  "inventory_sha256": "6c378b0b9b3de084d9f399d2b68930dd5739984274531c6d532ed1a04fd1ae29",
+  "grafana": {
+    "title": "Inventario U stable y canary",
+    "panels": 18,
+    "datasource_status": "OK"
+  },
+  "github_quality_tests": 176,
+  "application_coverage_percent": 93.33,
+  "cloud_run_command_execution": "SUCCEEDED",
+  "shutdown": {
+    "requested_at_utc": "2026-11-06T03:38:07.285982+00:00",
+    "method": "SOFTSTOP",
+    "final_cloud_scenarios": "SUCCEEDED",
+    "validated_image": "sha256:680ff6764850bc69b47d003742eb297b6c958d0e009a74bdd7e3e1b620775212",
+    "state": "STOPPED",
+    "checked_at_utc": "2026-11-06T03:38:44.028145+00:00"
+  },
+  "budget": {
+    "authorized_max_seconds": 3600,
+    "authorized_max_usd": 1,
+    "measured_power_window_seconds": 3366.041,
+    "measured_power_window_minutes": 56.1,
+    "estimated_compute_usd_at_list_price": 0.03927,
+    "estimate_is_invoice": false,
+    "rate_usd_per_hour": 0.042,
+    "price_source": "https://www.oracle.com/cloud/price-list/"
+  },
+  "credentials_in_public_evidence": false
+}

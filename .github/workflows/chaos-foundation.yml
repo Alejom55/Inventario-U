@@ -1,0 +1,30 @@
+name: Validacion local de caos
+
+on:
+  push:
+    branches: [feat/chaos-v4]
+    paths: ['app/**', 'chaos/**', 'chaos_lab/**', 'scripts/validate_chaos.py', 'tests/chaos/**', 'pyproject.toml', 'uv.lock', '.github/workflows/chaos-foundation.yml']
+  pull_request:
+    paths: ['app/**', 'chaos/**', 'chaos_lab/**', 'scripts/validate_chaos.py', 'tests/chaos/**', 'pyproject.toml', 'uv.lock', '.github/workflows/chaos-foundation.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  offline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - uses: astral-sh/setup-uv@v9.0.0
+      - run: uv sync --frozen --group dev --group chaos
+      - name: Pruebas de resiliencia y contratos del experimento
+        run: uv run --frozen --group chaos python -m pytest tests/chaos tests/canary --no-cov
+      - name: Validar experimento sin inyectar fallos
+        run: uv run --frozen --group chaos python -m scripts.validate_chaos --k6
+      - name: Verificar Toxiproxy real en contenedores sinteticos locales
+        run: uv run --frozen --group chaos python -m scripts.verify_toxiproxy

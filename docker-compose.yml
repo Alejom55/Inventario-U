@@ -21,7 +21,14 @@ services:
       DATABASE_URL: postgresql://inventario:inventario@db:5432/inventario
       DEPORTBACK_API_URL: ${DEPORTBACK_API_URL:-}
       FASTIFY_API_URL: ${FASTIFY_API_URL:-}
+      DEPORTBACK_ENTITY_PATH: ${DEPORTBACK_ENTITY_PATH:-}
+      FASTIFY_ENTITY_PATH: ${FASTIFY_ENTITY_PATH:-}
+      CHAOS_ROUND: ${CHAOS_ROUND:-none}
+      APP_REVISION: ${APP_REVISION:-development}
       TEAM_API_KEY: ${TEAM_API_KEY:-}
+      RESILIENCE_MODE: ${RESILIENCE_MODE:-baseline}
+      DEPORTBACK_TIMEOUT_SECONDS: ${DEPORTBACK_TIMEOUT_SECONDS:-0.5}
+      FASTIFY_TIMEOUT_SECONDS: ${FASTIFY_TIMEOUT_SECONDS:-0.5}
     depends_on:
       db:
         condition: service_healthy
