@@ -2,10 +2,13 @@
 
 import os
 import time
+import logging
 
 from fastapi import Response
 from fastapi.responses import JSONResponse
 from prometheus_client import CONTENT_TYPE_LATEST, Counter, Histogram, generate_latest
+from .observability import correlation_id, round_identity
+from .integrations.contracts import configuration_fingerprint
 
 TRACK = os.getenv("APP_TRACK", "stable")
 if TRACK not in {"stable", "canary"}:
@@ -19,6 +22,12 @@ LATENCY = Histogram(
     buckets=(.005, .01, .025, .05, .1, .2, .3, .5, .75, 1, 1.5, 2, 3, 5, 10),
 )
 QUERIES = Counter("inventory_queries_total", "Successful inventory queries", ("track", "version"))
+FLOWS = Counter("inventory_flow_requests_total", "Complete and failed three-entity flows", ("round", "outcome"))
+FLOW_DURATION = Histogram(
+    "inventory_flow_duration_seconds", "Three-entity flow duration, including failed flows",
+    ("round", "outcome"), buckets=(.005, .01, .025, .05, .1, .2, .3, .5, .75, 1, 1.5, 2, 3, 5, 10),
+)
+logger = logging.getLogger(__name__)
 
 
 def install_telemetry(app):
@@ -37,6 +46,20 @@ def install_telemetry(app):
         response.headers["X-App-Version"] = VERSION
         response.headers["X-App-Track"] = TRACK
         response.headers["X-App-Revision"] = REVISION
+        response.headers["X-Resilience-Mode"] = os.getenv("RESILIENCE_MODE", "baseline") if os.getenv("RESILIENCE_MODE", "baseline") in {"baseline", "protected"} else "invalid"
+        current_round = round_identity()
+        response.headers["X-Chaos-Round"] = current_round
+        trace_id = getattr(request.state, "trace_id", None) or response.headers.get("X-Trace-Id")
+        if not trace_id:
+            trace_id = correlation_id(request.headers.get("X-Trace-Id"))
+        response.headers["X-Trace-Id"] = trace_id
+        elapsed = time.perf_counter() - start
+        if request.url.path in {"/api/v2/integracion", "/api/v3/integracion"}:
+            response.headers["X-Integration-Contract"] = configuration_fingerprint()
+            outcome = "complete" if response.status_code == 200 and getattr(request.state, "flow_complete", False) else "error"
+            FLOWS.labels(current_round, outcome).inc()
+            FLOW_DURATION.labels(current_round, outcome).observe(elapsed)
+            logger.info("Flujo finalizado", extra={"trace_id": trace_id, "event": "flow_response", "round": current_round, "status": response.status_code, "duration_ms": round(elapsed*1000, 3), "outcome": outcome})
         if request.url.path not in {"/metrics", "/health", "/api/v2/health", "/api/v3/health"}:
             route = request.scope.get("route")
             # Unmatched paths and denied auth do not become user-controlled labels.
@@ -45,7 +68,7 @@ def install_telemetry(app):
                 "GET", "POST", "PUT", "DELETE", "OPTIONS", "QUERY", "HEAD", "PATCH"
             } else "OTHER", path)
             REQUESTS.labels(*labels, str(response.status_code)).inc()
-            LATENCY.labels(*labels).observe(time.perf_counter() - start)
+            LATENCY.labels(*labels).observe(elapsed)
             if path.endswith("/inventario/query") and response.status_code == 200:
                 QUERIES.labels(TRACK, VERSION).inc()
         return response

@@ -5,13 +5,13 @@ import hmac
 import os
 import random
 import time
-from uuid import uuid4
 
 from fastapi import HTTPException, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 from .telemetry import TRACK
+from .observability import correlation_id
 
 
 class Fault(BaseModel):
@@ -46,7 +46,7 @@ def install_faults(app):
             if current.latency_ms:
                 await asyncio.sleep(current.latency_ms / 1000)
             if random.random() < current.error_rate:
-                trace_id = request.headers.get("X-Trace-Id") or str(uuid4())
+                trace_id = correlation_id(request.headers.get("X-Trace-Id"))
                 return JSONResponse(
                     status_code=500,
                     content={"detail": "Controlled canary regression", "trace_id": trace_id},
