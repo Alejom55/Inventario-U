@@ -1,0 +1,7 @@
+FROM prom/prometheus:v3.5.0 AS prometheus
+FROM nginx:1.28-alpine
+RUN apk add --no-cache ca-certificates
+COPY --from=prometheus /bin/prometheus /usr/local/bin/prometheus
+COPY deploy/render/prometheus-entrypoint.sh /start-prometheus.sh
+RUN chmod 755 /start-prometheus.sh
+ENTRYPOINT ["/bin/sh", "/start-prometheus.sh"]

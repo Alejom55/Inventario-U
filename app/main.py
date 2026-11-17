@@ -51,12 +51,14 @@ async def agregar_trace_id(request: Request, call_next):
     logger.info("Solicitud recibida", extra={"trace_id": trace_id, "path": request.url.path})
 
     team_api_key = os.getenv("TEAM_API_KEY")
+    control_key = os.getenv('RESOURCE_ADMIN_KEY') if request.url.path.startswith('/api/v2/admin/resource-') else None
+    required_key = control_key or team_api_key
     es_ruta_funcional = request.url.path.startswith(FUNCTIONAL_PATHS)
     if (
-        team_api_key
+        required_key
         and request.url.path not in HEALTH_PATHS
         and es_ruta_funcional
-        and not hmac.compare_digest(request.headers.get("X-Api-Key", ""), team_api_key)
+        and not hmac.compare_digest(request.headers.get("X-Api-Key", "").encode(), required_key.encode())
     ):
         logger.warning("API key inválida o ausente", extra={"trace_id": trace_id})
         response = JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={"detail": "API key inválida o ausente"})
@@ -70,7 +72,7 @@ async def agregar_trace_id(request: Request, call_next):
 
 @app.get("/health")
 @app.get(f"{API_V2_PREFIX}/health")
-def estado_api(request: Request):
+async def estado_api(request: Request):
     if request.url.path.startswith((API_V2_PREFIX, "/api/v3")):
         return {"status": "ok", "version": VERSION, "service": "inventario-u"}
     return {"estado": "ok"}

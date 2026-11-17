@@ -1,0 +1,4 @@
+**
+!deploy/
+!deploy/render/
+!deploy/render/prometheus-entrypoint.sh

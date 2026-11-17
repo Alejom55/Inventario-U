@@ -3,8 +3,10 @@
 import os
 import time
 import logging
+import hmac
+import re
 
-from fastapi import Response
+from fastapi import Request, Response
 from fastapi.responses import JSONResponse
 from prometheus_client import CONTENT_TYPE_LATEST, Counter, Histogram, generate_latest
 from .observability import correlation_id, round_identity
@@ -14,7 +16,7 @@ TRACK = os.getenv("APP_TRACK", "stable")
 if TRACK not in {"stable", "canary"}:
     raise ValueError("APP_TRACK must be stable or canary")
 VERSION = "3.0.0" if TRACK == "canary" else "2.0.0"
-REVISION = os.getenv("APP_REVISION", "development")
+REVISION = os.getenv("RENDER_GIT_COMMIT") or os.getenv("APP_REVISION", "development")
 LABELS = ("track", "version", "method", "route")
 REQUESTS = Counter("inventory_http_requests_total", "HTTP responses", (*LABELS, "status"))
 LATENCY = Histogram(
@@ -32,7 +34,10 @@ logger = logging.getLogger(__name__)
 
 def install_telemetry(app):
     @app.get("/metrics", include_in_schema=False)
-    async def metrics():
+    async def metrics(request: Request):
+        token=os.getenv('METRICS_BEARER_TOKEN')
+        if token and not hmac.compare_digest(request.headers.get('Authorization','').encode(),('Bearer '+token).encode()):
+            return JSONResponse(status_code=401,content={'detail':'Metrics Bearer required'})
         return Response(generate_latest(), headers={"Content-Type": CONTENT_TYPE_LATEST})
 
     @app.middleware("http")
@@ -46,6 +51,11 @@ def install_telemetry(app):
         response.headers["X-App-Version"] = VERSION
         response.headers["X-App-Track"] = TRACK
         response.headers["X-App-Revision"] = REVISION
+        if os.getenv('RENDER')=='true':
+            response.headers['X-Deployment-Provider']='render'
+            for name,header in (('RENDER_SERVICE_ID','X-Render-Service-Id'),('RENDER_INSTANCE_ID','X-Render-Instance-Id')):
+                value=os.getenv(name,'')
+                if re.fullmatch(r'[A-Za-z0-9_-]{1,128}',value):response.headers[header]=value
         response.headers["X-Resilience-Mode"] = os.getenv("RESILIENCE_MODE", "baseline") if os.getenv("RESILIENCE_MODE", "baseline") in {"baseline", "protected"} else "invalid"
         current_round = round_identity()
         response.headers["X-Chaos-Round"] = current_round
