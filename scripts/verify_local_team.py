@@ -1,11 +1,41 @@
 """Exercise the real public surface using disposable synthetic entities."""
 import json
+import subprocess
 import time
+from urllib.parse import urlencode
 from uuid import uuid4
 
 import httpx
 
 from scripts.local_team import OPERATOR, RUNTIME, api, grafana, read_json, settings
+
+
+def verify_remote_prometheus():
+    """A second Prometheus actually scrapes HTTPS with its own secret-file mount."""
+    name='inventario-team-consumer-check-'+uuid4().hex[:10]
+    created=False
+    try:
+        subprocess.run(['docker','run','-d','--name',name,
+            '--mount','type=bind,source='+str(RUNTIME/'exports/prometheus.yml')+',target=/etc/prometheus/prometheus.yml,readonly',
+            '--mount','type=bind,source='+str(RUNTIME/'inventario_metrics_token')+',target=/run/secrets/inventario_metrics_token,readonly',
+            'prom/prometheus:v3.5.0','--config.file=/etc/prometheus/prometheus.yml'],check=True,capture_output=True)
+        created=True
+        def query(expression):
+            url='http://127.0.0.1:9090/api/v1/query?'+urlencode({'query':expression})
+            result=subprocess.run(['docker','exec',name,'wget','-q','-O','-',url],capture_output=True,text=True)
+            if result.returncode:
+                return []
+            return json.loads(result.stdout)['data']['result']
+        for _ in range(30):
+            up=query('up{job="inventario-u-remoto"}')
+            samples=query('sum(inventory_http_requests_total{job="inventory"})')
+            if up and float(up[0]['value'][1])==1 and samples and float(samples[0]['value'][1])>0:
+                return True
+            time.sleep(2)
+        raise AssertionError('Independent Prometheus did not ingest the public HTTPS metrics')
+    finally:
+        if created:
+            subprocess.run(['docker','rm','-f',name],check=True,capture_output=True)
 
 
 def verify():
@@ -82,6 +112,7 @@ def verify():
         assert query.status_code==200,query.text[:200]
         assert query.json()['results']['A']['frames']
         report['grafana_real_prometheus_query']='passed'
+    report['second_prometheus_https_ingestion']='passed' if verify_remote_prometheus() else 'failed'
     write=RUNTIME/'verification.json'
     write.write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
     print(json.dumps(report))
