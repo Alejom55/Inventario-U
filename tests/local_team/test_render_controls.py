@@ -70,3 +70,11 @@ def test_render_removes_storage_and_coordinator_without_hiding_business(monkeypa
     assert client.get('/api/v2/storage').status_code==404
     assert client.get('/api/v2/storage/test').status_code==404
     assert client.get('/api/v2/integracion').status_code==404
+
+
+def test_real_render_app_never_registers_nested_storage_router():
+    import subprocess,sys
+    env=dict(os.environ,RENDER='true',RESOURCE_LAB_ENABLED='false',TEAM_API_KEY='test-only')
+    code="from app.main import app; from fastapi.testclient import TestClient; c=TestClient(app); assert c.get('/api/v2/storage',headers={'X-Api-Key':'test-only'}).status_code==404; assert '/api/v2/storage' not in app.openapi()['paths']"
+    result=subprocess.run([sys.executable,'-c',code],env=env,capture_output=True,text=True)
+    assert result.returncode==0,result.stderr
