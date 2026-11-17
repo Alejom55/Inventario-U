@@ -1,5 +1,6 @@
 """Sequential cloud rounds on one verified Render Free deployment."""
 import json
+import argparse
 import os
 from pathlib import Path
 import subprocess
@@ -13,13 +14,22 @@ from deploy.render.free import ROOT,RUNTIME,api,read,write,credentials
 
 
 def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--manifest',type=Path,help='Previously attested public deployment; no Render account key required in CI')
+    args=parser.parse_args()
     state=read('deployment.json'); values=credentials(); base=state['api_url']
-    service=api('GET','/services/'+state['api_service_id'])
-    assert service['serviceDetails']['plan']=='free'
-    deployments=api('GET','/services/'+state['api_service_id']+'/deploys?limit=1')
-    deployment=deployments[0].get('deploy',deployments[0])
-    assert deployment['status']=='live'
-    revision=deployment['commit']['id']
+    if args.manifest:
+        manifest=json.loads(args.manifest.read_text(encoding='utf-8'))
+        assert manifest['plan']=='free' and manifest['provider']=='render'
+        assert manifest['api_url']==base and manifest['service_id']==state['api_service_id']
+        revision=manifest['application_revision'];deployment={'id':manifest['deployment_id']}
+    else:
+        service=api('GET','/services/'+state['api_service_id'])
+        assert service['serviceDetails']['plan']=='free'
+        deployments=api('GET','/services/'+state['api_service_id']+'/deploys?limit=1')
+        deployment=deployments[0].get('deploy',deployments[0])
+        assert deployment['status']=='live'
+        revision=deployment['commit']['id']
     execution=uuid4().hex
     folder=ROOT/'chaos/results'/('render-'+execution);folder.mkdir(parents=True)
     write('cloud-run.json',{'execution_id':execution,'folder':str(folder),'deployment_id':deployment['id']})
@@ -57,6 +67,8 @@ def main():
     summary={'provider':'render','scope':'real cloud single API; full three-API E2E and GKE/Chaos Mesh are separate requirements',
         'execution_id':execution,'service_id':state['api_service_id'],'deployment_id':deployment['id'],
         'instance_id':instance,'application_revision':revision,'plan':'free',
+        'generator':{'environment':'GitHub-hosted Ubuntu' if os.getenv('GITHUB_ACTIONS')=='true' else 'operator PC',
+            'run_id':os.getenv('GITHUB_RUN_ID'),'repository':os.getenv('GITHUB_REPOSITORY')},
         'same_profile':all(r['profile']==reports[0]['profile'] for r in reports),
         'measurements':[{k:v for k,v in r.items() if k!='requests'} for r in reports]}
     baseline=reports[0]['p95_ms']
