@@ -186,7 +186,9 @@ def start():
     base=session.get('public_url',SHARED) if tunnel_process('status') else SHARED
     configure(values,base,session.get('ids',{}))
     compose('config','--quiet')
-    compose('up','-d','--wait','--wait-timeout','240')
+    compose('up','-d','--wait','--wait-timeout','240','db','stable','canary','prometheus','grafana')
+    # Refresh upstream DNS after recreating API containers; clear old unhealthy state.
+    compose('up','-d','--force-recreate','--wait','--wait-timeout','120','gateway','share-gateway')
     ensure_viewer(values)
     ids=seed(values)
     print('Starting/reusing the owned HTTPS tunnel...',flush=True)
