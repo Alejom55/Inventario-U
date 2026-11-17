@@ -9,7 +9,8 @@ def public_gateway(values):
         if not re.fullmatch(r'[a-f0-9]{48,64}',values[name]):
             raise ValueError('Invalid generated credential: '+name)
     metrics_query = urlencode({'match[]':'{job="inventory",__name__=~"inventory_.*|process_cpu_seconds_total|process_resident_memory_bytes|up"}'})
-    return '''map $http_x_api_key $peer_ok { default 0; "PEER_KEY" 1; }
+    return r'''map_hash_bucket_size 256;
+map $http_x_api_key $peer_ok { default 0; "PEER_KEY" 1; }
 map $http_authorization $metrics_ok { default 0; "Bearer METRICS_KEY" 1; }
 server {
     listen 8080;
@@ -39,7 +40,7 @@ server {
         proxy_set_header X-Trace-Id $http_x_trace_id;
         proxy_pass http://stable:8000;
     }
-    location ~ ^/shared/(guia.md|contrato.json|postman.json|prometheus.yml|dashboard.json)$ {
+    location ~ ^/shared/(guia\.md|contrato\.json|postman\.json|prometheus\.yml|dashboard\.json)$ {
         alias /srv/team/$1;
     }
     location ~ ^/grafana/api/admin(?:/|$) { return 404; }
@@ -178,11 +179,26 @@ def postman(base, ids):
             request['url']['query']=[{'key':k,'value':v} for k,v in parse_qsl(path.split('?',1)[1])]
         if body is not None:
             request['header'].append({'key':'Content-Type','value':'application/json'})
-            request['body']={'mode':'raw','raw':json.dumps(body),'options':{'raw':{'language':'json'}}}
+            raw=json.dumps(body)
+            for variable in ('test_sku_id','test_almacen_id'):
+                raw=raw.replace('"{{'+variable+'}}"','{{'+variable+'}}')
+            request['body']={'mode':'raw','raw':raw,'options':{'raw':{'language':'json'}}}
         return {'name':name,'request':request}
-    return {'info':{'name':'Inventario-U equipo local','schema':'https://schema.getpostman.com/json/collection/v2.1.0/collection.json'},
+    collection={'info':{'name':'Inventario-U equipo local','schema':'https://schema.getpostman.com/json/collection/v2.1.0/collection.json'},
             'variable':[{'key':'base_url','value':base},{'key':'inventario_api_key','value':''}],
             'item':[item('Health','GET','/api/v2/health'),item('Inventario GET','GET','/api/v2/inventario?'+urlencode(ids)),
                     item('Inventario QUERY','QUERY','/api/v2/inventario/query',ids),item('Listar SKU','GET','/api/v2/skus'),
                     item('Crear SKU','POST','/api/v2/skus',{'codigo':'MI-PRUEBA-001','nombre':'Prueba equipo','stock_minimo':10}),
                     item('Listar almacenes','GET','/api/v2/almacenes'),item('Listar movimientos','GET','/api/v2/movimientos')]}
+    definitions=[('skus','test_sku_id',{'codigo':'PEER-{{$guid}}','nombre':'Prueba equipo','stock_minimo':10}),
+                 ('almacenes','test_almacen_id',{'nombre':'Prueba {{$guid}}','ubicacion':'Sintetica'}),
+                 ('movimientos','test_movimiento_id',{'sku_id':'{{test_sku_id}}','almacen_id':'{{test_almacen_id}}','tipo':'entrada','cantidad':8,'motivo':'Prueba equipo'})]
+    for resource,variable,body in definitions:
+        collection['variable'].append({'key':variable,'value':''})
+        create=item('Crear '+resource,'POST','/api/v2/'+resource,body)
+        create['event']=[{'listen':'test','script':{'type':'text/javascript','exec':[f'if (pm.response.code === 201) pm.collectionVariables.set("{variable}", pm.response.json().id);']}}]
+        collection['item'].append({'name':'CRUD '+resource+' — datos propios','item':[create,
+            item('Consultar '+resource,'GET','/api/v2/'+resource+'/{{'+variable+'}}'),
+            item('Actualizar '+resource,'PUT','/api/v2/'+resource+'/{{'+variable+'}}',body),
+            item('Eliminar '+resource,'DELETE','/api/v2/'+resource+'/{{'+variable+'}}')]})
+    return collection
