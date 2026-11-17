@@ -1,0 +1,12 @@
+{
+  "version": "1.0.0",
+  "title": "Propuesta local c: agotamiento real de concurrencia",
+  "description": "Dado GET /api/v2/skus a 5 solicitudes/s durante 120 s, al ocupar 6 workers durante 60 s desde t=30 s, p95 <500 ms y exito >=99% en [30,90). BASELINE no inyecta. R0 comparte workers. R1 aisla y limita admision de tareas de fondo a 4 sin cola. Misma imagen, datos, limites, carga y peticion de fallo. Asignacion pendiente del grupo; no acredita tres nubes.",
+  "tags": ["local", "synthetic", "resource-exhaustion", "group-assignment-pending"],
+  "steady-state-hypothesis": {
+    "title": "Endpoint propietario disponible antes y despues; el objetivo durante el fallo se mide por separado",
+    "probes": [{"type":"probe","name":"terminal-sku-healthy","tolerance":true,"provider":{"type":"python","module":"chaos_lab.resource","func":"healthy"}}]
+  },
+  "method": [{"type":"action","name":"constant-arrival-load-and-bounded-resource-fault","provider":{"type":"python","module":"chaos_lab.resource","func":"measure"}}],
+  "rollbacks": [{"type":"action","name":"release-and-verify-workers","provider":{"type":"python","module":"chaos_lab.resource","func":"rollback"}}]
+}

@@ -17,6 +17,7 @@ from .storage.router import router as storage_router
 from .telemetry import TRACK, VERSION, install_telemetry
 from .canary import install_v3
 from .faults import install_faults
+from .resource_lab import install_resource_lab
 from .observability import configure_logging, correlation_id
 
 
@@ -678,4 +679,5 @@ def consultar_integracion(
 
 install_v3(app, consultar_inventario)
 install_faults(app)
+install_resource_lab(app)
 install_telemetry(app)

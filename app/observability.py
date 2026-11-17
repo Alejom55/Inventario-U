@@ -17,6 +17,8 @@ class JsonFormatter(logging.Formatter):
         data = {
             "timestamp_utc": datetime.fromtimestamp(record.created, timezone.utc).isoformat(),
             "level": record.levelname, "logger": record.name, "message": record.getMessage(),
+            "round": round_identity(),
+            "execution_id": execution_identity(),
         }
         for field in ("trace_id", "service", "path", "status", "duration_ms", "round", "event", "outcome"):
             if hasattr(record, field):
@@ -36,4 +38,9 @@ def configure_logging():
 
 def round_identity():
     value = os.getenv("CHAOS_ROUND", "none")
-    return value if value in {"R0", "R1"} else "none"
+    return value if value in {"BASELINE", "R0", "R1"} else "none"
+
+
+def execution_identity():
+    value = os.getenv("CHAOS_EXECUTION_ID", "none")
+    return value if re.fullmatch(r"[a-f0-9]{32}", value) else "none"

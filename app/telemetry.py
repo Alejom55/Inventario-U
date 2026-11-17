@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 
 def install_telemetry(app):
     @app.get("/metrics", include_in_schema=False)
-    def metrics():
+    async def metrics():
         return Response(generate_latest(), headers={"Content-Type": CONTENT_TYPE_LATEST})
 
     @app.middleware("http")
@@ -69,6 +69,8 @@ def install_telemetry(app):
             } else "OTHER", path)
             REQUESTS.labels(*labels, str(response.status_code)).inc()
             LATENCY.labels(*labels).observe(elapsed)
+            logger.info('Respuesta HTTP', extra={'trace_id':trace_id, 'path':path,
+                'status':response.status_code, 'duration_ms':round(elapsed*1000,3)})
             if path.endswith(("/inventario/query", "/inventario")) and response.status_code == 200:
                 QUERIES.labels(TRACK, VERSION).inc()
         return response

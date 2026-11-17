@@ -1,0 +1,59 @@
+name: inventario-resource-lab
+x-lab: &lab
+  image: ${CANARY_IMAGE:?required}
+  restart: unless-stopped
+  cpus: 1.0
+  mem_limit: 512m
+  command: [/app/.venv/bin/uvicorn, app.main:app, --host, 0.0.0.0, --port, '8000', --limit-concurrency, '32', --no-access-log]
+  environment: &environment
+    DATABASE_URL: postgresql://inventario:${POSTGRES_PASSWORD:?required}@resource-db:5432/inventario
+    TEAM_API_KEY: ${TEAM_API_KEY:?required}
+    RESOURCE_LAB_ENABLED: 'true'
+    APP_REVISION: ${APP_REVISION:?required}
+    CHAOS_EXECUTION_ID: ${CHAOS_EXECUTION_ID:?required}
+    APP_TRACK: stable
+  networks: [default, team]
+  logging:
+    options: {max-size: 10m, max-file: '2'}
+  healthcheck:
+    test: [CMD, /app/.venv/bin/python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health',timeout=2)"]
+    interval: 5s
+    timeout: 3s
+    retries: 20
+  depends_on:
+    resource-db: {condition: service_healthy}
+services:
+  resource-db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: inventario
+      POSTGRES_DB: inventario
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?required}
+    volumes: [resource_data:/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U inventario -d inventario]
+      interval: 5s
+      retries: 20
+  resource-baseline:
+    <<: *lab
+    environment: {<<: *environment, CHAOS_ROUND: BASELINE, RESILIENCE_MODE: baseline}
+    ports: ['127.0.0.1:18110:8000']
+  resource-r0:
+    <<: *lab
+    environment: {<<: *environment, CHAOS_ROUND: R0, RESILIENCE_MODE: baseline}
+    ports: ['127.0.0.1:18111:8000']
+    depends_on:
+      resource-baseline: {condition: service_healthy}
+  resource-r1:
+    <<: *lab
+    environment: {<<: *environment, CHAOS_ROUND: R1, RESILIENCE_MODE: protected}
+    ports: ['127.0.0.1:18112:8000']
+    depends_on:
+      resource-r0: {condition: service_healthy}
+networks:
+  team:
+    external: true
+    name: inventario-team-local_default
+volumes:
+  resource_data:
