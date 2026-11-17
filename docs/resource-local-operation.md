@@ -24,6 +24,8 @@ La mitigación protege el tráfico de negocio limitando tareas de fondo; el lím
 de seis workers HTTP, la imagen, los datos y el perfil de solicitudes se mantienen.
 Las tareas son bloqueos reales de workers AnyIO. No se simula la degradación
 devolviendo errores prefabricados desde `/skus`.
+Las tres réplicas limitan a 32 las solicitudes simultáneas a `/api/v2/skus`;
+ese límite común conserva accesibles métricas y rollback privados durante el fallo.
 
 ## Ejecución y reversión
 

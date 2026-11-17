@@ -1,0 +1,128 @@
+{
+  "execution_id": "d09a9f61af694ad0ada7297863948807",
+  "profile_identical": true,
+  "revision_identical": true,
+  "scope": "local isolated single-API replica; assignment c pending group confirmation",
+  "measurements": [
+    {
+      "scope": "LOCAL single API replica; not cloud or three-API E2E",
+      "assignment_status": "proposed resource c; group confirmation pending",
+      "round": "BASELINE",
+      "execution_id": "d09a9f61af694ad0ada7297863948807",
+      "profile": {
+        "requests_per_second": 5,
+        "duration_seconds": 120,
+        "fault_start_seconds": 30,
+        "fault_duration_seconds": 60,
+        "timeout_seconds": 2,
+        "workers": 6,
+        "max_p95_ms": 500,
+        "min_success_percent": 99,
+        "window_seconds": 60
+      },
+      "revision": "51f758189dc7e156644627d43798a1a126da23be",
+      "started_utc": "2026-11-17T05:59:36.522726+00:00",
+      "ended_utc": "2026-11-17T06:01:36.367895+00:00",
+      "fault": {},
+      "samples": 300,
+      "total_requests": 600,
+      "p95_ms": 36.093,
+      "success_percent": 100.0,
+      "error_percent": 0.0,
+      "max_scheduler_lag_ms": 27.747,
+      "passed": true,
+      "rollback_verified": true,
+      "trace_id": "7987fd0b9f264a2dbc346ad49c31f11d",
+      "p95_variation_vs_baseline_percent": 0.0,
+      "error_variation_percentage_points": 0.0
+    },
+    {
+      "scope": "LOCAL single API replica; not cloud or three-API E2E",
+      "assignment_status": "proposed resource c; group confirmation pending",
+      "round": "R0",
+      "execution_id": "d09a9f61af694ad0ada7297863948807",
+      "profile": {
+        "requests_per_second": 5,
+        "duration_seconds": 120,
+        "fault_start_seconds": 30,
+        "fault_duration_seconds": 60,
+        "timeout_seconds": 2,
+        "workers": 6,
+        "max_p95_ms": 500,
+        "min_success_percent": 99,
+        "window_seconds": 60
+      },
+      "revision": "51f758189dc7e156644627d43798a1a126da23be",
+      "started_utc": "2026-11-17T06:01:38.044865+00:00",
+      "ended_utc": "2026-11-17T06:03:37.906161+00:00",
+      "fault": {
+        "injection_request_utc": "2026-11-17T06:02:08.041496+00:00",
+        "injection_ack_utc": "2026-11-17T06:02:08.115816+00:00",
+        "injection": {
+          "requested": 6,
+          "admitted": 6,
+          "rejected": 0,
+          "duration_seconds": 60,
+          "protected": false
+        },
+        "release": true,
+        "release_verified_utc": "2026-11-17T06:03:08.203908+00:00"
+      },
+      "samples": 300,
+      "total_requests": 600,
+      "p95_ms": 2015.517,
+      "success_percent": 0.0,
+      "error_percent": 100.0,
+      "max_scheduler_lag_ms": 27.225,
+      "passed": false,
+      "rollback_verified": true,
+      "trace_id": "591aaf82e0ee496889f3575cd59566f9",
+      "p95_variation_vs_baseline_percent": 5484.23,
+      "error_variation_percentage_points": 100.0
+    },
+    {
+      "scope": "LOCAL single API replica; not cloud or three-API E2E",
+      "assignment_status": "proposed resource c; group confirmation pending",
+      "round": "R1",
+      "execution_id": "d09a9f61af694ad0ada7297863948807",
+      "profile": {
+        "requests_per_second": 5,
+        "duration_seconds": 120,
+        "fault_start_seconds": 30,
+        "fault_duration_seconds": 60,
+        "timeout_seconds": 2,
+        "workers": 6,
+        "max_p95_ms": 500,
+        "min_success_percent": 99,
+        "window_seconds": 60
+      },
+      "revision": "51f758189dc7e156644627d43798a1a126da23be",
+      "started_utc": "2026-11-17T06:03:39.651350+00:00",
+      "ended_utc": "2026-11-17T06:05:39.529873+00:00",
+      "fault": {
+        "injection_request_utc": "2026-11-17T06:04:09.659902+00:00",
+        "injection_ack_utc": "2026-11-17T06:04:09.734092+00:00",
+        "injection": {
+          "requested": 6,
+          "admitted": 4,
+          "rejected": 2,
+          "duration_seconds": 60,
+          "protected": true
+        },
+        "release": true,
+        "release_verified_utc": "2026-11-17T06:05:09.770645+00:00"
+      },
+      "samples": 300,
+      "total_requests": 600,
+      "p95_ms": 43.558,
+      "success_percent": 100.0,
+      "error_percent": 0.0,
+      "max_scheduler_lag_ms": 28.36,
+      "passed": true,
+      "rollback_verified": true,
+      "trace_id": "f857f4f155914742b53d13a1a0342d59",
+      "p95_variation_vs_baseline_percent": 20.68,
+      "error_variation_percentage_points": 0.0
+    }
+  ]
+}
