@@ -6,6 +6,7 @@ from fastapi.testclient import TestClient
 
 from app.resource_lab import install_resource_lab
 from app.telemetry import install_telemetry
+from app.render_surface import restrict_render_surface
 
 
 def make_app(monkeypatch):
@@ -56,3 +57,16 @@ def test_render_refuses_unprotected_control_credentials(monkeypatch):
     monkeypatch.delenv('RESOURCE_ADMIN_KEY',raising=False)
     with pytest.raises(ValueError,match='separate private control'):
         install_resource_lab(FastAPI())
+
+
+def test_render_removes_storage_and_coordinator_without_hiding_business(monkeypatch):
+    monkeypatch.setenv('RENDER','true')
+    app=FastAPI()
+    for path in ('/api/v2/storage','/api/v2/storage/{trace_id}','/api/v2/integracion','/api/v2/skus'):
+        app.add_api_route(path,lambda:{'ok':True},methods=['GET'])
+    restrict_render_surface(app)
+    client=TestClient(app)
+    assert client.get('/api/v2/skus').status_code==200
+    assert client.get('/api/v2/storage').status_code==404
+    assert client.get('/api/v2/storage/test').status_code==404
+    assert client.get('/api/v2/integracion').status_code==404

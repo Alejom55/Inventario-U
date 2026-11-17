@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 import json
 import math
 import os
+import re
 from pathlib import Path
 import time
 from uuid import uuid4
@@ -30,22 +31,31 @@ def utc():
 
 def target():
     current=os.environ['CHAOS_ROUND']
+    base=os.getenv('RESOURCE_RENDER_URL')
+    if base:
+        if not re.fullmatch(r'https://[a-z0-9-]+\.onrender\.com',base):
+            raise ValueError('Expected one verified Render HTTPS origin')
+        return current,base
     return current,'http://127.0.0.1:'+str(PORTS[current])
 
 
-def headers(trace=None):
-    return {'X-Api-Key':os.environ['RESOURCE_PRIVATE_KEY'],'X-Trace-Id':trace or uuid4().hex}
+def headers(trace=None,control=False):
+    key=os.getenv('RESOURCE_CONTROL_KEY') if control else None
+    return {'X-Api-Key':key or os.environ['RESOURCE_PRIVATE_KEY'],'X-Trace-Id':trace or uuid4().hex}
 
 
 def healthy():
     _,base=target()
     response=httpx.get(base+'/api/v2/skus',headers=headers(),timeout=3)
-    return response.status_code==200 and isinstance(response.json(),list)
+    valid=response.status_code==200 and isinstance(response.json(),list)
+    if os.getenv('RESOURCE_RENDER_URL'):
+        valid=valid and response.headers.get('X-Deployment-Provider')=='render' and response.headers.get('X-Render-Service-Id')==os.environ['RESOURCE_EXPECTED_SERVICE_ID'] and response.headers.get('X-App-Revision')==os.environ['APP_REVISION']
+    return valid
 
 
 def rollback():
     _,base=target()
-    response=httpx.delete(base+'/api/v2/admin/resource-fault',headers=headers(),timeout=7)
+    response=httpx.delete(base+'/api/v2/admin/resource-fault',headers=headers(control=True),timeout=7)
     response.raise_for_status()
     return response.json()['rollback_verified']
 
@@ -59,22 +69,25 @@ def measure():
         async with httpx.AsyncClient(timeout=PROFILE['timeout_seconds'],limits=httpx.Limits(max_connections=40)) as client:
             started=time.perf_counter(); started_utc=utc()
             async def request(index,scheduled):
-                trace=uuid4().hex; beginning=time.perf_counter(); code=0; identity=False
+                trace=uuid4().hex; beginning=time.perf_counter(); code=0; identity=False; sent_utc=utc(); instance=None
                 try:
                     response=await client.get(base+'/api/v2/skus',headers=headers(trace))
                     code=response.status_code
                     identity=response.headers.get('X-Trace-Id')==trace and response.headers.get('X-Chaos-Round')==current
+                    if os.getenv('RESOURCE_RENDER_URL'):
+                        instance=response.headers.get('X-Render-Instance-Id')
+                        identity=identity and response.headers.get('X-Deployment-Provider')=='render' and response.headers.get('X-Render-Service-Id')==os.environ['RESOURCE_EXPECTED_SERVICE_ID'] and response.headers.get('X-App-Revision')==os.environ['APP_REVISION'] and instance==os.environ['RESOURCE_EXPECTED_INSTANCE_ID']
                 except httpx.TransportError:
                     pass
-                rows.append({'index':index,'scheduled_seconds':scheduled,'sent_utc':utc(),
+                rows.append({'index':index,'scheduled_seconds':scheduled,'sent_utc':sent_utc,
                     'scheduler_lag_ms':round((beginning-started-scheduled)*1000,3),
                     'duration_ms':round((time.perf_counter()-beginning)*1000,3),
-                    'status':code,'success':code==200 and identity,'trace_id':trace})
+                    'status':code,'success':code==200 and identity,'trace_id':trace,'server_instance_id':instance})
             async def inject():
                 await asyncio.sleep(max(0,30-(time.perf_counter()-started)))
                 if current=='BASELINE':return
                 events['injection_request_utc']=utc()
-                response=await client.post(base+'/api/v2/admin/resource-fault',headers=headers(),
+                response=await client.post(base+'/api/v2/admin/resource-fault',headers=headers(control=True),
                     json={'workers':6,'duration_seconds':60})
                 response.raise_for_status()
                 events.update(injection_ack_utc=utc(),injection=response.json())
@@ -97,7 +110,7 @@ def measure():
             window=[r for r in rows if 30<=r['scheduled_seconds']<90]
             p95=sorted(r['duration_ms'] for r in window)[math.ceil(len(window)*.95)-1]
             success=sum(r['success'] for r in window)/len(window)*100
-            report={'scope':'LOCAL single API replica; not cloud or three-API E2E',
+            report={'scope':'RENDER cloud single API; not three-API E2E' if os.getenv('RESOURCE_RENDER_URL') else 'LOCAL single API replica; not cloud or three-API E2E',
                 'assignment_status':'confirmed resource c: concurrency exhaustion',
                 'round':current,'execution_id':execution,'profile':PROFILE,'revision':os.environ['APP_REVISION'],
                 'started_utc':started_utc,'ended_utc':utc(),'fault':events,'samples':len(window),
@@ -106,6 +119,12 @@ def measure():
                 **evaluate_objective(success,p95),'rollback_verified':released,
                 'trace_id':next((r['trace_id'] for r in window if r['success']),window[0]['trace_id']),
                 'requests':sorted(rows,key=lambda r:r['index'])}
+            if os.getenv('RESOURCE_RENDER_URL'):
+                report['deployment']={'provider':'render','url':base,'service_id':os.environ['RESOURCE_EXPECTED_SERVICE_ID'],
+                    'instance_id':os.environ['RESOURCE_EXPECTED_INSTANCE_ID'],'application_revision':os.environ['APP_REVISION']}
+                result=await client.post(base+'/api/v2/admin/resource-result',headers=headers(control=True),json={
+                    'round':current,'execution_id':execution,'samples':len(window),'successes':sum(r['success'] for r in window),'p95_ms':p95})
+                result.raise_for_status()
             destination.write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
             return {key:value for key,value in report.items() if key!='requests'}
     return asyncio.run(run())

@@ -2,6 +2,7 @@
 import json
 from pathlib import Path
 import secrets
+import re
 
 import httpx
 
@@ -23,6 +24,16 @@ def write(name,value):
 def api(method,path,body=None):
     if not path.startswith('/') or '://' in path:
         raise ValueError('Only Render API paths are allowed')
+    if method not in ('GET','POST','PATCH','PUT','DELETE'):
+        raise ValueError('Unexpected API method')
+    if method!='GET' and path not in ('/services','/postgres'):
+        state=read('deployment.json',{})
+        owned={state.get(k) for k in ('api_service_id','prometheus_service_id','database_id')}
+        match=re.match(r'^/(?:services|postgres)/([^/?]+)(?:/|$)',path)
+        if not match or match[1] not in owned:
+            raise ValueError('Refusing to modify a resource outside this isolated practice')
+        if body and body.get('serviceDetails',{}).get('plan','free')!='free':
+            raise ValueError('Paid plan changes are forbidden')
     if method=='POST' and path in ('/services','/postgres'):
         details=body if path=='/postgres' else body.get('serviceDetails',{})
         if details.get('plan')!='free' or body.get('ownerId')!=OWNER:
@@ -30,6 +41,8 @@ def api(method,path,body=None):
         if any(details.get(k) for k in ('disk','autoscaling','enableHighAvailability','enableDiskAutoscaling','readReplicas')):
             raise ValueError('Optional paid resources are forbidden')
     token=(RUNTIME/'api-token.txt').read_text(encoding='utf-8-sig').strip()
+    if not token or any(ord(c)<33 or ord(c)>126 for c in token):
+        raise ValueError('Expected one private API token without whitespace')
     with httpx.Client(base_url='https://api.render.com/v1',headers={'Authorization':'Bearer '+token},timeout=45) as client:
         result=client.request(method,path,json=body)
     if result.status_code>=400:
