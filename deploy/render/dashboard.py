@@ -27,12 +27,15 @@ Aquí R0/R1 son rondas de caos; no son las versiones stable/canary del ejercicio
 '''
     for r in summary['measurements']:
         text+=f"| {r['round']} | {r['success_percent']:.3f} | {r['p95_ms']:.3f} | {r['p95_variation_vs_baseline_percent']:.2f} | {'cumple' if r['objective_passed'] else 'refutada'} | {'cumple' if r['guardrail_p95_passed'] else 'no cumple'} |\n"
+    text+='\nGenerador: '+summary.get('generator',{}).get('environment','ver artefactos')+'. Las latencias incluyen su ruta de red hacia Render. No comparar directamente con las ejecuciones desde el PC del operador como si tuvieran el mismo origen.\n'
     text+=f"\nExecution ID: `{summary['execution_id']}`\n\nRevisión: `{summary['application_revision']}`\n\nDeployment: `{summary['deployment_id']}`\n\n"
     for r in summary['measurements']:
         fault=r['fault']
         text+=f"**{r['round']}**: {r['started_utc']} a {r['ended_utc']}; trace_id `{r['trace_id']}`. "
         text+=f"Inyección: {fault.get('injection_ack_utc','sin fallo')}; reversión: {fault.get('release_verified_utc','verificada al finalizar')}.\n\n"
     text+='Prometheus tiene almacenamiento temporal. Descargar el informe; un reinicio puede perder las series. Cero tráfico sin peticiones es normal. Los indicadores de éxito/p95 del cliente se publican al terminar cada ronda, a partir de las muestras reales del generador.'
+    text+='\n\n## Postman y conexión del equipo\n\nMétodo GET, URL '+api_url+'/api/v2/skus. Header X-Api-Key: {{inventario_api_key}} y X-Trace-Id: equipo-{{$guid}}. Usar variables de entorno; credenciales por privado. IDs sintéticos: SKU 1 y almacén 1. Consulta GET /api/v2/inventario?sku_id=1&almacen_id=1, respuesta resultados[]. No llamar /integracion desde deport-back: causaría un ciclo.\n\nEn Grafana Cloud común, crear datasource tipo Prometheus con URL '+prometheus_url+', método POST y header seguro Authorization: Bearer <token privado de métricas>. Importar docs/render-free-dashboard.json y seleccionar ese datasource.\n\n## Sustentación desde Actions\n\nAbrir Actions > Validacion local de caos > Run workflow > Branch feat/render-free > Run workflow. El job render_free ejecuta las tres rondas sin crear infraestructura. R0 degrada el servicio durante 60 s: coordinar la ventana del grupo. Los resultados se descargan en el artefacto render-free-<run_id>.\n'
+    if summary.get('github_run_url'):text+='\nEjecución verificada: '+summary['github_run_url']+'\n'
     panels=[{'id':1,'type':'text','title':'Guía, resultados reales y trazabilidad',
         'gridPos':{'x':0,'y':0,'w':24,'h':22},'options':{'mode':'markdown','content':text}}]
     queries=[('Objetivo único: éxito del cliente por ronda ≥99%','inventory_resource_client_success_ratio{cloud="render"}','percentunit','stat'),

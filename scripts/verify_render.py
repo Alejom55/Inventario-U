@@ -2,7 +2,7 @@
 from datetime import datetime,timezone
 import json
 from pathlib import Path
-from urllib.parse import urlencode
+from urllib.parse import urlencode,urlsplit,unquote
 from uuid import uuid4
 
 import httpx
@@ -64,7 +64,8 @@ def main():
                 assert response.json()['data']['result'],panel['title']
     trace_proof=[]
     for report in summary['measurements']:
-        logs=api('GET','/logs?'+urlencode({'ownerId':OWNER,'resource':state['api_service_id'],'text':report['trace_id'],'limit':20}))
+        logs=api('GET','/logs?'+urlencode({'ownerId':OWNER,'resource':state['api_service_id'],
+            'text':report['trace_id'],'startTime':report['started_utc'],'endTime':report['ended_utc'],'limit':20}))
         matched=[]
         for row in logs.get('logs',[]):
             try:message=json.loads(row['message'])
@@ -86,7 +87,7 @@ def main():
         'actual_application_log_examples':trace_proof,'synthetic_ids':ids,
         'common_grafana_cloud_stack':'not configured; owner must import datasource/dashboard'}
     docs=ROOT/'docs'
-    (docs/'render-free-guide.md').write_text(guide+'\n',encoding='utf-8')
+    (docs/'render-free-guide.md').write_text(guide.rstrip()+'\n',encoding='utf-8')
     (docs/'render-free-dashboard.json').write_text(json.dumps(dashboard,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     collection=postman(base,ids);collection['info']['name']='Inventario-U — Render Free'
     (docs/'render-free-postman.json').write_text(json.dumps(collection,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
@@ -97,7 +98,8 @@ def main():
                   {'key':'inventario_api_key','value':values['TEAM_API_KEY'],'enabled':True,'type':'secret'}]})
     for name in ('render-free-guide.md','render-free-dashboard.json','render-free-postman.json','evidence/render-verification.json'):
         content=(docs/name).read_text(encoding='utf-8')
-        assert not any(value in content for value in values.values())
+        sensitive=list(values.values())+[(RUNTIME/'api-token.txt').read_text(encoding='utf-8-sig').strip(),unquote(urlsplit(values['DATABASE_URL']).password or '')]
+        assert not any(value and value in content for value in sensitive)
     write('verification.json',proof)
     print(json.dumps({k:v for k,v in proof.items() if k!='actual_application_log_examples'}))
 

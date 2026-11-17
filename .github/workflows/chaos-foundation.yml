@@ -24,7 +24,7 @@ jobs:
       - uses: astral-sh/setup-uv@v9.0.0
       - run: uv sync --frozen --group dev --group chaos
       - name: Pruebas de resiliencia y contratos del experimento
-        run: uv run --frozen --group chaos python -m pytest tests/chaos tests/canary --no-cov
+        run: uv run --frozen --group chaos python -m pytest tests/chaos tests/canary tests/local_team tests/digitalocean --no-cov
       - name: Validar experimento sin inyectar fallos
         run: uv run --frozen --group chaos python -m scripts.validate_chaos --k6
       - name: Verificar Toxiproxy real en contenedores sinteticos locales
@@ -48,6 +48,24 @@ jobs:
           python-version: '3.13'
       - uses: astral-sh/setup-uv@v9.0.0
       - run: uv sync --frozen --group chaos
+      - name: Esperar API y Prometheus antes de medir
+        shell: python
+        run: |
+          import json, time, urllib.request, urllib.error
+          from pathlib import Path
+          manifest = json.loads(Path('deploy/render/target.json').read_text())
+          for base in (manifest['api_url'], manifest['prometheus_url']):
+              for attempt in range(6):
+                  try:
+                      with urllib.request.urlopen(base + '/health', timeout=25) as response:
+                          if response.status == 200:
+                              break
+                  except (urllib.error.URLError, TimeoutError):
+                      pass
+                  time.sleep(5)
+              else:
+                  raise RuntimeError('Servicio Free no disponible antes de medir')
+          time.sleep(10)  # Allow two real Prometheus scrapes before the baseline.
       - name: Preparar exclusivamente las credenciales de la API sintetica
         shell: python
         run: |

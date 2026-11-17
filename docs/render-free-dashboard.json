@@ -1,0 +1,268 @@
+{
+  "uid": null,
+  "title": "Inventario-U — Fallo c en Render Free",
+  "schemaVersion": 41,
+  "version": 1,
+  "refresh": "5s",
+  "time": {
+    "from": "now-3h",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "text",
+      "title": "Guía, resultados reales y trazabilidad",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 22
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "# Inventario-U: ejecución real en Render Free\n\nAPI: https://inventario-chaos-free.onrender.com\nGET /api/v2/skus es terminal: consulta PostgreSQL, sin invocar a los compañeros.\nAutenticación de negocio: X-Api-Key. Propagar X-Trace-Id.\nDatasource Prometheus: https://inventario-chaos-prom-free.onrender.com; header Authorization: Bearer <token privado>.\nNo colocar claves en paneles, repositorios ni mensajes del grupo.\n\n**Única métrica objetivo: éxito del cliente ≥99% durante el fallo.**\nGuardarraíl separado: p95 del cliente <500 ms, incluyendo errores y timeouts.\nPerfil: 5 peticiones/s, 120 s; fallo desde t=30 durante 60 s; timeout 2 s.\nEstado estable, R0 y R1 usan la misma versión e instancia de la API y los mismos datos.\nR0 comparte los seis permisos HTTP con seis tareas de fondo. R1 usa bulkhead y\nadmisión máxima de cuatro tareas de fondo, rechazando dos sin cola.\nEl interruptor requiere una clave administrativa distinta y tiene expiración de 60 s.\n\nLas mediciones son de una API real en Render; no acreditan por sí solas el flujo\nintegrado de tres APIs ni Chaos Mesh/GKE. El grupo debe aceptar Render en lugar de OCI.\nAquí R0/R1 son rondas de caos; no son las versiones stable/canary del ejercicio anterior.\n\n| Ronda | Éxito % | p95 ms | Variación p95 % | Objetivo | Guardarraíl |\n|---|---:|---:|---:|---|---|\n| BASELINE | 100.000 | 317.210 | 0.00 | cumple | cumple |\n| R0 | 0.000 | 2015.747 | 535.46 | refutada | no cumple |\n| R1 | 100.000 | 295.692 | -6.78 | cumple | cumple |\n\nGenerador: GitHub-hosted Ubuntu. Las latencias incluyen su ruta de red hacia Render. No comparar directamente con las ejecuciones desde el PC del operador como si tuvieran el mismo origen.\n\nExecution ID: `11e3e0fc15d34f26a86d5946b2c80351`\n\nRevisión: `6e29c9addfa6d7e583c082ce5b001f202b811f85`\n\nDeployment: `dep-dbubbf08v5cc738j7fng`\n\n**BASELINE**: 2026-11-17T20:18:45.279372+00:00 a 2026-11-17T20:20:45.233468+00:00; trace_id `3d70fc84119a4881aa57544c6df3ce00`. Inyección: sin fallo; reversión: verificada al finalizar.\n\n**R0**: 2026-11-17T20:20:46.189816+00:00 a 2026-11-17T20:22:46.182288+00:00; trace_id `9277389fb1d849f49b43dfdac8bd8869`. Inyección: 2026-11-17T20:21:16.287124+00:00; reversión: 2026-11-17T20:22:16.377689+00:00.\n\n**R1**: 2026-11-17T20:22:46.913061+00:00 a 2026-11-17T20:24:46.839807+00:00; trace_id `2182c092db7e4ff0885c19b3a61ed585`. Inyección: 2026-11-17T20:23:17.024073+00:00; reversión: 2026-11-17T20:24:17.130349+00:00.\n\nPrometheus tiene almacenamiento temporal. Descargar el informe; un reinicio puede perder las series. Cero tráfico sin peticiones es normal. Los indicadores de éxito/p95 del cliente se publican al terminar cada ronda, a partir de las muestras reales del generador.\n\n## Postman y conexión del equipo\n\nMétodo GET, URL https://inventario-chaos-free.onrender.com/api/v2/skus. Header X-Api-Key: {{inventario_api_key}} y X-Trace-Id: equipo-{{$guid}}. Usar variables de entorno; credenciales por privado. IDs sintéticos: SKU 1 y almacén 1. Consulta GET /api/v2/inventario?sku_id=1&almacen_id=1, respuesta resultados[]. No llamar /integracion desde deport-back: causaría un ciclo.\n\nEn Grafana Cloud común, crear datasource tipo Prometheus con URL https://inventario-chaos-prom-free.onrender.com, método POST y header seguro Authorization: Bearer <token privado de métricas>. Importar docs/render-free-dashboard.json y seleccionar ese datasource.\n\n## Sustentación desde Actions\n\nAbrir Actions > Validacion local de caos > Run workflow > Branch feat/render-free > Run workflow. El job render_free ejecuta las tres rondas sin crear infraestructura. R0 degrada el servicio durante 60 s: coordinar la ventana del grupo. Los resultados se descargan en el artefacto render-free-<run_id>.\n\nEjecución verificada: https://github.com/Alejom55/Inventario-U/actions/runs/44167802835\n"
+      }
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Objetivo único: éxito del cliente por ronda ≥99%",
+      "gridPos": {
+        "x": 0,
+        "y": 22,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "inventory_resource_client_success_ratio{cloud=\"render\"}",
+          "legendFormat": "{{round}}",
+          "instant": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "max": 1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 0.99
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      }
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Guardarraíl: p95 del cliente <500 ms",
+      "gridPos": {
+        "x": 12,
+        "y": 22,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "1000 * inventory_resource_client_p95_seconds{cloud=\"render\"}",
+          "legendFormat": "{{round}}",
+          "instant": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 500
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      }
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Tráfico HTTP al endpoint y rechazos de admisión",
+      "gridPos": {
+        "x": 0,
+        "y": 30,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(inventory_http_requests_total{cloud=\"render\",method=\"GET\",route=~\"/api/v2/skus|unmatched\"}[1m]))",
+          "legendFormat": "{{round}}",
+          "instant": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "min": 0
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Tareas de fondo activas",
+      "gridPos": {
+        "x": 12,
+        "y": 30,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "inventory_resource_background_active{cloud=\"render\"}",
+          "legendFormat": "{{round}}",
+          "instant": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "min": 0
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "CPU del proceso respecto a 0,1 CPU asignada",
+      "gridPos": {
+        "x": 0,
+        "y": 38,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "rate(process_cpu_seconds_total{cloud=\"render\"}[1m]) / 0.1",
+          "legendFormat": "{{round}}",
+          "instant": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "max": 1
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Memoria del proceso respecto a 512 MiB",
+      "gridPos": {
+        "x": 12,
+        "y": 38,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "process_resident_memory_bytes{cloud=\"render\"} / 536870912",
+          "legendFormat": "{{round}}",
+          "instant": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "max": 1
+        },
+        "overrides": []
+      },
+      "options": {}
+    }
+  ],
+  "__inputs": [
+    {
+      "name": "DS_PROMETHEUS",
+      "label": "Prometheus Inventario-U Render",
+      "type": "datasource",
+      "pluginId": "prometheus",
+      "pluginName": "Prometheus"
+    }
+  ]
+}

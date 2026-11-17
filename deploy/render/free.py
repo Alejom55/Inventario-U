@@ -18,7 +18,10 @@ def read(name,default=None):
 
 def write(name,value):
     RUNTIME.mkdir(parents=True,exist_ok=True)
-    (RUNTIME/name).write_text(json.dumps(value,indent=2)+'\n',encoding='utf-8')
+    path=RUNTIME/name
+    temporary=path.with_name(path.name+'.'+secrets.token_hex(4)+'.next')
+    temporary.write_text(json.dumps(value,indent=2)+'\n',encoding='utf-8')
+    temporary.replace(path)
 
 
 def api(method,path,body=None):

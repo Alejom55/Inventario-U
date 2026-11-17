@@ -24,9 +24,22 @@ en ese mismo directorio. No equivalen a las rondas cloud de las tres APIs.
 
 El [fallo c confirmado: agotamiento de concurrencia](docs/resource-local-operation.md)
 usa un laboratorio aislado y un tablero de comparación. Única métrica objetivo:
-éxito >=99%; p95 <500 ms es un guardarraíl separado. Las rondas cloud siguen pendientes.
+éxito >=99%; p95 <500 ms es un guardarraíl separado. Las rondas integradas de las
+tres APIs siguen pendientes; las rondas individuales en Render se documentan abajo.
 La guía pública `/shared/grafana-cloud.md` permite configurar el datasource
 Prometheus autenticado `/shared/prometheus` en el stack común del equipo.
+
+## Caos en Render Free
+
+La [práctica Render Free](deploy/render/README.md) despliega la API y un Prometheus
+autenticado con PostgreSQL sintético separado, sin planes de pago. Incluye
+[guía y resultados cloud](docs/render-free-guide.md), [colección Postman](docs/render-free-postman.json)
+y [tablero importable](docs/render-free-dashboard.json). Las credenciales están
+fuera de Git en `deploy/render/runtime/`. La ejecución manual está en Actions >
+Validacion local de caos > Run workflow > rama feat/render-free.
+
+Estas rondas prueban Inventario-U en una nube real; la integración de las tres APIs,
+la aceptación de Render como sustituto de OCI y Chaos Mesh/GKE siguen a cargo del grupo.
 
 ## Canary Deployment en OCI
 

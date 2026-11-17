@@ -1,6 +1,7 @@
 {
   "provider": "render",
   "plan": "free",
+  "prometheus_url": "https://inventario-chaos-prom-free.onrender.com",
   "api_url": "https://inventario-chaos-free.onrender.com",
   "service_id": "srv-dbuaua95efls739purjg",
   "application_revision": "6e29c9addfa6d7e583c082ce5b001f202b811f85",

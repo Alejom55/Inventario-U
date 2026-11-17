@@ -41,3 +41,29 @@ Para Grafana Cloud, usar la URL del Prometheus nuevo como datasource, método PO
 y header seguro `Authorization: Bearer <token privado de métricas>`. Importar el
 tablero descargable generado en `docs/render-free-dashboard.json` y seleccionar
 esa fuente. Nunca colocar tokens en paneles ni en el grupo.
+
+## Botón Run workflow
+
+En GitHub, iniciar sesión como Alejom55 y abrir Actions > **Validacion local de caos**.
+Pulsar **Run workflow**, seleccionar **feat/render-free** y ejecutar. El job
+`render_free` realiza BASELINE/R0/R1 desde un runner GitHub; `main` conserva el
+comportamiento offline anterior. No se fusiona la rama ni se modifican los servicios
+Inventario-U e inventario-dev-api existentes.
+
+El repositorio tiene dos secretos cifrados exclusivos de la API sintética:
+`RENDER_CHAOS_API_KEY` y `RENDER_CHAOS_ADMIN_KEY`. No contiene la clave de cuenta Render,
+la conexión PostgreSQL ni el token de métricas. Los artefactos pasan un escaneo de claves.
+El gate exige estado estable correcto, degradación demostrada en R0 y recuperación
+de éxito >=99% más el guardarraíl p95 <500 ms en R1. El fracaso esperado de R0 no
+hace fallar el job. Descargar el artefacto `render-free-<run_id>` para revisar muestras
+crudas, journals, UTC, execution_id y trace_id.
+
+Se conservan por separado las ejecuciones iniciales desde el PC. Sus latencias no
+son intercambiables con las de un runner GitHub; la comparación de rondas utiliza
+un mismo origen, perfil, versión de aplicación e instancia.
+
+Validación final: 292 pruebas locales aprobadas, cobertura 94,04%; el subconjunto
+offline del workflow pasa 173 pruebas sin base de datos. La ejecución manual
+[44167802835](https://github.com/Alejom55/Inventario-U/actions/runs/44167802835)
+completó las tres rondas reales. La verificación HTTPS posterior confirmó CRUD,
+compatibilidad GET/QUERY, autenticación, trazas y consultas de los paneles.

@@ -1,0 +1,88 @@
+{
+  "verified_utc": "2026-11-17T20:39:48.232066+00:00",
+  "provider": "render",
+  "plans": {
+    "api": "free",
+    "prometheus": "free",
+    "postgres": "free"
+  },
+  "application_revision": "6e29c9addfa6d7e583c082ce5b001f202b811f85",
+  "execution_id": "11e3e0fc15d34f26a86d5946b2c80351",
+  "public_crud_get_query_trace_auth": "passed",
+  "private_controls_and_metrics": "passed",
+  "storage_coordinator_and_prometheus_write_blocked": "passed",
+  "dashboard_promql": "passed",
+  "actual_application_log_examples": [
+    {
+      "timestamp_utc": "2026-11-17T20:19:15.308477+00:00",
+      "level": "INFO",
+      "logger": "app.main",
+      "message": "Solicitud recibida",
+      "round": "BASELINE",
+      "execution_id": "11e3e0fc15d34f26a86d5946b2c80351",
+      "trace_id": "3d70fc84119a4881aa57544c6df3ce00",
+      "path": "/api/v2/skus"
+    },
+    {
+      "timestamp_utc": "2026-11-17T20:19:15.324454+00:00",
+      "level": "INFO",
+      "logger": "app.telemetry",
+      "message": "Respuesta HTTP",
+      "round": "BASELINE",
+      "execution_id": "11e3e0fc15d34f26a86d5946b2c80351",
+      "trace_id": "3d70fc84119a4881aa57544c6df3ce00",
+      "path": "/api/v2/skus",
+      "status": 200,
+      "duration_ms": 16.238
+    },
+    {
+      "timestamp_utc": "2026-11-17T20:21:16.259146+00:00",
+      "level": "INFO",
+      "logger": "app.main",
+      "message": "Solicitud recibida",
+      "round": "R0",
+      "execution_id": "11e3e0fc15d34f26a86d5946b2c80351",
+      "trace_id": "9277389fb1d849f49b43dfdac8bd8869",
+      "path": "/api/v2/skus"
+    },
+    {
+      "timestamp_utc": "2026-11-17T20:22:18.682168+00:00",
+      "level": "INFO",
+      "logger": "app.telemetry",
+      "message": "Respuesta HTTP",
+      "round": "R0",
+      "execution_id": "11e3e0fc15d34f26a86d5946b2c80351",
+      "trace_id": "9277389fb1d849f49b43dfdac8bd8869",
+      "path": "/api/v2/skus",
+      "status": 200,
+      "duration_ms": 62423.298
+    },
+    {
+      "timestamp_utc": "2026-11-17T20:23:16.993850+00:00",
+      "level": "INFO",
+      "logger": "app.main",
+      "message": "Solicitud recibida",
+      "round": "R1",
+      "execution_id": "11e3e0fc15d34f26a86d5946b2c80351",
+      "trace_id": "2182c092db7e4ff0885c19b3a61ed585",
+      "path": "/api/v2/skus"
+    },
+    {
+      "timestamp_utc": "2026-11-17T20:23:17.013908+00:00",
+      "level": "INFO",
+      "logger": "app.telemetry",
+      "message": "Respuesta HTTP",
+      "round": "R1",
+      "execution_id": "11e3e0fc15d34f26a86d5946b2c80351",
+      "trace_id": "2182c092db7e4ff0885c19b3a61ed585",
+      "path": "/api/v2/skus",
+      "status": 200,
+      "duration_ms": 20.225
+    }
+  ],
+  "synthetic_ids": {
+    "sku_id": 1,
+    "almacen_id": 1
+  },
+  "common_grafana_cloud_stack": "not configured; owner must import datasource/dashboard"
+}
