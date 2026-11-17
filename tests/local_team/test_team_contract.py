@@ -40,3 +40,5 @@ def test_contract_and_postman_use_same_ids_and_body():
     assert json.loads(collection['item'][2]['request']['body']['raw'])==ids
     assert 'dependencia circular' in guide(base,ids)
     assert collection['variable'][1]['value']==''
+    assert schema['terminal_dependency']['calls_peer_apis'] is False
+    assert 'no llama a deport-back ni api-fastify' in guide(base,ids)

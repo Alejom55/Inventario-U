@@ -18,6 +18,7 @@ def start():
         age=(datetime.now(timezone.utc)-datetime.fromisoformat(current['heartbeat_utc'])).total_seconds()
         if age<45 and current.get('desired')=='running':return
     state={'token':uuid4().hex,'desired':'running'}
+    (RUNTIME/'watch.stop').unlink(missing_ok=True)
     write_json(RUNTIME/'watch.json',state)
     subprocess.Popen([sys.executable,'-m','scripts.local_team_watch',state['token']],
         cwd=Path(__file__).resolve().parents[1],stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,
@@ -26,6 +27,7 @@ def start():
 
 
 def stop():
+    (RUNTIME/'watch.stop').touch()
     state=read_json(RUNTIME/'watch.json',{})
     state['desired']='stopped'
     write_json(RUNTIME/'watch.json',state)
@@ -36,7 +38,7 @@ def worker(token):
     try:
         while True:
             state=read_json(RUNTIME/'watch.json',{})
-            if state.get('token')!=token or state.get('desired')!='running':return
+            if (RUNTIME/'watch.stop').exists() or state.get('token')!=token or state.get('desired')!='running':return
             awake=bool(ctypes.windll.kernel32.SetThreadExecutionState(0x80000001))
             current=read_json(RUNTIME/'session.json',{}).get('public_url')
             if previous and current and current!=previous:
@@ -45,7 +47,8 @@ def worker(token):
             previous=current
             state.update(pid=os.getpid(),heartbeat_utc=datetime.now(timezone.utc).isoformat(),
                 system_required=awake,public_url=current)
-            write_json(RUNTIME/'watch.json',state)
+            write_json(RUNTIME/'watch-next.json',state)
+            (RUNTIME/'watch-next.json').replace(RUNTIME/'watch.json')
             time.sleep(10)
     finally:
         ctypes.windll.kernel32.SetThreadExecutionState(0x80000000)

@@ -40,7 +40,7 @@ server {
         proxy_set_header X-Trace-Id $http_x_trace_id;
         proxy_pass http://stable:8000;
     }
-    location ~ ^/shared/(guia\.md|contrato\.json|postman\.json|prometheus\.yml|dashboard\.json)$ {
+    location ~ ^/shared/(guia\.md|contrato\.json|postman\.json|prometheus\.yml|dashboard\.json|resource-results\.md)$ {
         alias /srv/team/$1;
     }
     location ~ ^/grafana/api/admin(?:/|$) { return 404; }
@@ -64,6 +64,7 @@ def contract(base, ids):
         'inventory':{'method':'GET','path':'/api/v2/inventario','query':ids,'response':{'resultados':[{'sku_id':ids.get('sku_id'),'almacen_id':ids.get('almacen_id'),'stock_disponible':8}]}},
         'legacy_query':{'method':'QUERY','path':'/api/v2/inventario/query','body':ids},
         'crud':{name:base+'/api/v2/'+name for name in ('skus','almacenes','movimientos')},
+        'terminal_dependency':{'method':'GET','path':'/api/v2/skus','calls':['PostgreSQL only'],'calls_peer_apis':False},
         'metrics':{'url':base+'/shared/metrics','authentication':'Bearer token from INVENTARIO_METRICS_TOKEN; distinct from API key','instrument':'Prometheus federation, not JSON business API'},
         'grafana':{'url':base+'/grafana/d/inventory-team/','role':'Viewer','username':'companeros'},
         'limitations':['URL changes when the tunnel restarts','Available only while this PC, Docker and tunnel run','Peer API URLs are still required for the full coordinator flow'],
@@ -148,6 +149,8 @@ Base URL: {base}
 Usa INVENTARIO_API_BASE_URL e INVENTARIO_API_KEY desde variables de entorno.
 No guardes claves en Git, logs, dashboards ni código frontend.
 Consulta GET /api/v2/inventario con sku_id y almacen_id positivos; procesa resultados[].
+Para listar SKU usa GET /api/v2/skus: endpoint final, consulta solo nuestra BD;
+no llama a deport-back ni api-fastify. Puede usarse como dependencia de deport-back.
 Propaga el mismo X-Trace-Id de la solicitud entrante; si falta, genera uno válido.
 No llames /integracion desde nuestros endpoints propietarios: causaría una dependencia circular.
 Usa timeout y errores controlados; no conviertas una respuesta incompleta en éxito.
@@ -159,6 +162,27 @@ No afirmes que esta práctica local demuestra despliegue en tres nubes o rondas 
 
 El acceso permanece hasta que el operador lo detenga. Reiniciar el túnel cambia la URL;
 actualizar entonces las variables de ambos proyectos y sus targets Prometheus.
+El operador conserva el túnel actual y registra cualquier cambio en URL-CAMBIO.txt.
+El aviso es local y aparece en la salida de iniciar; no es una notificación remota al equipo.
+Mantener el PC conectado a corriente, Docker abierto y la tapa abierta durante la demo.
+El ayudante local solicita que Windows no entre en suspensión mientras la práctica está activa.
+No garantiza disponibilidad ante cortes eléctricos, cierre de tapa, reinicios o fallos de internet.
+
+## Propuesta de fallo c: agotamiento de concurrencia
+
+El grupo todavía debe confirmar el cambio desde latencia saliente. Las rondas se ejecutan
+en réplicas locales aisladas; no afectan la API pública usada por deport-back.
+Herramienta: Chaos Toolkit e interruptor propio privado con TTL máximo de 60 s.
+Recurso: 6 permisos del pool de ejecución síncrona; las tareas de fondo los ocupan realmente.
+R1 usa bulkhead (limiter independiente) y admisión de máximo 4 tareas de fondo sin cola.
+Perfil: 5 GET /api/v2/skus por segundo, 120 s; fallo desde t=30 durante 60 s, timeout 2 s.
+Hipótesis: p95 <500 ms y éxito >=99% durante [30,90). Los errores y timeouts cuentan.
+[Resultados y trazabilidad de las tres mediciones](/shared/resource-results.md).
+[Tablero de réplicas y resultados](/grafana/d/inventory-resource/).
+Los logs de aplicación incluyen trace_id, round y execution_id. En la API pública,
+round=none es correcto: las rondas del laboratorio no cambian el entorno compartido.
+Métricas del laboratorio: /shared/metrics con el mismo token de métricas; filtrar
+track=~"resource-.*" y mantener honor_labels:true en el Prometheus receptor.
 '''
 
 

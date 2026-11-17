@@ -16,6 +16,7 @@ from deploy.canary.dashboard import build as canary_dashboard
 from deploy.canary.gateway import render
 from chaos.dashboard import build as chaos_dashboard
 from deploy.local_team.content import contract, guide, postman, prometheus_config, public_gateway, team_dashboard
+from deploy.local_team.resource_dashboard import build as resource_dashboard
 
 ROOT = Path(__file__).resolve().parents[1]
 FOLDER = ROOT/'deploy/local_team'
@@ -78,6 +79,10 @@ def configure(values,base,ids):
     write_json(RUNTIME/'dashboards/team.json',team_dashboard(base,ids))
     write_json(RUNTIME/'dashboards/canary.json',canary_dashboard())
     write_json(RUNTIME/'dashboards/chaos.json',chaos_dashboard())
+    report=ROOT/'docs/resource-local-results.md'
+    write_json(RUNTIME/'dashboards/resource.json',resource_dashboard(report.read_text(encoding='utf-8') if report.exists() else 'Rondas locales pendientes. Asignación c pendiente de confirmar por el grupo.'))
+    if report.exists():
+        (RUNTIME/'exports/resource-results.md').write_text(report.read_text(encoding='utf-8'),encoding='utf-8')
     (RUNTIME/'prometheus.yml').write_text((ROOT/'deploy/canary/prometheus.yml').read_text(encoding='utf-8')+'''
       - targets: ['resource-baseline:8000']
         labels: {track: resource-baseline, version: 2.0.0}
@@ -240,6 +245,9 @@ def start():
     (RUNTIME/'inventario_metrics_token').write_text(values['METRICS_TOKEN'],encoding='utf-8')
     from scripts.local_team_watch import start as start_watch
     start_watch()
+    if (RUNTIME/'resource.env').exists():
+        run(['docker','compose','--project-name','inventario-resource-lab','--env-file',str(RUNTIME/'resource.env'),
+             '-f',str(FOLDER/'resource-compose.yml'),'up','-d','--wait','--wait-timeout','180'])
     print(json.dumps({'ready':True,'public_url':base,'grafana':base+'/grafana/d/inventory-team/','credentials_file':str(RUNTIME/'credenciales-companeros.txt')}),flush=True)
 
 
@@ -263,7 +271,7 @@ def main():
         from scripts.local_team_watch import stop as stop_watch
         stop_watch()
         if (RUNTIME/'resource.env').exists():
-            run(['docker','compose','--env-file',str(RUNTIME/'resource.env'),'-f',str(FOLDER/'resource-compose.yml'),'stop'])
+            run(['docker','compose','--project-name','inventario-resource-lab','--env-file',str(RUNTIME/'resource.env'),'-f',str(FOLDER/'resource-compose.yml'),'stop'])
         tunnel_process('stop')
         if (RUNTIME/'local.env').exists():compose('stop')
         print('Owned tunnel and team containers stopped; data volumes retained')
@@ -271,6 +279,9 @@ def main():
         print(json.dumps({'tunnel_running':tunnel_process('status'),'session':read_json(RUNTIME/'session.json',{}),
                          'watch':read_json(RUNTIME/'watch.json',{})},indent=2))
         if (RUNTIME/'local.env').exists():compose('ps')
+        if (RUNTIME/'resource.env').exists():
+            run(['docker','compose','--project-name','inventario-resource-lab','--env-file',str(RUNTIME/'resource.env'),
+                 '-f',str(FOLDER/'resource-compose.yml'),'ps'])
 
 
 if __name__=='__main__':

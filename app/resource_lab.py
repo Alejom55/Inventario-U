@@ -8,6 +8,7 @@ import time
 
 import anyio
 from fastapi import HTTPException, Request
+from fastapi.responses import JSONResponse
 from prometheus_client import Counter, Gauge
 
 logger = logging.getLogger(__name__)
@@ -23,6 +24,7 @@ class ResourceFault:
         self.stop_event = Event()
         self.limiter = anyio.CapacityLimiter(4)
         self.expires = 0.0
+        self.http_active = 0
 
     async def occupy(self, duration):
         ACTIVE.labels(self.current_round).inc()
@@ -60,6 +62,19 @@ def install_resource_lab(app):
     # Fixed small capacity makes the fault reproducible without consuming host resources.
     state = ResourceFault(os.getenv('RESILIENCE_MODE') == 'protected', os.getenv('CHAOS_ROUND','none'))
     app.state.resource_fault = state
+
+    @app.middleware('http')
+    async def bound_business_queue(request,call_next):
+        # Keep private rollback and metrics reachable even when business workers are exhausted.
+        if request.url.path != '/api/v2/skus':
+            return await call_next(request)
+        if state.http_active >= 32:
+            return JSONResponse(status_code=503,content={'detail':'Lab business concurrency capacity reached'})
+        state.http_active += 1
+        try:
+            return await call_next(request)
+        finally:
+            state.http_active -= 1
 
     @app.on_event('startup')
     async def capacity():

@@ -14,12 +14,15 @@ from scripts.local_team import ROOT, RUNTIME, FOLDER, read_json, settings, write
 
 
 def compose(*arguments):
-    subprocess.run(['docker','compose','--env-file',str(RUNTIME/'resource.env'),
+    subprocess.run(['docker','compose','--project-name','inventario-resource-lab','--env-file',str(RUNTIME/'resource.env'),
         '-f',str(FOLDER/'resource-compose.yml'),*arguments],cwd=ROOT,check=True)
 
 
 def main():
     values=settings(); execution=uuid4().hex
+    subprocess.run(['docker','build','-t','inventario-resource:local','.'],cwd=ROOT,check=True)
+    values['CANARY_IMAGE']=subprocess.check_output(['docker','image','inspect','--format','{{.Id}}','inventario-resource:local'],text=True).strip()
+    values['APP_REVISION']=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()
     values['CHAOS_EXECUTION_ID']=execution
     (RUNTIME/'resource.env').write_text(''.join(k+'='+json.dumps(v)+'\n' for k,v in values.items()),encoding='utf-8')
     folder=ROOT/'chaos/results'/('resource-'+execution)
@@ -45,6 +48,9 @@ def main():
         if result.returncode:
             raise RuntimeError(current+' Chaos Toolkit failed; inspect private result log')
         report=read_json(folder/(current+'.json'))
+        journal=read_json(folder/(current+'-journal.json'))
+        if not report or any(activity.get('status')!='succeeded' for activity in journal.get('run',[])):
+            raise RuntimeError(current+' experiment action failed; inspect journal; no approved evidence')
         assert report['total_requests']==600 and report['samples']==300 and report['rollback_verified']
         reports.append(report)
         print(json.dumps({k:report[k] for k in ('round','p95_ms','error_percent','passed')}),flush=True)
@@ -79,8 +85,10 @@ def main():
     report_text='\n'.join(lines)+'\n'
     (ROOT/'docs/resource-local-results.md').write_text(report_text,encoding='utf-8')
     (RUNTIME/'exports/resource-results.md').write_text(report_text,encoding='utf-8')
+    from deploy.local_team.resource_dashboard import build
+    write_json(RUNTIME/'dashboards/resource.json',build(report_text))
     # App logs carry trace_id, round and execution_id; capture genuine logs after each run.
-    command=['docker','compose','--env-file',str(RUNTIME/'resource.env'),'-f',str(FOLDER/'resource-compose.yml'),'logs','--no-color']
+    command=['docker','compose','--project-name','inventario-resource-lab','--env-file',str(RUNTIME/'resource.env'),'-f',str(FOLDER/'resource-compose.yml'),'logs','--no-color']
     with (folder/'application.log').open('w',encoding='utf-8') as output:
         subprocess.run(command,stdout=output,stderr=subprocess.STDOUT,check=True,cwd=ROOT)
     print('Results: '+str(ROOT/'docs/resource-local-results.md'),flush=True)
