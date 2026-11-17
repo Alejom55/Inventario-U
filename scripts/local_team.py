@@ -160,10 +160,14 @@ if (!$process -or $process.StartTime.ToUniversalTime().Ticks.ToString() -ne $sav
 $out=Join-Path $env:LOCAL_TEAM_RUNTIME 'tunnel.stdout.log'
 $err=Join-Path $env:LOCAL_TEAM_RUNTIME 'tunnel.stderr.log'
 $process=Start-Process -FilePath $env:LOCAL_TEAM_CLOUDFLARED -ArgumentList @('--no-autoupdate','tunnel','--protocol','http2','--url','http://127.0.0.1:18180') -WindowStyle Hidden -PassThru -RedirectStandardOutput $out -RedirectStandardError $err
-@{pid=$process.Id; started_ticks=$process.StartTime.ToUniversalTime().Ticks.ToString(); executable=$process.Path} | ConvertTo-Json -Compress
+$process=Get-Process -Id $process.Id -ErrorAction Stop
+$value=@{pid=$process.Id; started_ticks=$process.StartTime.ToUniversalTime().Ticks.ToString(); executable=$process.Path} | ConvertTo-Json -Compress
+[System.IO.File]::WriteAllText((Join-Path $env:LOCAL_TEAM_RUNTIME 'tunnel.json'),$value)
 '''
-    result=run(['powershell.exe','-NoProfile','-NonInteractive','-Command',script],env=env,capture_output=True,text=True)
-    write_json(path,json.loads(result.stdout.strip()))
+    # The detached child can inherit pipe handles; do not wait for captured EOF.
+    run(['powershell.exe','-NoProfile','-NonInteractive','-Command',script],env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,timeout=30)
+    if not path.exists():
+        raise RuntimeError('Owned tunnel process metadata was not saved')
 
 
 def tunnel_url():
