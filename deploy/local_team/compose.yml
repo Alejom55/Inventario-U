@@ -1,0 +1,42 @@
+name: inventario-team-local
+services:
+  db:
+    extends: {file: ../canary/compose.yml, service: db}
+  stable:
+    extends: {file: ../canary/compose.yml, service: stable}
+  canary:
+    extends: {file: ../canary/compose.yml, service: canary}
+  prometheus:
+    extends: {file: ../canary/compose.yml, service: prometheus}
+  grafana:
+    extends: {file: ../canary/compose.yml, service: grafana}
+    environment:
+      GF_SERVER_ROOT_URL: ${PUBLIC_BASE_URL:-http://127.0.0.1:18100}/grafana/
+      GF_SECURITY_COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      GF_USERS_DEFAULT_THEME: dark
+    volumes:
+      - ./runtime/dashboards:/var/lib/grafana/dashboards:ro
+  gateway:
+    extends: {file: ../canary/compose.yml, service: gateway}
+    volumes:
+      - ./runtime/private:/etc/nginx/conf.d:ro
+  share-gateway:
+    image: nginx:1.28-alpine
+    restart: unless-stopped
+    ports: ['127.0.0.1:18180:8080']
+    volumes:
+      - ./runtime/public:/etc/nginx/conf.d:ro
+      - ./runtime/exports:/srv/team:ro
+    depends_on:
+      stable: {condition: service_healthy}
+      grafana: {condition: service_started}
+      prometheus: {condition: service_started}
+    healthcheck:
+      test: [CMD, wget, -q, -O, /dev/null, 'http://127.0.0.1:8080/']
+      interval: 5s
+      timeout: 3s
+      retries: 12
+volumes:
+  postgres_data:
+  prometheus_data:
+  grafana_data:
