@@ -2,6 +2,26 @@
 
 API para administrar inventario entre varios almacenes.
 
+## Practica local compartida con el equipo
+
+La [guía local](deploy/local_team/README.md) levanta un entorno Docker aislado
+con datos sintéticos, API CRUD, Grafana Viewer y métricas federadas mediante
+HTTPS temporal. Incluye un tablero con instrucciones y un prompt para las IA
+de los compañeros. No requiere iniciar recursos de OCI.
+
+```powershell
+uv run --frozen python -m scripts.local_team start
+uv run --frozen python -m scripts.local_team demo
+uv run --frozen python -m scripts.verify_local_team
+uv run --frozen python -m scripts.local_team stop
+```
+
+Las credenciales se conservan en el directorio privado ignorado
+`deploy/local_team/runtime/`. La operación local se validó con 265 pruebas,
+CRUD público real, login Viewer, consumo HTTPS desde un segundo Prometheus y
+reinicio conservando credenciales y datos. Las evidencias de ejecución están
+en ese mismo directorio. No equivalen a las rondas cloud de las tres APIs.
+
 ## Canary Deployment en OCI
 
 La entrega canary incorpora stable v2 y canary v3 en OCI Compute, con Nginx,
