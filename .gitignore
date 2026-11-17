@@ -30,3 +30,4 @@ chaos/results/
 chaos/chaos.log
 chaos/journal*.json
 deploy/local_team/runtime/
+deploy/digitalocean/runtime/
