@@ -1,6 +1,7 @@
 """Expose compatible v3 routes only in the canary process."""
 
-from fastapi import Depends
+from typing import Annotated
+from fastapi import Depends, Query
 from fastapi.routing import APIRoute
 
 from .database import get_db
@@ -23,6 +24,8 @@ def install_v3(app, query_inventory):
             continue
         if route.path == "/api/v2/inventario/query" and "QUERY" in route.methods:
             continue
+        if route.path == "/api/v2/inventario" and "GET" in route.methods:
+            continue
         app.add_api_route(
             route.path.replace("/api/v2", "/api/v3", 1), route.endpoint,
             methods=list(route.methods), status_code=route.status_code,
@@ -32,3 +35,7 @@ def install_v3(app, query_inventory):
     @app.api_route("/api/v3/inventario/query", methods=["QUERY"], tags=["v3"])
     def query_v3(filtros: dict, db=Depends(get_db)):
         return enrich_inventory(query_inventory(filtros, db))
+
+    @app.get("/api/v3/inventario", tags=["v3"])
+    def query_v3_get(sku_id: Annotated[int, Query(gt=0)], almacen_id: Annotated[int, Query(gt=0)], db=Depends(get_db)):
+        return enrich_inventory(query_inventory({"sku_id": sku_id, "almacen_id": almacen_id}, db))

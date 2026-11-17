@@ -617,6 +617,16 @@ def consultar_inventario(filtros: dict, db=Depends(get_db)):
     return {"resultados": resultado.fetchall()}
 
 
+@app.get(f"{API_V2_PREFIX}/inventario")
+def consultar_inventario_get(
+    sku_id: Annotated[int, Query(gt=0)],
+    almacen_id: Annotated[int, Query(gt=0)],
+    db=Depends(get_db),
+):
+    """HTTP GET compatible with integration clients and ordinary proxies."""
+    return consultar_inventario({"sku_id": sku_id, "almacen_id": almacen_id}, db)
+
+
 @app.get(f"{API_V2_PREFIX}/integracion")
 def consultar_integracion(
     request: Request,

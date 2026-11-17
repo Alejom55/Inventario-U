@@ -69,6 +69,6 @@ def install_telemetry(app):
             } else "OTHER", path)
             REQUESTS.labels(*labels, str(response.status_code)).inc()
             LATENCY.labels(*labels).observe(elapsed)
-            if path.endswith("/inventario/query") and response.status_code == 200:
+            if path.endswith(("/inventario/query", "/inventario")) and response.status_code == 200:
                 QUERIES.labels(TRACK, VERSION).inc()
         return response

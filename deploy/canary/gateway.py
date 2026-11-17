@@ -13,6 +13,7 @@ def render(percent, api_key):
 map_hash_bucket_size 256;
 upstream stable {{ server stable:8000; keepalive 16; }}
 upstream canary {{ server canary:8000; keepalive 16; }}
+map $http_x_trace_id $forwarded_trace_id {{ default $request_id; "~^[A-Za-z0-9_-]{{1,128}}$" $http_x_trace_id; }}
 map $http_x_api_key $authorized {{ default 0; "{api_key}" 1; }}
 split_clients "$request_id" $public_track {{ {split} }}
 map "$authorized:$http_x_canary" $selected {{ default $public_track; "1:true" canary; "1:baseline" stable; }}
@@ -25,7 +26,7 @@ server {{
     proxy_read_timeout 10s;
     proxy_next_upstream off;
     proxy_set_header Host $host;
-    proxy_set_header X-Trace-Id $request_id;
+    proxy_set_header X-Trace-Id $forwarded_trace_id;
     location = /metrics {{ return 404; }}
     location /api/live/ {{
         rewrite ^/api/live/(.*)$ $api_prefix/$1 break;
