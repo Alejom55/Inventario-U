@@ -24,6 +24,8 @@ def build():
                 "fieldConfig": {"defaults": {"unit": unit, "color": {"mode": "fixed", "fixedColor": "blue" if track == "stable" else "orange"}}, "overrides": []},
                 "options": {"legend": {"displayMode": "list", "placement": "bottom"}},
             })
+            if unit == "percentunit":
+                panels[-1]["fieldConfig"]["defaults"].update(min=0, max=1)
     return {
         "uid": "inventory-canary", "title": "Inventario U stable y canary", "schemaVersion": 41,
         "version": 1, "refresh": "5s", "timezone": "browser", "panels": panels,

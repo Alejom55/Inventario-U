@@ -100,6 +100,11 @@ def verify():
         assert response.status_code==200 and not response.json()['isGrafanaAdmin']
         response=client.get(base+'/grafana/api/user/orgs',auth=('companeros',values['VIEWER_PASSWORD']))
         assert response.status_code==200 and any(org['role']=='Viewer' for org in response.json())
+        login=client.post(base+'/grafana/login',json={'user':'companeros','password':values['VIEWER_PASSWORD']},headers={'Origin':base})
+        assert login.status_code==200,login.text[:160]
+        assert any(cookie.name=='grafana_session' and cookie.secure for cookie in client.cookies.jar)
+        assert client.get(base+'/grafana/api/user').status_code==200
+        report['viewer_cookie_login']='passed'
         assert client.post(base+'/grafana/api/dashboards/db',json={},auth=('companeros',values['VIEWER_PASSWORD'])).status_code==403
         for _ in range(15):
             response=client.get(base+'/grafana/api/dashboards/uid/inventory-team',auth=('companeros',values['VIEWER_PASSWORD']))
