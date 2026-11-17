@@ -63,6 +63,25 @@ jobs:
           (folder/'deployment.json').write_text(json.dumps({'api_url': manifest['api_url'], 'api_service_id': manifest['service_id']}))
       - name: Estado estable, R0 y R1 reales en Render
         run: uv run --frozen --group chaos python -m scripts.run_render_resource --manifest deploy/render/target.json
+      - name: Evaluar el objetivo y el guardarrail sin confundir el fallo esperado de R0
+        shell: python
+        run: |
+          import json, os
+          from pathlib import Path
+          report = json.loads(Path('docs/evidence/render-cloud-results.json').read_text())
+          rows = {row['round']: row for row in report['measurements']}
+          table = '| Ronda | Exito % | p95 ms | Objetivo | Guardarrail |\n|---|---:|---:|---|---|\n'
+          for row in rows.values():
+              table += f"| {row['round']} | {row['success_percent']:.3f} | {row['p95_ms']:.3f} | {row['objective_passed']} | {row['guardrail_p95_passed']} |\n"
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as output:
+              output.write('## Ejecucion real de Inventario-U en Render Free\n\n' + table + '\nExecution ID: `' + report['execution_id'] + '`\n')
+          assert report['same_profile'] and all(row['rollback_verified'] for row in rows.values())
+          assert rows['BASELINE']['objective_passed'], 'Estado estable no cumple exito >=99%'
+          assert not rows['R0']['objective_passed'], 'R0 no demuestra la degradacion esperada'
+          assert rows['R0']['fault']['injection']['admitted'] == 6
+          assert rows['R1']['fault']['injection']['admitted'] == 4
+          assert rows['R1']['objective_passed'], 'R1 no cumple la unica metrica objetivo'
+          assert rows['R1']['guardrail_p95_passed'], 'R1 cumple exito, pero el guardarrail impide la promocion'
       - name: Comprobar que los artefactos no contienen claves
         id: scan_secrets
         if: always()
