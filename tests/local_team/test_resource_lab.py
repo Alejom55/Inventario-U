@@ -6,6 +6,15 @@ from fastapi import HTTPException
 
 from app.resource_lab import ResourceFault
 from app.resource_lab import install_resource_lab
+from chaos_lab.resource import evaluate_objective
+
+
+def test_success_is_only_objective_and_latency_is_guardrail():
+    result=evaluate_objective(99,750)
+    assert result['passed'] and result['objective_passed']
+    assert not result['guardrail_p95_passed'] and not result['promotion_allowed']
+    assert not evaluate_objective(98.9,20)['passed']
+    assert evaluate_objective(100,499)['promotion_allowed']
 
 
 @pytest.mark.parametrize('protected,admitted',[(False,6),(True,4)])

@@ -56,7 +56,7 @@ def main():
         print(json.dumps({k:report[k] for k in ('round','p95_ms','error_percent','passed')}),flush=True)
     comparison={'execution_id':execution,'profile_identical':all(r['profile']==reports[0]['profile'] for r in reports),
         'revision_identical':len({r['revision'] for r in reports})==1,
-        'scope':'local isolated single-API replica; assignment c pending group confirmation',
+        'scope':'local isolated single-API replica; assignment c confirmed; cloud evidence pending',
         'measurements':[{k:v for k,v in report.items() if k!='requests'} for report in reports]}
     baseline=reports[0]['p95_ms']
     for report in comparison['measurements']:
@@ -65,9 +65,9 @@ def main():
     write_json(folder/'comparison.json',comparison)
     write_json(RUNTIME/'resource-last.json',{'folder':str(folder),'execution_id':execution})
     lines=['# Inventario-U: evidencia local de agotamiento de concurrencia','',
-        'Asignación c propuesta; el grupo debe confirmar el cambio desde latencia saliente.',
+        'Asignación c confirmada por el grupo. Las rondas locales NO cuentan como evidencia de ejecución en nube.',
         'Réplica local aislada; no demuestra tres APIs en tres nubes. La API compartida no recibió este fallo.','',
-        'Hipótesis: con 5 GET /api/v2/skus por segundo durante 120 s, al solicitar 6 tareas bloqueantes durante 60 s desde t=30, p95 <500 ms y éxito >=99% en la ventana [30,90).',
+        'Hipótesis: con 5 GET /api/v2/skus por segundo durante 120 s, al solicitar 6 tareas bloqueantes durante 60 s desde t=30, tasa de éxito >=99% en [30,90). Única métrica objetivo: éxito. Guardarraíl separado: p95 <500 ms.',
         'Carga de llegada constante: 600 peticiones, timeout 2 s; 300 muestras en cada ventana. Las respuestas fallidas y timeouts se incluyen en p95.',
         'R0: las tareas ocupan los 6 permisos del pool HTTP. R1: bulkhead con limiter separado y admisión máxima de 4 tareas de fondo sin cola; se rechazan 2. Misma solicitud de fallo, distinta protección.',
         'La hipótesis de disponibilidad de Chaos Toolkit verifica antes/después; passed en la tabla evalúa el objetivo DURANTE el fallo.','',

@@ -8,6 +8,7 @@ services:
     extends: {file: ../canary/compose.yml, service: canary}
   prometheus:
     extends: {file: ../canary/compose.yml, service: prometheus}
+    command: ['--config.file=/etc/prometheus/prometheus.yml', '--storage.tsdb.retention.time=7d', '--query.timeout=5s', '--query.max-concurrency=4', '--query.max-samples=5000000']
     volumes:
       - ./runtime/prometheus.yml:/etc/prometheus/prometheus.yml:ro
   grafana:

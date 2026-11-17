@@ -12,6 +12,8 @@ def public_gateway(values):
     return r'''map_hash_bucket_size 256;
 map $http_x_api_key $peer_ok { default 0; "PEER_KEY" 1; }
 map $http_authorization $metrics_ok { default 0; "Bearer METRICS_KEY" 1; }
+limit_req_zone $binary_remote_addr zone=prom_queries:10m rate=5r/s;
+limit_conn_zone $binary_remote_addr zone=prom_connections:10m;
 server {
     listen 8080;
     server_tokens off;
@@ -28,6 +30,17 @@ server {
         if ($metrics_ok = 0) { return 401; }
         proxy_pass http://prometheus:9090/federate?METRICS_QUERY;
     }
+    location ~ ^/shared/prometheus/api/v1/(query|query_range|status/buildinfo|labels|label/[a-zA-Z_][a-zA-Z0-9_]*/values|series|metadata)$ {
+        if ($metrics_ok = 0) { return 401; }
+        if ($request_method !~ ^(GET|POST)$) { return 405; }
+        client_max_body_size 16k;
+        limit_req zone=prom_queries burst=20 nodelay;
+        limit_conn prom_connections 5;
+        proxy_read_timeout 10s;
+        proxy_set_header Authorization "";
+        rewrite ^/shared/prometheus(/api/v1/.*)$ $1 break;
+        proxy_pass http://prometheus:9090;
+    }
     location ~ ^/api/v2/(skus|almacenes|movimientos)(/[1-9][0-9]*)?$ {
         if ($peer_ok = 0) { return 401; }
         proxy_set_header X-Api-Key "INTERNAL_KEY";
@@ -40,7 +53,7 @@ server {
         proxy_set_header X-Trace-Id $http_x_trace_id;
         proxy_pass http://stable:8000;
     }
-    location ~ ^/shared/(guia\.md|contrato\.json|postman\.json|prometheus\.yml|dashboard\.json|resource-results\.md)$ {
+    location ~ ^/shared/(guia\.md|contrato\.json|postman\.json|prometheus\.yml|dashboard\.json|resource-results\.md|grafana-cloud\.md|resource-dashboard\.json|datasource-template\.json)$ {
         alias /srv/team/$1;
     }
     location ~ ^/grafana/api/admin(?:/|$) { return 404; }
@@ -66,6 +79,7 @@ def contract(base, ids):
         'crud':{name:base+'/api/v2/'+name for name in ('skus','almacenes','movimientos')},
         'terminal_dependency':{'method':'GET','path':'/api/v2/skus','calls':['PostgreSQL only'],'calls_peer_apis':False},
         'metrics':{'url':base+'/shared/metrics','authentication':'Bearer token from INVENTARIO_METRICS_TOKEN; distinct from API key','instrument':'Prometheus federation, not JSON business API'},
+        'prometheus_query_api':{'url':base+'/shared/prometheus','authentication':'Same private metrics Bearer; set Authorization in Grafana secure HTTP headers','scope':'Read-only query API, no admin/write/lifecycle endpoints'},
         'grafana':{'url':base+'/grafana/d/inventory-team/','role':'Viewer','username':'companeros'},
         'limitations':['URL changes when the tunnel restarts','Available only while this PC, Docker and tunnel run','Peer API URLs are still required for the full coordinator flow'],
     }
@@ -86,6 +100,46 @@ scrape_configs:
       credentials_file: /run/secrets/inventario_metrics_token
     static_configs:
       - targets: ['{host}']
+'''
+
+
+def grafana_cloud_guide(base):
+    return f'''# Conectar Inventario-U al Grafana Cloud común
+
+Stack del grupo: https://niftyivy3144.grafana.net
+Datasource tipo **Prometheus**, URL **{base}/shared/prometheus**.
+No usar /shared/metrics como datasource: ese endpoint es federación para otro Prometheus.
+
+1. Connections > Data sources > Add new data source > Prometheus.
+2. Nombre: Inventario-U. URL: {base}/shared/prometheus.
+3. Authentication > HTTP headers: Authorization = Bearer <TOKEN_PRIVADO_DE_METRICAS>.
+   Introducir el token en el campo seguro de Grafana. El responsable lo recibe por privado;
+   nunca incluirlo en el grupo, Git, paneles, capturas ni este documento.
+4. Advanced settings: HTTP method POST, Prometheus 3.5.0, scrape interval 5s.
+5. Save & test. En Explore consultar: up{{job="inventory"}}.
+6. Importar [tablero de recursos]({base}/shared/resource-dashboard.json) y seleccionar
+   este datasource. El tablero Canary importable está en /shared/dashboard.json.
+
+Ejemplo de consulta de negocio:
+sum by (track) (rate(inventory_http_requests_total{{job="inventory"}}[1m]))
+
+Solo se exponen consultas y metadatos de lectura. Escritura, admin, lifecycle y UI
+están bloqueados. Hay límites de consultas y recursos de ejecución. Las series solo
+proceden del Prometheus dedicado de Inventario-U, no del entorno GEMA.
+
+El acceso usa la URL temporal actual; un reinicio del Quick Tunnel puede cambiarla.
+Cambiar en ese caso la URL del datasource. No se garantiza una dirección fija sin
+dominio/named tunnel, Tailscale autenticado u otro alojamiento HTTPS estable.
+
+Asignación confirmada: Inventario-U (c, concurrencia); Faty (a, latencia en su llamada
+a deport-back); deport-back (b, corta su propia llamada a /api/v2/skus).
+Métrica objetivo única: tasa de éxito >=99% durante los 60s de fallo.
+Guardarraíl separado: p95 <500 ms. Inyectar por turnos, avisando al grupo, sin solaparse.
+Las mediciones actuales son locales y NO cuentan como evidencia de ejecución en OCI.
+Las rondas cloud y la prueba desde el stack común siguen pendientes hasta verificarlas realmente.
+
+Referencias: [configuración oficial de Grafana](https://grafana.com/docs/grafana-cloud/observe-and-act/connect-externally-hosted/data-sources/prometheus/configure/)
+y [API oficial de Prometheus](https://prometheus.io/docs/prometheus/latest/querying/api/).
 '''
 
 
@@ -168,21 +222,37 @@ Mantener el PC conectado a corriente, Docker abierto y la tapa abierta durante l
 El ayudante local solicita que Windows no entre en suspensión mientras la práctica está activa.
 No garantiza disponibilidad ante cortes eléctricos, cierre de tapa, reinicios o fallos de internet.
 
-## Propuesta de fallo c: agotamiento de concurrencia
+## Fallo c confirmado: agotamiento de concurrencia
 
-El grupo todavía debe confirmar el cambio desde latencia saliente. Las rondas se ejecutan
+El grupo confirmó: Inventario-U (c), Faty (a, latencia hacia deport-back),
+deport-back (b, corta su propia llamada a /api/v2/skus). Inyectar por turnos,
+sin solapamiento, avisando al grupo antes de cada ventana. Las rondas locales se ejecutan
 en réplicas locales aisladas; no afectan la API pública usada por deport-back.
 Herramienta: Chaos Toolkit e interruptor propio privado con TTL máximo de 60 s.
 Recurso: 6 permisos del pool de ejecución síncrona; las tareas de fondo los ocupan realmente.
 R1 usa bulkhead (limiter independiente) y admisión de máximo 4 tareas de fondo sin cola.
 Perfil: 5 GET /api/v2/skus por segundo, 120 s; fallo desde t=30 durante 60 s, timeout 2 s.
-Hipótesis: p95 <500 ms y éxito >=99% durante [30,90). Los errores y timeouts cuentan.
+Única métrica objetivo: tasa de éxito >=99% durante [30,90).
+Guardarraíl separado: p95 <500 ms. Errores y timeouts cuentan como fallos.
+Las rondas de entrega deben repetirse realmente en OCI; los datos locales no cuentan como evidencia cloud.
 [Resultados y trazabilidad de las tres mediciones](/shared/resource-results.md).
 [Tablero de réplicas y resultados](/grafana/d/inventory-resource/).
 Los logs de aplicación incluyen trace_id, round y execution_id. En la API pública,
 round=none es correcto: las rondas del laboratorio no cambian el entorno compartido.
 Métricas del laboratorio: /shared/metrics con el mismo token de métricas; filtrar
 track=~"resource-.*" y mantener honor_labels:true en el Prometheus receptor.
+
+## Fuente de datos en Grafana Cloud común
+
+En https://niftyivy3144.grafana.net, crear datasource tipo Prometheus.
+URL: `{base}/shared/prometheus` (sin añadir /api/v1/query).
+Custom HTTP Header: `Authorization`; valor `Bearer <token de métricas>`.
+Guardar el valor en el campo seguro de Grafana; enviarlo por privado al responsable.
+Método HTTP: POST; versión Prometheus 3.5.0; scrape interval 5 s.
+Save & test, luego consultar `up{{job="inventory"}}`.
+El proxy permite consultas y metadatos de solo lectura con límites; bloquea
+admin, escritura, lifecycle y la UI de Prometheus. /shared/metrics sirve federación,
+no es la URL del datasource. Consultar [guía de conexión](/shared/grafana-cloud.md).
 '''
 
 

@@ -15,7 +15,7 @@ import httpx
 from deploy.canary.dashboard import build as canary_dashboard
 from deploy.canary.gateway import render
 from chaos.dashboard import build as chaos_dashboard
-from deploy.local_team.content import contract, guide, postman, prometheus_config, public_gateway, team_dashboard
+from deploy.local_team.content import contract, guide, postman, prometheus_config, public_gateway, team_dashboard, grafana_cloud_guide
 from deploy.local_team.resource_dashboard import build as resource_dashboard
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -67,12 +67,18 @@ def configure(values,base,ids):
         (RUNTIME/name).mkdir(parents=True,exist_ok=True)
     values['PUBLIC_BASE_URL']=base
     values['COOKIE_SECURE']='true' if base.startswith('https://') else 'false'
+    (RUNTIME/'grafana-cloud-privado.txt').write_text('SOLO POR PRIVADO AL RESPONSABLE DE GRAFANA\nDatasource Prometheus URL: '+base+'/shared/prometheus\nHTTP header Authorization: Bearer '+values['METRICS_TOKEN']+'\nNo enviar al grupo ni subir a Git. Guardar el header como secreto en Grafana.\n',encoding='utf-8')
     (RUNTIME/'local.env').write_text(''.join(k+'='+json.dumps(v)+'\n' for k,v in values.items()),encoding='utf-8')
     write_json(RUNTIME/'settings.json',values)
     (RUNTIME/'private/proxy.conf').write_text(render(0,values['TEAM_API_KEY']),encoding='utf-8')
     (RUNTIME/'public/proxy.conf').write_text(public_gateway(values),encoding='utf-8')
     (RUNTIME/'exports/index.html').write_text('<!doctype html><meta charset="utf-8"><title>Inventario-U</title><h1>Inventario-U: práctica del equipo</h1><a href="/grafana/d/inventory-team/">Abrir Grafana</a> · <a href="/shared/guia.md">Guía de integración e IA</a>',encoding='utf-8')
     (RUNTIME/'exports/guia.md').write_text(guide(base,ids),encoding='utf-8')
+    (RUNTIME/'exports/grafana-cloud.md').write_text(grafana_cloud_guide(base),encoding='utf-8')
+    write_json(RUNTIME/'exports/datasource-template.json',{'name':'Inventario-U','type':'prometheus',
+        'access':'proxy','url':base+'/shared/prometheus','jsonData':{'httpMethod':'POST','httpHeaderName1':'Authorization',
+        'prometheusType':'Prometheus','prometheusVersion':'3.5.0','timeInterval':'5s'},
+        'secureJsonData':{'httpHeaderValue1':'Bearer <INSERT_PRIVATE_METRICS_TOKEN_IN_GRAFANA>'}})
     (RUNTIME/'exports/prometheus.yml').write_text(prometheus_config(base),encoding='utf-8')
     write_json(RUNTIME/'exports/contrato.json',contract(base,ids))
     write_json(RUNTIME/'exports/postman.json',postman(base,ids))
@@ -80,7 +86,13 @@ def configure(values,base,ids):
     write_json(RUNTIME/'dashboards/canary.json',canary_dashboard())
     write_json(RUNTIME/'dashboards/chaos.json',chaos_dashboard())
     report=ROOT/'docs/resource-local-results.md'
-    write_json(RUNTIME/'dashboards/resource.json',resource_dashboard(report.read_text(encoding='utf-8') if report.exists() else 'Rondas locales pendientes. Asignación c pendiente de confirmar por el grupo.'))
+    write_json(RUNTIME/'dashboards/resource.json',resource_dashboard(report.read_text(encoding='utf-8') if report.exists() else 'Fallo c confirmado. Rondas OCI pendientes; no usar datos locales como evidencia cloud.'))
+    resource_import=resource_dashboard(report.read_text(encoding='utf-8') if report.exists() else 'Rondas OCI pendientes; no usar datos locales como evidencia cloud.')
+    resource_import['uid']=None
+    resource_import['__inputs']=[{'name':'DS_PROMETHEUS','label':'Prometheus Inventario-U','type':'datasource','pluginId':'prometheus','pluginName':'Prometheus'}]
+    for panel in resource_import['panels']:
+        if panel.get('targets'):panel['datasource']={'type':'prometheus','uid':'${DS_PROMETHEUS}'}
+    write_json(RUNTIME/'exports/resource-dashboard.json',resource_import)
     if report.exists():
         (RUNTIME/'exports/resource-results.md').write_text(report.read_text(encoding='utf-8'),encoding='utf-8')
     (RUNTIME/'prometheus.yml').write_text((ROOT/'deploy/canary/prometheus.yml').read_text(encoding='utf-8')+'''

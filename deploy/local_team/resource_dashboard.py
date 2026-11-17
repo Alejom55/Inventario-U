@@ -1,7 +1,7 @@
 """Resource lab charts use real Prometheus series, with an explicit scope label."""
 def build(report='Las mediciones todavía no han terminado; no hay resultados aprobados.'):
-    panels=[{'id':1,'type':'text','title':'Propuesta c: evidencia LOCAL y trazabilidad',
-        'gridPos':{'x':0,'y':0,'w':24,'h':16},'options':{'mode':'markdown','content':report}}]
+    panels=[{'id':1,'type':'text','title':'Fallo c confirmado: práctica LOCAL, no evidencia cloud',
+        'gridPos':{'x':0,'y':0,'w':24,'h':16},'options':{'mode':'markdown','content':'Métrica objetivo única: éxito ≥99%. Guardarraíl: p95 <500 ms. El grupo exige repetir estado estable/R0/R1 en OCI.\n\n'+report}}]
     selector='track=~"resource-.*",route="/api/v2/skus",method="GET"'
     total='sum by (track) (rate(inventory_http_requests_total{track=~"resource-.*"}[30s]))'
     errors='sum by (track) (rate(inventory_http_requests_total{track=~"resource-.*",status!~"2.."}[30s]))'
@@ -15,6 +15,6 @@ def build(report='Las mediciones todavía no han terminado; no hay resultados ap
             'datasource':{'type':'prometheus','uid':'prometheus'},
             'targets':[{'refId':'A','expr':expression,'legendFormat':'{{track}} {{round}}'}],
             'fieldConfig':{'defaults':{'unit':unit,'min':0,**({'max':1} if unit=='percentunit' else {})},'overrides':[]}})
-    return {'uid':'inventory-resource','title':'Inventario-U — Recursos: propuesta c LOCAL',
+    return {'uid':'inventory-resource','title':'Inventario-U — Fallo c: concurrencia LOCAL',
         'schemaVersion':41,'version':1,'refresh':'5s','time':{'from':'now-30m','to':'now'},'panels':panels,
         'links':[{'title':'Guía del equipo','type':'link','url':'/grafana/d/inventory-team/'}]}

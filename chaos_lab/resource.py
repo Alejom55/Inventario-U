@@ -16,6 +16,14 @@ PROFILE = {'requests_per_second':5,'duration_seconds':120,'fault_start_seconds':
 PORTS = {'BASELINE':18110,'R0':18111,'R1':18112}
 
 
+def evaluate_objective(success_percent,p95_ms):
+    objective=success_percent>=PROFILE['min_success_percent']
+    guardrail=p95_ms<PROFILE['max_p95_ms']
+    return {'objective_name':'success_percent','objective_threshold':99,
+        'objective_passed':objective,'guardrail_p95_passed':guardrail,
+        'passed':objective,'promotion_allowed':objective and guardrail}
+
+
 def utc():
     return datetime.now(timezone.utc).isoformat()
 
@@ -90,12 +98,12 @@ def measure():
             p95=sorted(r['duration_ms'] for r in window)[math.ceil(len(window)*.95)-1]
             success=sum(r['success'] for r in window)/len(window)*100
             report={'scope':'LOCAL single API replica; not cloud or three-API E2E',
-                'assignment_status':'proposed resource c; group confirmation pending',
+                'assignment_status':'confirmed resource c: concurrency exhaustion',
                 'round':current,'execution_id':execution,'profile':PROFILE,'revision':os.environ['APP_REVISION'],
                 'started_utc':started_utc,'ended_utc':utc(),'fault':events,'samples':len(window),
                 'total_requests':len(rows),'p95_ms':p95,'success_percent':success,'error_percent':100-success,
                 'max_scheduler_lag_ms':max(r['scheduler_lag_ms'] for r in rows),
-                'passed':p95<500 and success>=99,'rollback_verified':released,
+                **evaluate_objective(success,p95),'rollback_verified':released,
                 'trace_id':next((r['trace_id'] for r in window if r['success']),window[0]['trace_id']),
                 'requests':sorted(rows,key=lambda r:r['index'])}
             destination.write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')

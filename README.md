@@ -17,14 +17,16 @@ uv run --frozen python -m scripts.local_team stop
 ```
 
 Las credenciales se conservan en el directorio privado ignorado
-`deploy/local_team/runtime/`. La operación local se validó con 272 pruebas,
+`deploy/local_team/runtime/`. La operación local se validó con 273 pruebas,
 CRUD público real, login Viewer, consumo HTTPS desde un segundo Prometheus y
 reinicio conservando credenciales y datos. Las evidencias de ejecución están
 en ese mismo directorio. No equivalen a las rondas cloud de las tres APIs.
 
-La [propuesta local de agotamiento de concurrencia](docs/resource-local-operation.md)
-añade un laboratorio aislado y un tablero de comparación. La asignación del fallo c
-sigue pendiente de confirmación del grupo; el experimento de latencia se conserva.
+El [fallo c confirmado: agotamiento de concurrencia](docs/resource-local-operation.md)
+usa un laboratorio aislado y un tablero de comparación. Única métrica objetivo:
+éxito >=99%; p95 <500 ms es un guardarraíl separado. Las rondas cloud siguen pendientes.
+La guía pública `/shared/grafana-cloud.md` permite configurar el datasource
+Prometheus autenticado `/shared/prometheus` en el stack común del equipo.
 
 ## Canary Deployment en OCI
 

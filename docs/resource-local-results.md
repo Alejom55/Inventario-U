@@ -1,6 +1,11 @@
 # Inventario-U: evidencia local de agotamiento de concurrencia
 
-Asignación c propuesta; el grupo debe confirmar el cambio desde latencia saliente.
+Actualización del acuerdo: el grupo confirmó Inventario-U (c, concurrencia).
+Única métrica objetivo acordada: éxito >=99%; p95 <500 ms es un guardarraíl separado.
+Las cifras siguientes conservan las mediciones originales, previas al acuerdo;
+el protocolo original evaluaba ambos límites. La clasificación de estas tres mediciones
+coincide con el nuevo criterio, sin recalcular ni inventar observaciones.
+Estas rondas locales NO cuentan como evidencia exigida de ejecución en OCI.
 Réplica local aislada; no demuestra tres APIs en tres nubes. La API compartida no recibió este fallo.
 
 Hipótesis: con 5 GET /api/v2/skus por segundo durante 120 s, al solicitar 6 tareas bloqueantes durante 60 s desde t=30, p95 <500 ms y éxito >=99% en la ventana [30,90).

@@ -1,0 +1,55 @@
+{
+  "captured_utc": "2026-11-17T06:25:23.816238+00:00",
+  "region": "sa-bogota-1",
+  "authorized_max_usd": 1,
+  "authorized_max_hours": 2,
+  "deployment_performed": false,
+  "cloud_rounds_performed": false,
+  "active_instances_in_project": 0,
+  "quota": {
+    "A1_available_ocpus": 2,
+    "A1_available_memory_gb": 12,
+    "E4_available_ocpus": 0,
+    "E5_available_ocpus": 0
+  },
+  "capacity": [
+    {
+      "fault_domain": "FAULT-DOMAIN-1",
+      "shape": "VM.Standard.A1.Flex",
+      "memory_gb": 4.0,
+      "status": "OUT_OF_HOST_CAPACITY"
+    },
+    {
+      "fault_domain": "FAULT-DOMAIN-2",
+      "shape": "VM.Standard.A1.Flex",
+      "memory_gb": 4.0,
+      "status": "OUT_OF_HOST_CAPACITY"
+    },
+    {
+      "fault_domain": "FAULT-DOMAIN-3",
+      "shape": "VM.Standard.A1.Flex",
+      "memory_gb": 4.0,
+      "status": "OUT_OF_HOST_CAPACITY"
+    },
+    {
+      "fault_domain": "FAULT-DOMAIN-1",
+      "shape": "VM.Standard.A1.Flex",
+      "memory_gb": 6.0,
+      "status": "OUT_OF_HOST_CAPACITY"
+    },
+    {
+      "fault_domain": "FAULT-DOMAIN-2",
+      "shape": "VM.Standard.A1.Flex",
+      "memory_gb": 6.0,
+      "status": "OUT_OF_HOST_CAPACITY"
+    },
+    {
+      "fault_domain": "FAULT-DOMAIN-3",
+      "shape": "VM.Standard.A1.Flex",
+      "memory_gb": 6.0,
+      "status": "OUT_OF_HOST_CAPACITY"
+    }
+  ],
+  "E2_micro_listed": false,
+  "source": "OCI Limits API, CreateComputeCapacityReport and ListShapes; read-only assessment, no VM launched"
+}

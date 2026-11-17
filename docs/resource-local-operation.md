@@ -1,7 +1,9 @@
-# Operación local: propuesta de agotamiento de concurrencia
+# Operación local: fallo c confirmado, agotamiento de concurrencia
 
-La asignación del fallo c a Inventario-U está pendiente de confirmación del grupo.
-El experimento anterior de latencia saliente se conserva. No mezclar ambas evidencias.
+El grupo confirma Inventario-U (c, concurrencia), Faty (a, latencia hacia deport-back)
+y deport-back (b, interrupción de su propia llamada a /api/v2/skus).
+Cada propietario inyecta en su lado, por turnos sin solaparse y avisando antes al grupo.
+El experimento anterior de latencia saliente se conserva como histórico.
 
 ## Alcance e hipótesis
 
@@ -11,7 +13,8 @@ Este experimento local de una API no acredita integración de tres APIs en tres 
 
 **Hipótesis:** con 5 GET `/api/v2/skus` por segundo durante 120 segundos,
 cuando seis tareas bloqueantes ocupen concurrencia durante 60 segundos desde t=30,
-el p95 será menor de 500 ms y el éxito será al menos 99% en la ventana [30,90).
+la tasa de éxito será al menos 99% en la ventana [30,90). Esta es la única métrica objetivo.
+El p95 menor de 500 ms es un guardarraíl separado; no una segunda métrica objetivo.
 Cada ventana tiene 300 solicitudes. Timeout de cliente: dos segundos. Se incluyen
 errores y timeouts en las mediciones; no se calcula p95 solamente sobre éxitos.
 
@@ -81,12 +84,23 @@ En la API pública es normal `round=none`: el experimento corre en las réplicas
 Grafana observa duración dentro del servidor. El informe de carga mide duración
 del cliente e incluye timeouts, por lo que ambas medidas no son intercambiables.
 El probe de salud de Chaos Toolkit valida antes/después; el campo `passed` del
-informe evalúa el objetivo durante el fallo. Un journal completado no significa
+informe evalúa solo éxito durante el fallo. `guardrail_p95_passed` evalúa el guardarraíl;
+`promotion_allowed` exige ambos, manteniendo una sola métrica objetivo. Un journal completado no significa
 que R0 haya cumplido el objetivo.
 
 `GET /api/v2/skus` es terminal: solo consulta PostgreSQL y devuelve una lista JSON.
 No llama a deport-back ni api-fastify. La ruta coordinadora `/integracion` no debe
 usarse como dependencia de sus propios proveedores: produciría un ciclo.
+
+## Grafana Cloud común
+
+La guía pública `/shared/grafana-cloud.md` explica la conexión a
+`https://niftyivy3144.grafana.net`. Usar como URL de datasource
+`<URL>/shared/prometheus`, con HTTP header `Authorization: Bearer <token privado de métricas>`.
+El proxy admite solo consultas/metadata autorizadas, limita tráfico y bloquea admin/escritura.
+El receptor introduce la credencial en el campo seguro de Grafana; nunca por el grupo.
+Exportar `/shared/resource-dashboard.json` e importarlo seleccionando el datasource.
+Habilitar el endpoint no demuestra que ya se haya configurado el stack del grupo.
 
 Referencias de implementación: [AnyIO workers](https://anyio.readthedocs.io/en/stable/threads.html)
 y [experimentos Chaos Toolkit](https://chaostoolkit.org/reference/api/experiment/).
