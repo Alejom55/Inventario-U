@@ -78,6 +78,14 @@ def configure(values,base,ids):
     write_json(RUNTIME/'dashboards/team.json',team_dashboard(base,ids))
     write_json(RUNTIME/'dashboards/canary.json',canary_dashboard())
     write_json(RUNTIME/'dashboards/chaos.json',chaos_dashboard())
+    (RUNTIME/'prometheus.yml').write_text((ROOT/'deploy/canary/prometheus.yml').read_text(encoding='utf-8')+'''
+      - targets: ['resource-baseline:8000']
+        labels: {track: resource-baseline, version: 2.0.0}
+      - targets: ['resource-r0:8000']
+        labels: {track: resource-r0, version: 2.0.0}
+      - targets: ['resource-r1:8000']
+        labels: {track: resource-r1, version: 2.0.0}
+''',encoding='utf-8')
     imported=canary_dashboard()
     imported['uid']=None
     imported['title']='Inventario-U remoto: stable y canary'
@@ -199,6 +207,10 @@ def start():
     tunnel_process('start')
     base=tunnel_url()
     configure(values,base,ids)
+    if session.get('public_url') and session['public_url']!=base:
+        notice='URL CAMBIO: '+session['public_url']+' -> '+base+'\nActualizar las variables del equipo y sus Prometheus.\n'
+        (RUNTIME/'URL-CAMBIO.txt').write_text(notice,encoding='utf-8')
+        print(notice,flush=True)
     compose('up','-d','grafana')
     for _ in range(45):
         try:
@@ -226,6 +238,8 @@ def start():
     write_json(RUNTIME/'session.json',{'public_url':base,'ids':ids,'revision':values['APP_REVISION'],'started_at_utc':datetime.now(timezone.utc).isoformat()})
     (RUNTIME/'credenciales-companeros.txt').write_text(f'URL: {base}\nGrafana: {base}/grafana/d/inventory-team/\nUsuario Grafana: companeros\nClave Grafana: {values["VIEWER_PASSWORD"]}\nX-Api-Key: {values["PEER_API_KEY"]}\nBearer de metricas: {values["METRICS_TOKEN"]}\nIDs sinteticos: {json.dumps(ids)}\nCompartir este archivo solo con los companeros; no subir a Git.\n',encoding='utf-8')
     (RUNTIME/'inventario_metrics_token').write_text(values['METRICS_TOKEN'],encoding='utf-8')
+    from scripts.local_team_watch import start as start_watch
+    start_watch()
     print(json.dumps({'ready':True,'public_url':base,'grafana':base+'/grafana/d/inventory-team/','credentials_file':str(RUNTIME/'credenciales-companeros.txt')}),flush=True)
 
 
@@ -246,11 +260,16 @@ def main():
     if action=='start':start()
     elif action=='demo':demo()
     elif action=='stop':
+        from scripts.local_team_watch import stop as stop_watch
+        stop_watch()
+        if (RUNTIME/'resource.env').exists():
+            run(['docker','compose','--env-file',str(RUNTIME/'resource.env'),'-f',str(FOLDER/'resource-compose.yml'),'stop'])
         tunnel_process('stop')
         if (RUNTIME/'local.env').exists():compose('stop')
         print('Owned tunnel and team containers stopped; data volumes retained')
     else:
-        print(json.dumps({'tunnel_running':tunnel_process('status'),'session':read_json(RUNTIME/'session.json',{})},indent=2))
+        print(json.dumps({'tunnel_running':tunnel_process('status'),'session':read_json(RUNTIME/'session.json',{}),
+                         'watch':read_json(RUNTIME/'watch.json',{})},indent=2))
         if (RUNTIME/'local.env').exists():compose('ps')
 
 

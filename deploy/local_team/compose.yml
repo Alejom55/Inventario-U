@@ -8,6 +8,8 @@ services:
     extends: {file: ../canary/compose.yml, service: canary}
   prometheus:
     extends: {file: ../canary/compose.yml, service: prometheus}
+    volumes:
+      - ./runtime/prometheus.yml:/etc/prometheus/prometheus.yml:ro
   grafana:
     extends: {file: ../canary/compose.yml, service: grafana}
     environment:
