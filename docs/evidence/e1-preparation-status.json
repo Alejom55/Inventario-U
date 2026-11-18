@@ -1,0 +1,28 @@
+{
+  "official_E1_rounds": 0,
+  "group_window": "pending_confirmation",
+  "personal_acceptances_recorded": 0,
+  "local_security_tests_passed": 38,
+  "local_test_warnings": 3,
+  "cloud_lab_deployed": false,
+  "grafana_datasource_uid": "fg4mx1por95ogc",
+  "grafana_datasource_url": "https://3.151.219.131.sslip.io/prometheus",
+  "grafana_save_and_test": "success",
+  "grafana_dashboard_text_save": "submitted_not_verified_browser_timeout",
+  "runs": [
+    {
+      "name": "Validacion Ciber E1",
+      "url": "https://github.com/Alejom55/Inventario-U/actions/runs/44242452904",
+      "head_sha": "a056422bf39feb97fa0e5852ffdbc33ccafa83d0",
+      "conclusion": "success",
+      "kind": "software_validation_not_official_E1"
+    },
+    {
+      "name": "Validacion OCI",
+      "url": "https://github.com/Alejom55/Inventario-U/actions/runs/44242452737",
+      "head_sha": "a056422bf39feb97fa0e5852ffdbc33ccafa83d0",
+      "conclusion": "success",
+      "kind": "software_validation_not_official_E1"
+    }
+  ]
+}
