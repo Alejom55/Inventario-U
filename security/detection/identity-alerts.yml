@@ -1,0 +1,12 @@
+groups:
+  - name: inventario-security-e1
+    interval: 5s
+    rules:
+      - alert: InventoryMachineIdentityMisuse
+        expr: inventory_security_identity_detections_total{reason=~"scope_violation|wrong_audience|expired|unknown_subject|honeytoken"} > 0
+        labels:
+          severity: high
+          experiment: E1
+        annotations:
+          summary: Machine credential misuse detected in Inventario-U
+          description: Review security_identity_detected JSON logs using trace_id and round. A counter remains positive until the round process is reset.

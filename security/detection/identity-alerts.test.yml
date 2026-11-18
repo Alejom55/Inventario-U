@@ -1,0 +1,25 @@
+rule_files: [identity-alerts.yml]
+evaluation_interval: 5s
+tests:
+  - name: Normal authorized traffic produces no security alert
+    interval: 5s
+    input_series:
+      - series: inventory_security_identity_decisions_total{round="R1",decision="allowed",reason="valid"}
+        values: 0+1x6
+    alert_rule_test:
+      - eval_time: 30s
+        alertname: InventoryMachineIdentityMisuse
+        exp_alerts: []
+  - name: A scope violation produces a real alert
+    interval: 5s
+    input_series:
+      - series: inventory_security_identity_detections_total{round="R1",reason="scope_violation"}
+        values: 0 0 1 1 1 1 1
+    alert_rule_test:
+      - eval_time: 15s
+        alertname: InventoryMachineIdentityMisuse
+        exp_alerts:
+          - exp_labels: {round: R1, reason: scope_violation, severity: high, experiment: E1}
+            exp_annotations:
+              summary: Machine credential misuse detected in Inventario-U
+              description: Review security_identity_detected JSON logs using trace_id and round. A counter remains positive until the round process is reset.
