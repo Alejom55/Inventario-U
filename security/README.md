@@ -13,17 +13,20 @@ https://3.151.219.131.sslip.io/api/v2 y su clave original.
 
 ```powershell
 uv run python -m deploy.security.aws_e1 state
+uv run python -m deploy.security.aws_e1 authorize --minutes 60
 uv run python -m deploy.security.aws_e1 R0
 uv run python -m deploy.security.aws_e1 R1
 uv run python -m deploy.security.aws_e1 stop
 ```
 
 R0/R1 requieren el alcance privado vigente `security/runtime/rules-owner.json`.
+`authorize` registra una nueva ventana individual explícita de 5 a 120 minutos;
+no amplía recursos ni programa apagados, y conserva cualquier STOP activo.
 El comando cambia solo `e1-api`, ejecuta el perfil acotado y conserva reportes
 y logs por execution_id. `stop` es cooperativo; no apaga la VM ni detiene la API
 compartida. La clave privada JWT permanece en el equipo operador.
 
-Estado: implementación y pruebas offline. **No hay todavía rondas de Ciber ejecutadas en AWS, firmas del grupo ni capturas del tablero con datos reales.** Los resultados de `docs/evidence/aws-cloud-results.json` corresponden al fallo de concurrencia de DevOps; no sirven como resultados de E1.
+Estado 18/11/2026: **R0 y R1 ejecutadas en el laboratorio AWS autorizado por el propietario**, con limpieza verificada. R1: MTTD 5,484 s, MTTC 0,500 s y 0/10 lecturas legítimas rechazadas. Evidencia original: `docs/evidence/ciber-e1-aws/`; tablero: https://niftyivy3144.grafana.net/d/inventario-security-e1-aws. No se representan firmas grupales. Los resultados de `docs/evidence/aws-cloud-results.json` corresponden al fallo de concurrencia de DevOps y siguen separados de E1.
 
 ## Hipótesis y método declarado
 
@@ -38,7 +41,7 @@ MTTD se mide desde la inyección hasta que el cliente observa `ALERTS` en Promet
 1. Identidad de máquina: JWT Ed25519, verificador público fijado, emisor, audiencia, sujeto autorizado, vencimiento máximo de 300 s y alcance `inventory:read`/`inventory:write`. La API no recibe la clave privada. Una API key no evita la política R1.
 2. Credencial señuelo: hash del token reservado, rechazo obligatorio y alerta específica con `trace_id` y ronda. El token no concede acceso aunque su firma sea válida. No debe distribuirse como credencial funcional.
 
-Ambas están instrumentadas y probadas offline. Su eficacia en la nube sigue pendiente. No se afirma cumplimiento normativo ni se presenta Ed25519 como criptografía poscuántica.
+Ambas están instrumentadas, probadas offline y observadas en R1 del laboratorio AWS. La muestra es de diez intentos y una técnica emulada; no garantiza cobertura de producción. No se afirma cumplimiento normativo ni se presenta Ed25519 como criptografía poscuántica.
 
 ```mermaid
 flowchart LR
@@ -51,7 +54,7 @@ flowchart LR
   P --> G[Grafana Ciber E1]
 ```
 
-## Reglas de compromiso: antes de cualquier ronda
+## Reglas de compromiso para la modalidad grupal
 
 La rúbrica exige reglas escritas y aceptadas por los tres antes de ejecutar. El archivo de ejemplo es deliberadamente incompleto. No contiene firmas ni autoriza pruebas.
 
@@ -66,7 +69,7 @@ La rúbrica exige reglas escritas y aceptadas por los tres antes de ejecutar. El
 4. Cada persona revisa ese alcance y deja su aceptación personal en PDF. Registrar nombre, `accepted: true`, fecha UTC, `accepted_scope_sha256`, ruta relativa `signed_pdf` y SHA256 del PDF en `participants`. Guardar los PDF dentro de la carpeta privada. El formulario en `output/pdf/reglas-e1-para-firmar.pdf` ayuda a documentarlo; **debe completarse antes de firmar**.
 5. Revisar manualmente la identidad y aceptación de cada participante. El programa verifica integridad de archivos y coincidencia del alcance; no autentica escritura manuscrita ni constituye una firma electrónica certificada. Cambiar ventana o destino exige renovar la aceptación.
 
-El validador impide ejecutar sin tres aceptaciones, fuera de ventana, con destinos no HTTPS o con un perfil distinto. Antes de ejecutar, comprobar facturación y la política de cierre vigente. En la VM actual el usuario autorizó créditos Free y apagado manual: no reinstalar un temporizador ni apagar el servicio grupal al terminar una ronda. La ventana E1 limita la carga, no la disponibilidad de la API. No hay creación automática de VM en este paquete.
+En modalidad grupal el validador exige tres aceptaciones. La modalidad individual exige autorización explícita del propietario y un host E1 separado. Ambas verifican ventana, HTTPS, rutas y perfil. Antes de ejecutar, comprobar facturación y la política de cierre vigente. En la VM actual el usuario autorizó créditos Free y apagado manual: no reinstalar un temporizador ni apagar el servicio grupal al terminar una ronda. La ventana E1 limita la carga, no la disponibilidad de la API. No hay creación automática de VM en este paquete.
 
 ## Entorno aislado y arranque local de ensayo
 
@@ -128,7 +131,7 @@ Workflow: `Validacion Ciber E1`. Valida código y detección con ejemplos positi
 
 ## Tablero y cinco demos de Ciber
 
-Importar `security/dashboard.json`, seleccionar la fuente `security-prometheus` o una fuente Prometheus propia con acceso autenticado. El entorno aislado lo provisiona automáticamente. No pegar Bearer ni JWT en paneles o capturas. Cero peticiones sin carga es normal; ausencia de métricas de ronda significa pendiente, no éxito. Un tiempo censurado no debe convertirse en 0 s. No hay todavía capturas de este tablero con rondas AWS.
+Para AWS, `security/dashboard-aws.json` apunta a la fuente `Inventario E1 AWS` del Grafana Cloud común. Capturas reales: `docs/evidence/ciber-e1-grafana/`. La plantilla local sigue en `security/dashboard.json`, con fuente `security-prometheus`. No pegar Bearer ni JWT en paneles o capturas. Cero peticiones sin carga es normal; ausencia de métricas de ronda significa pendiente, no éxito. Un tiempo censurado no debe convertirse en 0 s.
 
 1. Mostrar estado estable: identidad de VM, salud, telemetría, lecturas legítimas sin alerta.
 2. Mostrar alcance aceptado, inyección y archivo STOP; demostrar detención acotada.

@@ -1,0 +1,20 @@
+{
+  "instance_id": "i-094c00455c9ac62ba",
+  "api_url": "https://e1.3.151.219.131.sslip.io",
+  "application_revision": "c2ee1dc85710563768a844a671bc61b2d1f69ead",
+  "application_image": "sha256:d341ab3eac40b847d0ffd81b0b458b304a587b7d6f51c4c499b90eb2fb431158",
+  "state": "R1_ready",
+  "identity_policy": "workload",
+  "round": "R1",
+  "shared_service_restarted": false,
+  "prometheus_retention": "48h",
+  "prometheus_retention_size": "128MB",
+  "grafana_dashboard": "https://niftyivy3144.grafana.net/d/inventario-security-e1-aws",
+  "grafana_datasource_uid": "fg4n7aqm8d98ga",
+  "verified_utc": "2026-11-18T06:12:27.972937+00:00",
+  "shared_api_status": 200,
+  "shared_synthetic_sku_preserved": true,
+  "isolated_api_status": 200,
+  "isolated_skus_remaining": 0,
+  "tls_verified": true
+}
