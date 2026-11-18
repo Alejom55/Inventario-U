@@ -56,6 +56,12 @@ def install_telemetry(app):
             for name,header in (('RENDER_SERVICE_ID','X-Render-Service-Id'),('RENDER_INSTANCE_ID','X-Render-Instance-Id')):
                 value=os.getenv(name,'')
                 if re.fullmatch(r'[A-Za-z0-9_-]{1,128}',value):response.headers[header]=value
+        elif os.getenv('CLOUD_PROVIDER')=='aws':
+            response.headers['X-Deployment-Provider']='aws'
+            instance=os.getenv('AWS_INSTANCE_ID','')
+            if re.fullmatch(r'i-[a-f0-9]{8,17}',instance):
+                response.headers['X-Cloud-Service-Id']=instance
+                response.headers['X-Cloud-Instance-Id']=instance
         response.headers["X-Resilience-Mode"] = os.getenv("RESILIENCE_MODE", "baseline") if os.getenv("RESILIENCE_MODE", "baseline") in {"baseline", "protected"} else "invalid"
         current_round = round_identity()
         response.headers["X-Chaos-Round"] = current_round

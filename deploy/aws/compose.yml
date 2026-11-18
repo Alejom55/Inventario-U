@@ -1,0 +1,61 @@
+name: inventario-aws-practice
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    mem_limit: 256m
+    environment:
+      POSTGRES_DB: inventario
+      POSTGRES_USER: inventario
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?required}
+    volumes: [postgres_data:/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U inventario -d inventario]
+      interval: 5s
+      retries: 30
+  api:
+    build: ../..
+    restart: unless-stopped
+    mem_limit: 512m
+    cpus: 0.5
+    command: [/app/.venv/bin/uvicorn, app.main:app, --host, 0.0.0.0, --port, '8000', --no-access-log]
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://inventario:${POSTGRES_PASSWORD:?required}@db:5432/inventario
+      CLOUD_PROVIDER: aws
+      TERMINAL_API_ONLY: 'true'
+      RESOURCE_LAB_ENABLED: 'true'
+      APP_TRACK: stable
+      CHAOS_ROUND: none
+      CHAOS_EXECUTION_ID: none
+      RESILIENCE_MODE: protected
+    ports: ['127.0.0.1:8000:8000']
+    depends_on:
+      db: {condition: service_healthy}
+  prometheus:
+    image: prom/prometheus:v3.5.0
+    restart: unless-stopped
+    mem_limit: 192m
+    command: ['--config.file=/etc/prometheus/prometheus.yml', '--storage.tsdb.retention.time=3h', '--query.timeout=5s', '--query.max-concurrency=2', '--query.max-samples=1000000']
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./runtime/metrics-token:/etc/prometheus/metrics-token:ro
+      - prometheus_data:/prometheus
+  gateway:
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    mem_limit: 96m
+    environment:
+      PUBLIC_HOST: ${PUBLIC_HOST:?required}
+      METRICS_BEARER_TOKEN: ${METRICS_BEARER_TOKEN:?required}
+    ports: ['80:80', '443:443']
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on: [api, prometheus]
+volumes:
+  postgres_data:
+  prometheus_data:
+  caddy_data:
+  caddy_config:

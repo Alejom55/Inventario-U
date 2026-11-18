@@ -72,9 +72,23 @@ def test_render_removes_storage_and_coordinator_without_hiding_business(monkeypa
     assert client.get('/api/v2/integracion').status_code==404
 
 
-def test_real_render_app_never_registers_nested_storage_router():
+@pytest.mark.parametrize('cloud_environment',[{'RENDER':'true'},{'CLOUD_PROVIDER':'aws','TERMINAL_API_ONLY':'true'}])
+def test_real_render_app_never_registers_nested_storage_router(cloud_environment):
     import subprocess,sys
-    env=dict(os.environ,RENDER='true',RESOURCE_LAB_ENABLED='false',TEAM_API_KEY='test-only')
+    env=dict(os.environ,RESOURCE_LAB_ENABLED='false',TEAM_API_KEY='test-only',**cloud_environment)
     code="from app.main import app; from fastapi.testclient import TestClient; c=TestClient(app); assert c.get('/api/v2/storage',headers={'X-Api-Key':'test-only'}).status_code==404; assert '/api/v2/storage' not in app.openapi()['paths']"
     result=subprocess.run([sys.executable,'-c',code],env=env,capture_output=True,text=True)
     assert result.returncode==0,result.stderr
+
+
+def test_aws_identity_is_distinct_from_render(monkeypatch):
+    monkeypatch.delenv('RENDER',raising=False)
+    monkeypatch.setenv('CLOUD_PROVIDER','aws')
+    monkeypatch.setenv('AWS_INSTANCE_ID','i-0123456789abcdef0')
+    app=make_app(monkeypatch)
+    @app.get('/health')
+    async def health():return {'ok':True}
+    response=TestClient(app).get('/health')
+    assert response.headers['X-Deployment-Provider']=='aws'
+    assert response.headers['X-Cloud-Instance-Id']=='i-0123456789abcdef0'
+    assert 'X-Render-Instance-Id' not in response.headers

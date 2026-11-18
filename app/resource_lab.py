@@ -63,8 +63,8 @@ class ResourceFault:
 def install_resource_lab(app):
     if os.getenv('RESOURCE_LAB_ENABLED') != 'true':
         return
-    if os.getenv('RENDER') == 'true' and (not os.getenv('RESOURCE_ADMIN_KEY') or not os.getenv('METRICS_BEARER_TOKEN')):
-        raise ValueError('Render requires separate private control and metrics credentials')
+    if (os.getenv('RENDER') == 'true' or os.getenv('CLOUD_PROVIDER') == 'aws') and (not os.getenv('RESOURCE_ADMIN_KEY') or not os.getenv('METRICS_BEARER_TOKEN')):
+        raise ValueError('Cloud deployment requires separate private control and metrics credentials')
     # Fixed small capacity makes the fault reproducible without consuming host resources.
     state = ResourceFault(os.getenv('RESILIENCE_MODE') == 'protected', os.getenv('CHAOS_ROUND','none'))
     app.state.resource_fault = state

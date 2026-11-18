@@ -1,0 +1,21 @@
+{$PUBLIC_HOST} {
+    @prometheus {
+        path /prometheus/api/v1/query /prometheus/api/v1/query_range /prometheus/api/v1/labels /prometheus/api/v1/label/*/values /prometheus/api/v1/series /prometheus/api/v1/metadata /prometheus/api/v1/status/buildinfo
+        method GET POST
+        header Authorization "Bearer {$METRICS_BEARER_TOKEN}"
+    }
+    handle @prometheus {
+        uri strip_prefix /prometheus
+        reverse_proxy prometheus:9090 {
+            header_up -Authorization
+        }
+    }
+    handle /prometheus/* {
+        respond "Unauthorized" 401
+    }
+    @business path /health /api/v2/health /api/v2/skus /api/v2/skus/* /api/v2/almacenes /api/v2/almacenes/* /api/v2/movimientos /api/v2/movimientos/* /api/v2/inventario /api/v2/inventario/query /api/v2/admin/resource-*
+    handle @business {
+        reverse_proxy api:8000
+    }
+    respond "Not found" 404
+}

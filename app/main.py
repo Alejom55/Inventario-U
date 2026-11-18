@@ -33,7 +33,7 @@ app = FastAPI(
     version=VERSION,
     description="API para la gestión de SKU, almacenes y movimientos de inventario.",
 )
-if os.getenv('RENDER')!='true':
+if os.getenv('RENDER')!='true' and os.getenv('TERMINAL_API_ONLY')!='true':
     app.include_router(storage_router, prefix=API_V2_PREFIX)
 
 

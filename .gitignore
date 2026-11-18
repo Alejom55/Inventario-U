@@ -32,3 +32,4 @@ chaos/journal*.json
 deploy/local_team/runtime/
 deploy/digitalocean/runtime/
 deploy/render/runtime/
+deploy/aws/runtime/
