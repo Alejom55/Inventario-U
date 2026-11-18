@@ -4,8 +4,8 @@ API: https://3.147.57.31.sslip.io
 Prometheus para Grafana Cloud: https://3.147.57.31.sslip.io/prometheus
 Instancia actual: i-094c00455c9ac62ba; aplicación: c2ee1dc85710563768a844a671bc61b2d1f69ead.
 El plan FREE se verificó antes de crear recursos. No se habilitó un plan de pago.
-Solo créditos gratuitos; el cálculo reservado de la práctica es USD 0,775, dentro de USD 1 en créditos.
-Terminación automática: 2026-11-18T23:00:00+00:00 (18 de noviembre, 18:00 COL). Se elimina el disco sintético.
+Solo créditos gratuitos. El usuario autorizó consumo continuado, incluso por encima del límite anterior de USD 1, hasta indicar el apagado manual. La reserva anterior de USD 0,775 correspondía únicamente a la ventana inicial.
+Apagado manual: AWS Scheduler desactivado y temporizador systemd detenido y deshabilitado. No hay fecha de apagado programada. La VM permanece encendida hasta que el usuario indique apagarla. El estado se registra en `docs/evidence/aws-manual-shutdown.json`.
 La URL depende de esta IP y no se conserva para otro lanzamiento.
 
 ## Postman
@@ -47,7 +47,7 @@ Execution ID: dd2699928d6149b2ad7cc8d1dc9bc187.
 | R0 | 0.000 | 2128.845 | 2471.72 |
 | R1 | 100.000 | 82.624 | -0.19 |
 
-Para otra ejecución coordinada: Actions > Validacion local de caos > Run workflow > feat/security-chaos-v4 > Run workflow. No ejecutar mientras el grupo usa la demo: R0 degrada el servicio. La corrida histórica se inició desde feat/aws-chaos. Coordinar R0 con el grupo antes de ejecutarla. Solo funciona durante la ventana autorizada.
+Para otra ejecución coordinada: Actions > Validacion local de caos > Run workflow > feat/security-chaos-v4 > Run workflow. No ejecutar mientras el grupo usa la demo: R0 degrada el servicio. La corrida histórica se inició desde feat/aws-chaos. Coordinar R0 con el grupo antes de ejecutarla. La carga solo funciona durante la ventana de experimentación autorizada, independiente del apagado manual de la VM.
 
 Para las IA: consumir /api/v2/skus y las otras rutas propietarias; nunca llamar a /integracion desde una dependencia. Enviar X-Api-Key desde secretos, propagar X-Trace-Id, establecer timeouts y tratar respuestas no 2xx como errores.
 

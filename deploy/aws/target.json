@@ -2,9 +2,11 @@
   "api_url": "https://3.147.57.31.sslip.io",
   "prometheus_url": "https://3.147.57.31.sslip.io/prometheus",
   "instance_id": "i-094c00455c9ac62ba",
-  "deadline_utc": "2026-11-18T23:00:00+00:00",
   "application_revision": "c2ee1dc85710563768a844a671bc61b2d1f69ead",
   "provider": "aws",
   "region": "us-east-2",
-  "free_account_verified": true
+  "free_account_verified": true,
+  "experiment_window_end_utc": "2026-11-18T23:00:00+00:00",
+  "shutdown_mode": "manual",
+  "automatic_shutdown_enabled": false
 }

@@ -17,7 +17,9 @@ def main():
     state=json.loads((ROOT/'deploy/aws/target.json').read_text())
     values=json.loads((RUNTIME/'credentials.json').read_text())
     assert state['provider']=='aws' and state['free_account_verified'] is True
-    assert datetime.fromisoformat(state['deadline_utc'])>datetime.now(timezone.utc)+timedelta(minutes=10),'Not enough authorized time to measure'
+    window_end=state.get('experiment_window_end_utc') or state.get('deadline_utc')
+    assert window_end,'An explicit agreed experiment window is required, even when the VM uses manual shutdown'
+    assert datetime.fromisoformat(window_end)>datetime.now(timezone.utc)+timedelta(minutes=10),'Not enough authorized experiment time to measure'
     base=state['api_url'];revision=state['application_revision'];instance=state['instance_id']
     execution=uuid4().hex
     folder=ROOT/'chaos/results'/('aws-'+execution);folder.mkdir(parents=True)

@@ -1,0 +1,22 @@
+{
+  "verified_utc": "2026-11-18T03:41:47.760445+00:00",
+  "provider": "aws",
+  "instance_id": "i-094c00455c9ac62ba",
+  "api_url": "https://3.147.57.31.sslip.io",
+  "shutdown_mode": "manual",
+  "scheduler_state": "DISABLED",
+  "local_timer_active": false,
+  "local_timer_enabled": false,
+  "queued_guest_shutdown": false,
+  "ongoing_free_credits_authorized": true,
+  "previous_usd_1_limit_superseded": true,
+  "free_account": {
+    "type": "FREE",
+    "status": "ACTIVE",
+    "remaining_credits_usd": 120.0,
+    "expiration_utc": "2027-05-18T00:12:34.814000+00:00",
+    "maximum_out_of_pocket_usd": 0
+  },
+  "api_status_after_change": 200,
+  "api_checked_utc": "2026-11-18T03:44:04.259215+00:00"
+}

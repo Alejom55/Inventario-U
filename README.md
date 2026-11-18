@@ -19,6 +19,11 @@ La VM y el disco sintético se eliminan al vencer las dos horas autorizadas;
 consultar la fecha exacta en la guía y no asumir que una URL histórica sigue activa.
 Las evidencias de Render y las locales se conservan por separado.
 
+Excepción autorizada para la VM actual `i-094c00455c9ac62ba`: apagado manual, sin
+fecha automática y con consumo continuado de créditos Free. El usuario indicará
+cuándo apagarla. [Estado actual](docs/evidence/aws-manual-shutdown.json). Las
+ventanas para inyectar fallos siguen requiriendo coordinación independiente.
+
 ## Practica local compartida con el equipo
 
 La [guía local](deploy/local_team/README.md) levanta un entorno Docker aislado
