@@ -1,0 +1,268 @@
+{
+  "uid": "inventario-security-e1",
+  "title": "Inventario U Ciber E1 Identidad",
+  "schemaVersion": 41,
+  "version": 1,
+  "refresh": "5s",
+  "time": {
+    "from": "now-3h",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "text",
+      "title": "Guía y límites de la evidencia",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 5
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "E1 mide eficacia de identidad de máquinas. Objetivo único: MTTD <=30 s; guardarraíl: MTTC <=5 s. R0 conserva API key; R1 usa tokens Ed25519, audiencia, caducidad y alcance. Las métricas de tiempo son observaciones del controlador frente a alertas Prometheus; NaN significa no observado, nunca cero. Sin rondas reales no hay resultados. El material de pruebas offline no es evidencia de nube. Las reglas deben estar aceptadas por los tres participantes antes de ejecutar. Los logs security_identity_detected contienen UTC, trace_id, round, reason y decision, sin tokens. Este tablero no acredita E2, E3 ni E4."
+      }
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "MTTD observado por ronda",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "security-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 5,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "inventory_security_mttd_seconds",
+          "legendFormat": "{{round}} {{reason}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "min": 0,
+          "noValue": "Sin medición"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "MTTC observado por ronda",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "security-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 5,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "inventory_security_mttc_seconds",
+          "legendFormat": "{{round}} {{reason}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "min": 0,
+          "noValue": "Sin medición"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Cobertura sobre la técnica emulada",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "security-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 13,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "inventory_security_detection_coverage_percent",
+          "legendFormat": "{{round}} {{reason}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "noValue": "Sin medición"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Falsos positivos sobre solicitudes normales",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "security-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 13,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "inventory_security_false_positive_percent",
+          "legendFormat": "{{round}} {{reason}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "noValue": "Sin medición"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "Alertas nativas de identidad",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "security-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 21,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "ALERTS{alertname=\"InventoryMachineIdentityMisuse\",alertstate=\"firing\"}",
+          "legendFormat": "{{round}} {{reason}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "min": 0,
+          "noValue": "Sin medición"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Decisiones por causa",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "security-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 21,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (round,decision,reason) (inventory_security_identity_decisions_total)",
+          "legendFormat": "{{round}} {{reason}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "min": 0,
+          "noValue": "Sin medición"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "Señuelo activado",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "security-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 29,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "inventory_security_identity_detections_total{reason=\"honeytoken\"}",
+          "legendFormat": "{{round}} {{reason}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "min": 0,
+          "noValue": "Sin medición"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "Cobertura de telemetría de la API",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "security-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 29,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "up{job=\"inventory\"}",
+          "legendFormat": "{{round}} {{reason}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "min": 0,
+          "noValue": "Sin medición"
+        },
+        "overrides": []
+      }
+    }
+  ]
+}

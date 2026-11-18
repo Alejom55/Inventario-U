@@ -1,0 +1,28 @@
+{
+  "evidence_kind": "offline_validation_not_cloud_game_day",
+  "checked_at_utc": "2026-11-18T03:06:42.579017+00:00",
+  "pytest": {
+    "passed": 213,
+    "warnings": 19,
+    "duration_seconds": 7.9,
+    "command": "uv run --frozen --group chaos python -m pytest tests/security tests/local_team tests/chaos tests/canary tests/digitalocean --no-cov -q --disable-warnings"
+  },
+  "promtool": {
+    "version": "3.5.0",
+    "positive_and_negative_rules": "SUCCESS"
+  },
+  "compose": {
+    "R0": "config --quiet passed",
+    "R1": "config --quiet passed",
+    "services_started": false
+  },
+  "pdf": {
+    "path": "output/pdf/reglas-e1-para-firmar.pdf",
+    "pages": 1,
+    "visually_reviewed": true,
+    "personal_acceptances": 0
+  },
+  "cloud_rounds_executed": false,
+  "group_report_available": false,
+  "portfolio_location_known": false
+}

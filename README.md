@@ -2,6 +2,14 @@
 
 API para administrar inventario entre varios almacenes.
 
+## Ciber E1: identidad de máquinas
+
+La [guía E1](security/README.md) incluye identidad con alcance y vencimiento,
+credencial señuelo, alertas Prometheus, tablero y ejecutor acotado con parada
+y reversión. La [ficha individual](security/entrega-e1.md) distingue implementación
+de resultados pendientes. Las reglas deben ser aceptadas por los tres antes de
+las rondas cloud. Las mediciones anteriores de DevOps no son evidencia de Ciber.
+
 ## Práctica AWS con cuenta gratuita
 
 La [guía AWS](docs/aws-guide.md) contiene el contrato, Postman, Prometheus y las

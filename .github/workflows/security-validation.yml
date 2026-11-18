@@ -1,0 +1,27 @@
+name: Validacion Ciber E1
+on:
+  push:
+    branches: [feat/security-chaos-v4]
+    paths: ['app/**', 'security/**', 'tests/security/**', 'deploy/security/**', 'pyproject.toml', 'uv.lock', '.github/workflows/security-validation.yml']
+  pull_request:
+    paths: ['app/**', 'security/**', 'tests/security/**', 'deploy/security/**', 'pyproject.toml', 'uv.lock', '.github/workflows/security-validation.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  contracts_and_detections:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - uses: astral-sh/setup-uv@v9.0.0
+      - run: uv sync --frozen --group dev --group chaos
+      - name: Identidad, alcance, metricas y compatibilidad
+        run: uv run --frozen --group chaos python -m pytest tests/security tests/local_team tests/chaos tests/canary tests/digitalocean --no-cov
+      - name: Deteccion positiva y negativa real con promtool
+        run: docker run --rm --entrypoint /bin/promtool -v "$PWD/security/detection:/work:ro" -w /work prom/prometheus:v3.5.0 test rules identity-alerts.test.yml
+      - name: Validar que esta ejecucion no es evidencia de nube
+        run: echo "Pruebas offline. No game day, no firmas, no recursos cloud creados."
