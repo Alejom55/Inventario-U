@@ -9,3 +9,6 @@
 docs/evidence/aws-fault-c/* -text
 docs/evidence/aws-fault-c/README.md text
 docs/evidence/aws-fault-c/manifest.json text eol=lf
+
+# Preserve measured E1 payloads byte for byte for the published SHA256 manifest.
+docs/evidence/ciber-e1-aws/** -text
