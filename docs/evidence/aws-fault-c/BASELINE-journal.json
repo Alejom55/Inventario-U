@@ -1,0 +1,184 @@
+{
+  "chaoslib-version": "1.45.1",
+  "platform": "Linux-7.0.0-1019-azure-x86_64-with-glibc2.43",
+  "node": "runnervmccnms",
+  "experiment": {
+    "version": "1.0.0",
+    "title": "Fallo c confirmado: agotamiento real de concurrencia",
+    "description": "Unica metrica objetivo: exito >=99% en [30,90), con GET /api/v2/skus a 5 solicitudes/s durante 120 s, al ocupar 6 workers durante 60 s desde t=30. Guardarrail separado: p95 <500 ms. BASELINE no inyecta. R0 comparte workers. R1 aisla y limita admision de tareas de fondo a 4 sin cola. Misma imagen, datos, limites, carga y peticion de fallo. Ejecutar por turnos, sin solaparse con Faty (a) y deport-back (b). La entrega exige repetir las rondas realmente en OCI; ejecuciones locales no acreditan nube.",
+    "tags": [
+      "synthetic",
+      "resource-exhaustion",
+      "group-assignment-confirmed"
+    ],
+    "steady-state-hypothesis": {
+      "title": "Endpoint propietario disponible antes y despues; el objetivo durante el fallo se mide por separado",
+      "probes": [
+        {
+          "type": "probe",
+          "name": "terminal-sku-healthy",
+          "tolerance": true,
+          "provider": {
+            "type": "python",
+            "module": "chaos_lab.resource",
+            "func": "healthy"
+          }
+        }
+      ]
+    },
+    "method": [
+      {
+        "type": "action",
+        "name": "constant-arrival-load-and-bounded-resource-fault",
+        "provider": {
+          "type": "python",
+          "module": "chaos_lab.resource",
+          "func": "measure"
+        }
+      }
+    ],
+    "rollbacks": [
+      {
+        "type": "action",
+        "name": "release-and-verify-workers",
+        "provider": {
+          "type": "python",
+          "module": "chaos_lab.resource",
+          "func": "rollback"
+        }
+      }
+    ],
+    "dry": null
+  },
+  "start": "2026-11-18T00:40:40.173250+00:00",
+  "status": "completed",
+  "deviated": false,
+  "steady_states": {
+    "before": {
+      "steady_state_met": true,
+      "probes": [
+        {
+          "activity": {
+            "type": "probe",
+            "name": "terminal-sku-healthy",
+            "tolerance": true,
+            "provider": {
+              "type": "python",
+              "module": "chaos_lab.resource",
+              "func": "healthy"
+            }
+          },
+          "output": true,
+          "start": "2026-11-18T00:40:40.173472+00:00",
+          "status": "succeeded",
+          "end": "2026-11-18T00:40:40.418470+00:00",
+          "duration": 0.244998,
+          "tolerance_met": true
+        }
+      ]
+    },
+    "after": {
+      "steady_state_met": true,
+      "probes": [
+        {
+          "activity": {
+            "type": "probe",
+            "name": "terminal-sku-healthy",
+            "tolerance": true,
+            "provider": {
+              "type": "python",
+              "module": "chaos_lab.resource",
+              "func": "healthy"
+            }
+          },
+          "output": true,
+          "start": "2026-11-18T00:42:40.562378+00:00",
+          "status": "succeeded",
+          "end": "2026-11-18T00:42:40.764331+00:00",
+          "duration": 0.201953,
+          "tolerance_met": true
+        }
+      ]
+    },
+    "during": []
+  },
+  "run": [
+    {
+      "activity": {
+        "type": "action",
+        "name": "constant-arrival-load-and-bounded-resource-fault",
+        "provider": {
+          "type": "python",
+          "module": "chaos_lab.resource",
+          "func": "measure"
+        }
+      },
+      "output": {
+        "scope": "AWS cloud single API; not three-API E2E",
+        "assignment_status": "confirmed resource c: concurrency exhaustion",
+        "round": "BASELINE",
+        "execution_id": "dd2699928d6149b2ad7cc8d1dc9bc187",
+        "profile": {
+          "requests_per_second": 5,
+          "duration_seconds": 120,
+          "fault_start_seconds": 30,
+          "fault_duration_seconds": 60,
+          "timeout_seconds": 2,
+          "workers": 6,
+          "max_p95_ms": 500,
+          "min_success_percent": 99,
+          "window_seconds": 60
+        },
+        "revision": "d81d9ac4c88be5211ccbd80465894280c0496cc4",
+        "started_utc": "2026-11-18T00:40:40.423089+00:00",
+        "ended_utc": "2026-11-18T00:42:40.496167+00:00",
+        "fault": {},
+        "samples": 300,
+        "total_requests": 600,
+        "p95_ms": 82.779,
+        "success_percent": 100.0,
+        "error_percent": 0.0,
+        "max_scheduler_lag_ms": 2.315,
+        "objective_name": "success_percent",
+        "objective_threshold": 99,
+        "objective_passed": true,
+        "guardrail_p95_passed": true,
+        "passed": true,
+        "promotion_allowed": true,
+        "rollback_verified": true,
+        "trace_id": "23ff1ef5271641c5968003abff50364b",
+        "deployment": {
+          "provider": "aws",
+          "url": "https://77.113.238.87.sslip.io",
+          "service_id": "i-03dee81b7d92a60c8",
+          "instance_id": "i-03dee81b7d92a60c8",
+          "application_revision": "d81d9ac4c88be5211ccbd80465894280c0496cc4"
+        }
+      },
+      "start": "2026-11-18T00:40:40.418708+00:00",
+      "status": "succeeded",
+      "end": "2026-11-18T00:42:40.562199+00:00",
+      "duration": 120.143491
+    }
+  ],
+  "rollbacks": [
+    {
+      "activity": {
+        "type": "action",
+        "name": "release-and-verify-workers",
+        "provider": {
+          "type": "python",
+          "module": "chaos_lab.resource",
+          "func": "rollback"
+        }
+      },
+      "output": true,
+      "start": "2026-11-18T00:42:40.764575+00:00",
+      "status": "succeeded",
+      "end": "2026-11-18T00:42:40.960870+00:00",
+      "duration": 0.196295
+    }
+  ],
+  "end": "2026-11-18T00:42:40.960918+00:00",
+  "duration": 120.79075694084167
+}

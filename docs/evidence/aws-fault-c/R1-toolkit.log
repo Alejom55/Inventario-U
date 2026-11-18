@@ -1,0 +1,17 @@
+[32m[2026-11-18 00:44:42 INFO] Validating the experiment's syntax
+[32m[2026-11-18 00:44:42 INFO] Experiment looks valid
+[32m[2026-11-18 00:44:42 INFO] Running experiment: Fallo c confirmado: agotamiento real de concurrencia
+[32m[2026-11-18 00:44:42 INFO] Steady-state strategy: default
+[32m[2026-11-18 00:44:42 INFO] Rollbacks strategy: default
+[32m[2026-11-18 00:44:42 INFO] Steady state hypothesis: Endpoint propietario disponible antes y despues; el objetivo durante el fallo se mide por separado
+[32m[2026-11-18 00:44:42 INFO] Probe: terminal-sku-healthy
+[32m[2026-11-18 00:44:42 INFO] Steady state hypothesis is met!
+[32m[2026-11-18 00:44:42 INFO] Playing your experiment's method now...
+[32m[2026-11-18 00:44:42 INFO] Action: constant-arrival-load-and-bounded-resource-fault
+[32m[2026-11-18 00:46:43 INFO] Steady state hypothesis: Endpoint propietario disponible antes y despues; el objetivo durante el fallo se mide por separado
+[32m[2026-11-18 00:46:43 INFO] Probe: terminal-sku-healthy
+[32m[2026-11-18 00:46:43 INFO] Steady state hypothesis is met!
+[32m[2026-11-18 00:46:43 INFO] Let's rollback...
+[32m[2026-11-18 00:46:43 INFO] Rollback: release-and-verify-workers
+[32m[2026-11-18 00:46:43 INFO] Action: release-and-verify-workers
+[32m[2026-11-18 00:46:43 INFO] Experiment ended with status: completed

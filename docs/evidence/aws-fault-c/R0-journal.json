@@ -1,0 +1,196 @@
+{
+  "chaoslib-version": "1.45.1",
+  "platform": "Linux-7.0.0-1019-azure-x86_64-with-glibc2.43",
+  "node": "runnervmccnms",
+  "experiment": {
+    "version": "1.0.0",
+    "title": "Fallo c confirmado: agotamiento real de concurrencia",
+    "description": "Unica metrica objetivo: exito >=99% en [30,90), con GET /api/v2/skus a 5 solicitudes/s durante 120 s, al ocupar 6 workers durante 60 s desde t=30. Guardarrail separado: p95 <500 ms. BASELINE no inyecta. R0 comparte workers. R1 aisla y limita admision de tareas de fondo a 4 sin cola. Misma imagen, datos, limites, carga y peticion de fallo. Ejecutar por turnos, sin solaparse con Faty (a) y deport-back (b). La entrega exige repetir las rondas realmente en OCI; ejecuciones locales no acreditan nube.",
+    "tags": [
+      "synthetic",
+      "resource-exhaustion",
+      "group-assignment-confirmed"
+    ],
+    "steady-state-hypothesis": {
+      "title": "Endpoint propietario disponible antes y despues; el objetivo durante el fallo se mide por separado",
+      "probes": [
+        {
+          "type": "probe",
+          "name": "terminal-sku-healthy",
+          "tolerance": true,
+          "provider": {
+            "type": "python",
+            "module": "chaos_lab.resource",
+            "func": "healthy"
+          }
+        }
+      ]
+    },
+    "method": [
+      {
+        "type": "action",
+        "name": "constant-arrival-load-and-bounded-resource-fault",
+        "provider": {
+          "type": "python",
+          "module": "chaos_lab.resource",
+          "func": "measure"
+        }
+      }
+    ],
+    "rollbacks": [
+      {
+        "type": "action",
+        "name": "release-and-verify-workers",
+        "provider": {
+          "type": "python",
+          "module": "chaos_lab.resource",
+          "func": "rollback"
+        }
+      }
+    ],
+    "dry": null
+  },
+  "start": "2026-11-18T00:42:41.403402+00:00",
+  "status": "completed",
+  "deviated": false,
+  "steady_states": {
+    "before": {
+      "steady_state_met": true,
+      "probes": [
+        {
+          "activity": {
+            "type": "probe",
+            "name": "terminal-sku-healthy",
+            "tolerance": true,
+            "provider": {
+              "type": "python",
+              "module": "chaos_lab.resource",
+              "func": "healthy"
+            }
+          },
+          "output": true,
+          "start": "2026-11-18T00:42:41.403686+00:00",
+          "status": "succeeded",
+          "end": "2026-11-18T00:42:41.640780+00:00",
+          "duration": 0.237094,
+          "tolerance_met": true
+        }
+      ]
+    },
+    "after": {
+      "steady_state_met": true,
+      "probes": [
+        {
+          "activity": {
+            "type": "probe",
+            "name": "terminal-sku-healthy",
+            "tolerance": true,
+            "provider": {
+              "type": "python",
+              "module": "chaos_lab.resource",
+              "func": "healthy"
+            }
+          },
+          "output": true,
+          "start": "2026-11-18T00:44:41.780814+00:00",
+          "status": "succeeded",
+          "end": "2026-11-18T00:44:41.980723+00:00",
+          "duration": 0.199909,
+          "tolerance_met": true
+        }
+      ]
+    },
+    "during": []
+  },
+  "run": [
+    {
+      "activity": {
+        "type": "action",
+        "name": "constant-arrival-load-and-bounded-resource-fault",
+        "provider": {
+          "type": "python",
+          "module": "chaos_lab.resource",
+          "func": "measure"
+        }
+      },
+      "output": {
+        "scope": "AWS cloud single API; not three-API E2E",
+        "assignment_status": "confirmed resource c: concurrency exhaustion",
+        "round": "R0",
+        "execution_id": "dd2699928d6149b2ad7cc8d1dc9bc187",
+        "profile": {
+          "requests_per_second": 5,
+          "duration_seconds": 120,
+          "fault_start_seconds": 30,
+          "fault_duration_seconds": 60,
+          "timeout_seconds": 2,
+          "workers": 6,
+          "max_p95_ms": 500,
+          "min_success_percent": 99,
+          "window_seconds": 60
+        },
+        "revision": "d81d9ac4c88be5211ccbd80465894280c0496cc4",
+        "started_utc": "2026-11-18T00:42:41.645523+00:00",
+        "ended_utc": "2026-11-18T00:44:41.714949+00:00",
+        "fault": {
+          "injection_request_utc": "2026-11-18T00:43:11.645879+00:00",
+          "injection_ack_utc": "2026-11-18T00:43:11.758737+00:00",
+          "injection": {
+            "requested": 6,
+            "admitted": 6,
+            "rejected": 0,
+            "duration_seconds": 60,
+            "protected": false
+          },
+          "release": true,
+          "release_verified_utc": "2026-11-18T00:44:11.990614+00:00"
+        },
+        "samples": 300,
+        "total_requests": 600,
+        "p95_ms": 2128.845,
+        "success_percent": 0.0,
+        "error_percent": 100.0,
+        "max_scheduler_lag_ms": 2.295,
+        "objective_name": "success_percent",
+        "objective_threshold": 99,
+        "objective_passed": false,
+        "guardrail_p95_passed": false,
+        "passed": false,
+        "promotion_allowed": false,
+        "rollback_verified": true,
+        "trace_id": "a8b01a06cd0e4974a3314f68c1fd0cab",
+        "deployment": {
+          "provider": "aws",
+          "url": "https://77.113.238.87.sslip.io",
+          "service_id": "i-03dee81b7d92a60c8",
+          "instance_id": "i-03dee81b7d92a60c8",
+          "application_revision": "d81d9ac4c88be5211ccbd80465894280c0496cc4"
+        }
+      },
+      "start": "2026-11-18T00:42:41.641006+00:00",
+      "status": "succeeded",
+      "end": "2026-11-18T00:44:41.780638+00:00",
+      "duration": 120.139632
+    }
+  ],
+  "rollbacks": [
+    {
+      "activity": {
+        "type": "action",
+        "name": "release-and-verify-workers",
+        "provider": {
+          "type": "python",
+          "module": "chaos_lab.resource",
+          "func": "rollback"
+        }
+      },
+      "output": true,
+      "start": "2026-11-18T00:44:41.980962+00:00",
+      "status": "succeeded",
+      "end": "2026-11-18T00:44:42.168063+00:00",
+      "duration": 0.187101
+    }
+  ],
+  "end": "2026-11-18T00:44:42.168119+00:00",
+  "duration": 120.76779794692993
+}

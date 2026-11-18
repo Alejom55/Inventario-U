@@ -1,0 +1,57 @@
+{
+  "source_run_id": 44209628616,
+  "source_run_url": "https://github.com/Alejom55/Inventario-U/actions/runs/44209628616",
+  "kind": "original AWS artifacts; not a new execution",
+  "files": [
+    {
+      "file": "BASELINE-journal.json",
+      "sha256": "9962a5e81685d15fa1b1f37bfc6c0d3ab26b15c42b906b144a9e6e60f3c0c76d",
+      "source_artifact_path": "chaos/results/aws-dd2699928d6149b2ad7cc8d1dc9bc187/BASELINE-journal.json"
+    },
+    {
+      "file": "BASELINE-toolkit.log",
+      "sha256": "4cd45091b6ef4e8f9f7e11e20007ca3215bdf10d5ff4b40434e9c2d0a2c5c3d3",
+      "source_artifact_path": "chaos/results/aws-dd2699928d6149b2ad7cc8d1dc9bc187/BASELINE-toolkit.log"
+    },
+    {
+      "file": "BASELINE.json",
+      "sha256": "db14ad2a3507782024b2abb39de15c4bbe223f548303882258feb7c0b7a3557a",
+      "source_artifact_path": "chaos/results/aws-dd2699928d6149b2ad7cc8d1dc9bc187/BASELINE.json"
+    },
+    {
+      "file": "R0-journal.json",
+      "sha256": "ed1f741ac5fe34d364967c672424bc6fcdaceabd8f8cfcfd7d3c1479ebae671f",
+      "source_artifact_path": "chaos/results/aws-dd2699928d6149b2ad7cc8d1dc9bc187/R0-journal.json"
+    },
+    {
+      "file": "R0-toolkit.log",
+      "sha256": "7086d2a5213345619e7c9dfeea5b604fe29b822336201960363370fde744f5f6",
+      "source_artifact_path": "chaos/results/aws-dd2699928d6149b2ad7cc8d1dc9bc187/R0-toolkit.log"
+    },
+    {
+      "file": "R0.json",
+      "sha256": "880ef443dc12a9064556a003ab9ec7102136ef22146bb650081e4c91f01f3645",
+      "source_artifact_path": "chaos/results/aws-dd2699928d6149b2ad7cc8d1dc9bc187/R0.json"
+    },
+    {
+      "file": "R1-journal.json",
+      "sha256": "a715922a4c0741c03a91f94b8053b5639cfab22136087e231406ba5783ac036d",
+      "source_artifact_path": "chaos/results/aws-dd2699928d6149b2ad7cc8d1dc9bc187/R1-journal.json"
+    },
+    {
+      "file": "R1-toolkit.log",
+      "sha256": "419c8596cb9036feeebfc9ee3d32b40d00f073d709750f7fc345950b4fc3759e",
+      "source_artifact_path": "chaos/results/aws-dd2699928d6149b2ad7cc8d1dc9bc187/R1-toolkit.log"
+    },
+    {
+      "file": "R1.json",
+      "sha256": "e6ce0df012d12326d5bdd88174e8c744746b1450112bf2f812d833e77f922197",
+      "source_artifact_path": "chaos/results/aws-dd2699928d6149b2ad7cc8d1dc9bc187/R1.json"
+    },
+    {
+      "file": "comparison.json",
+      "sha256": "0f287ac8f56d658e9b8b9711171e258877530ffd4e6b8d83c14f9b1e414f4106",
+      "source_artifact_path": "chaos/results/aws-dd2699928d6149b2ad7cc8d1dc9bc187/comparison.json"
+    }
+  ]
+}

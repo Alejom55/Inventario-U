@@ -157,7 +157,7 @@ def main():
         report.update(summarize(normal,adverse,mttd,mttc,observed_seconds),
             injected_utc=injected_utc,method={'normal_requests':10,'adverse_requests':10,'observation_seconds':30,'maximum_rps':2},
             timing_note='MTTD is the measured upper bound until the controller observes the native monitoring alert. Missing detection is censored, never zero.',
-            attack='T1550.001',request_count=requests,alert_evidence=alert_evidence,honeytoken_evidence=honey_evidence)
+            attack='T1078',request_count=requests,alert_evidence=alert_evidence,honeytoken_evidence=honey_evidence)
         payload={name:report[name] for name in ('round','execution_id','scope_sha256','mttd_seconds','mttc_seconds',
             'detection_coverage_percent','false_positive_percent','adverse_acceptance_percent')}
         response,_=send('POST',base+'/api/v2/admin/security-result',{'X-Api-Key':secrets['results_key']},payload,rollback_request=True)

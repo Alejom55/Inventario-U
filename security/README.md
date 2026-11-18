@@ -117,13 +117,15 @@ Este guion corresponde a las cinco demostraciones de Ciber de la rúbrica. El gr
 
 | Capa / medida | ISO 27001:2022 Anexo A | NIST SP 800-53 | ATT&CK / D3FEND |
 |---|---|---|---|
-| Identidad con audiencia y alcance | A.5.16, A.5.17, A.8.3, A.8.5 | AC-3, AC-6, IA-5, IA-9 | T1550.001 / D3-CTS |
+| Identidad con audiencia y alcance | A.5.16, A.5.17, A.8.3, A.8.5 | AC-3, AC-6, IA-5, IA-9 | T1078 / D3-CTS |
 | Logs y alerta como código | A.8.15, A.8.16 | AU-12, SI-4 | D3-AZET |
 | Señuelo y revisión humana | A.8.16 | SI-4 | D3-DST |
 
 Es una correspondencia de diseño, no certificación. NIST SP 800-207 orienta la verificación explícita de identidad por petición. ATLAS y prompt injection corresponden a E3 del grupo; no se declaran implementados por E1.
 
-Referencias oficiales: [NIST SP 800-207](https://csrc.nist.gov/pubs/sp/800/207/final), [NIST SP 800-53 y mapeos ISO](https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final), [ATT&CK T1550.001](https://attack.mitre.org/techniques/T1550/001/), [D3-CTS](https://d3fend.mitre.org/technique/d3f:CredentialTransmissionScoping/), [D3-AZET](https://d3fend.mitre.org/technique/d3f:AuthorizationEventThresholding/), [D3-DST](https://d3fend.mitre.org/technique/d3f:DecoySessionToken/), [PyJWT](https://pyjwt.readthedocs.io/en/stable/usage.html), [reglas Prometheus](https://prometheus.io/docs/prometheus/latest/configuration/unit_testing_rules/). Consultadas el 17 de noviembre de 2026.
+Para el informe del grupo se limita ATT&CK a **T1078 (Valid Accounts)** como correspondencia conceptual del abuso de una identidad válida de aplicación. Se verificaron también T1078.004 y T1552 en MITRE, pero este ensayo no demuestra abuso de una cuenta IAM de AWS ni extracción de credenciales inseguras; por eso no se atribuyen esas técnicas al resultado. No se usa T1562.008. Referencias verificadas: [T1078](https://attack.mitre.org/techniques/T1078/), [T1078.004](https://attack.mitre.org/techniques/T1078/004/) y [T1552](https://attack.mitre.org/techniques/T1552/).
+
+Referencias oficiales: [NIST SP 800-207](https://csrc.nist.gov/pubs/sp/800/207/final), [NIST SP 800-53 y mapeos ISO](https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final), [ATT&CK T1078](https://attack.mitre.org/techniques/T1078/), [D3-CTS](https://d3fend.mitre.org/technique/d3f:CredentialTransmissionScoping/), [D3-AZET](https://d3fend.mitre.org/technique/d3f:AuthorizationEventThresholding/), [D3-DST](https://d3fend.mitre.org/technique/d3f:DecoySessionToken/), [PyJWT](https://pyjwt.readthedocs.io/en/stable/usage.html), [reglas Prometheus](https://prometheus.io/docs/prometheus/latest/configuration/unit_testing_rules/). Consultadas el 17 de noviembre de 2026.
 
 ## IA defensiva con revisión humana
 

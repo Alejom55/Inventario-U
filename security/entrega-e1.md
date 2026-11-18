@@ -4,7 +4,7 @@
 
 Responsable: Alejandro Marín. Servicio: Inventario-U. Experimento: reutilización de una credencial de lectura para crear SKU sintéticos (identidad de máquinas). Objetivo único: MTTD <= 30 s. Método idéntico por ronda: 10 lecturas legítimas y 10 intentos adversos, máximo 2 peticiones/s, observación primaria de 30 s. Guardarraíl: rechazo sostenido y MTTC <= 5 s.
 
-R0: API key sin alcance por operación. R1: JWT Ed25519 de vida corta con emisor, audiencia, sujeto y alcance verificados; credencial señuelo con alerta y revisión humana. Correspondencias propuestas: NIST AC-3/AC-6/IA-5/IA-9/AU-12/SI-4, ISO A.5.16/A.5.17/A.8.3/A.8.5/A.8.15/A.8.16, ATT&CK T1550.001; D3FEND CTS/AZET/DST.
+R0: API key sin alcance por operación. R1: JWT Ed25519 de vida corta con emisor, audiencia, sujeto y alcance verificados; credencial señuelo con alerta y revisión humana. Correspondencias propuestas: NIST AC-3/AC-6/IA-5/IA-9/AU-12/SI-4, ISO A.5.16/A.5.17/A.8.3/A.8.5/A.8.15/A.8.16, ATT&CK T1078; D3FEND CTS/AZET/DST.
 
 | Medición real | R0 | R1 |
 |---|---|---|
