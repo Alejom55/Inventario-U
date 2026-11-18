@@ -1,0 +1,7 @@
+{
+  "grafana_url": "https://niftyivy3144.grafana.net/d/inventario-aws-evidence",
+  "aws_run": "https://github.com/Alejom55/Inventario-U/actions/runs/44209628616",
+  "security_validation": "https://github.com/Alejom55/Inventario-U/actions/runs/44229590871",
+  "scope": "AWS historical fault-c rounds plus current live telemetry; no official E1 cloud rounds",
+  "full_validation": "https://github.com/Alejom55/Inventario-U/actions/runs/44232493710"
+}

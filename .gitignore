@@ -35,3 +35,5 @@ deploy/render/runtime/
 deploy/aws/runtime/
 security/runtime/
 security/results/
+
+output/evidence/*.zip

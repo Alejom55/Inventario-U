@@ -51,6 +51,6 @@ Para otra ejecución coordinada: Actions > Validacion local de caos > Run workfl
 
 Para las IA: consumir /api/v2/skus y las otras rutas propietarias; nunca llamar a /integracion desde una dependencia. Enviar X-Api-Key desde secretos, propagar X-Trace-Id, establecer timeouts y tratar respuestas no 2xx como errores.
 
-Esta evidencia corresponde a una API en AWS. No acredita la integración de las tres APIs ni Chaos Mesh/GKE. El Grafana Cloud común requiere que su responsable agregue la fuente y el tablero.
+Esta evidencia corresponde a una API en AWS. No acredita la integración de las tres APIs ni Chaos Mesh/GKE. Grafana Cloud ya está conectado al Prometheus actual. Tablero: https://niftyivy3144.grafana.net/d/inventario-aws-evidence . Las capturas están en `docs/evidence/screenshots/`: distinguen la tabla histórica de la telemetría actual y no acreditan rondas oficiales de E1.
 
 Ejecución: https://github.com/Alejom55/Inventario-U/actions/runs/44209628616

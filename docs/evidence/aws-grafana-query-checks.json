@@ -1,0 +1,29 @@
+{
+  "source": "AWS restored VM, live queries; historical round table is separate",
+  "queries": [
+    {
+      "panel": "Tráfico actual de SKU",
+      "returned_series": 1
+    },
+    {
+      "panel": "Errores 5xx actuales",
+      "returned_series": 1
+    },
+    {
+      "panel": "Latencia p95 actual",
+      "returned_series": 1
+    },
+    {
+      "panel": "CPU / límite 0,5 CPU",
+      "returned_series": 1
+    },
+    {
+      "panel": "Memoria / límite 512 MiB",
+      "returned_series": 1
+    },
+    {
+      "panel": "API recolectada por Prometheus",
+      "returned_series": 1
+    }
+  ]
+}

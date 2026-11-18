@@ -1,93 +1,50 @@
 {
-  "title": "Inventario-U — Guía y fallo c en AWS",
+  "title": "Inventario-U | AWS: evidencia y servicio actual",
   "schemaVersion": 41,
   "version": 1,
   "refresh": "5s",
   "time": {
-    "from": "now-3h",
+    "from": "now-30m",
     "to": "now"
   },
   "panels": [
     {
       "id": 1,
       "type": "text",
-      "title": "Guía del equipo y evidencia AWS",
+      "title": "BASELINE / R0 / R1: datos medidos, archivados",
       "gridPos": {
         "x": 0,
         "y": 0,
-        "w": 24,
-        "h": 24
+        "w": 12,
+        "h": 9
       },
       "options": {
         "mode": "markdown",
-        "content": "# Inventario-U: AWS con plan gratuito\n\nAPI: https://77.113.238.87.sslip.io\nPrometheus para Grafana Cloud: https://77.113.238.87.sslip.io/prometheus\nInstancia: i-03dee81b7d92a60c8; aplicación: d81d9ac4c88be5211ccbd80465894280c0496cc4.\nEl plan FREE se verificó antes de crear recursos. No se habilitó un plan de pago.\nSolo créditos gratuitos; el cálculo reservado de la práctica es USD 0,31.\nTerminación automática: 2026-11-18T02:29:40.124823+00:00. Se elimina el disco sintético.\nLa URL depende de esta IP y no se conserva para otro lanzamiento.\n\n## Postman\n\nGET https://77.113.238.87.sslip.io/api/v2/skus\nHeaders: X-Api-Key: {{inventario_api_key}} y X-Trace-Id: equipo-{{$guid}}.\nEsperado: 200 con lista de SKU. Es un endpoint terminal, sin llamadas a los compañeros.\nGET https://77.113.238.87.sslip.io/api/v2/inventario?sku_id=1&almacen_id=1\nDevuelve resultados[]. El método QUERY /api/v2/inventario/query sigue disponible.\nConserva CRUD de SKU, almacenes y movimientos. Usar exclusivamente datos sintéticos.\n\n## Grafana Cloud\n\nCrear datasource Prometheus con la URL anterior, método POST y header seguro\nAuthorization: Bearer <token privado de métricas>. Importar docs/aws-dashboard.json.\nLas claves se entregan por privado; no ponerlas en paneles ni en el grupo.\nCero tráfico sin peticiones es normal. Una petición aislada apenas cambia una tasa.\nLos indicadores del cliente se publican al terminar la ronda, contando timeouts.\nEstos gráficos comparan BASELINE/R0/R1 de una API; no son dos versiones Canary.\n\n## Resultados reales\n\nPerfil: 5 peticiones/s, 120 s; agotamiento de concurrencia desde t=30 durante 60 s.\nÚnico objetivo: éxito del cliente >=99%. Guardarraíl separado: p95 <500 ms.\nR0 ocupa los seis trabajadores compartidos. R1 usa bulkhead y admite cuatro tareas\nde fondo, rechazando dos sin cola. Reversión verificada en las tres rondas.\nGenerador: GitHub-hosted Ubuntu. Comparar únicamente rondas del mismo origen.\nExecution ID: dd2699928d6149b2ad7cc8d1dc9bc187.\n\n| Ronda | Éxito % | p95 ms | Variación p95 % |\n|---|---:|---:|---:|\n| BASELINE | 100.000 | 82.779 | 0.00 |\n| R0 | 0.000 | 2128.845 | 2471.72 |\n| R1 | 100.000 | 82.624 | -0.19 |\n\nActions > Validacion local de caos > Run workflow > feat/aws-chaos > Run workflow. Coordinar R0 con el grupo antes de ejecutarla. Solo funciona durante la ventana autorizada.\n\nPara las IA: consumir /api/v2/skus y las otras rutas propietarias; nunca llamar a /integracion desde una dependencia. Enviar X-Api-Key desde secretos, propagar X-Trace-Id, establecer timeouts y tratar respuestas no 2xx como errores.\n\nEsta evidencia corresponde a una API en AWS. No acredita la integración de las tres APIs ni Chaos Mesh/GKE. El Grafana Cloud común requiere que su responsable agregue la fuente y el tablero.\n\nEjecución: https://github.com/Alejom55/Inventario-U/actions/runs/44209628616\n"
+        "content": "## Resultados AWS archivados\n| Ronda | Éxito | p95 |\n|---|---:|---:|\n| BASELINE | 100.0 % | 82.779 ms |\n| R0 | 0.0 % | 2128.845 ms |\n| R1 | 100.0 % | 82.624 ms |\n\n**Umbral R1 ≥99 %: cumple.** Bulkhead + control de admisión.\n\n[Run real 44209628616](https://github.com/Alejom55/Inventario-U/actions/runs/44209628616) · [Muestras y logs](https://github.com/Alejom55/Inventario-U/tree/feat/security-chaos-v4/docs/evidence/aws-fault-c)\n\nMedidos el 18/11/2026, 00:40–00:46 UTC, en la VM anterior. **No son rondas nuevas de la VM actual ni resultados E1.**"
       }
     },
     {
       "id": 2,
-      "type": "timeseries",
-      "title": "Objetivo único: éxito del cliente ≥99%",
+      "type": "text",
+      "title": "Servicio actual y alcance",
       "gridPos": {
-        "x": 0,
-        "y": 24,
+        "x": 12,
+        "y": 0,
         "w": 12,
-        "h": 8
+        "h": 9
       },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "inventory_resource_client_success_ratio{cloud=\"aws\"}",
-          "legendFormat": "{{round}}"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "percentunit",
-          "min": 0
-        },
-        "overrides": []
+      "options": {
+        "mode": "markdown",
+        "content": "**API:** https://3.147.57.31.sslip.io/api/v2\n\n**VM actual:** i-094c00455c9ac62ba · AWS Ohio\n\n**Apagado manual:** permanece encendida hasta indicación del usuario.\n\nDatos sintéticos: sku_id=1, almacen_id=1.\n\nGráficas inferiores: telemetría en vivo de esta VM. Cero errores es normal.\n\n**E1 oficial pendiente:** no hay aún MTTD/MTTC cloud ni alerta oficial; requiere reglas aceptadas. No confundir pruebas de software con rondas de Ciber."
       }
     },
     {
       "id": 3,
       "type": "timeseries",
-      "title": "Guardarraíl: p95 del cliente <500 ms",
-      "gridPos": {
-        "x": 12,
-        "y": 24,
-        "w": 12,
-        "h": 8
-      },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "1000 * inventory_resource_client_p95_seconds{cloud=\"aws\"}",
-          "legendFormat": "{{round}}"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "ms",
-          "min": 0
-        },
-        "overrides": []
-      }
-    },
-    {
-      "id": 4,
-      "type": "timeseries",
-      "title": "Tráfico HTTP",
+      "title": "Tráfico actual de SKU",
       "gridPos": {
         "x": 0,
-        "y": 32,
+        "y": 9,
         "w": 12,
         "h": 8
       },
@@ -99,24 +56,25 @@
         {
           "refId": "A",
           "expr": "sum(rate(inventory_http_requests_total{cloud=\"aws\",route=\"/api/v2/skus\"}[1m]))",
-          "legendFormat": "{{round}}"
+          "legendFormat": "AWS actual"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "reqps",
-          "min": 0
+          "min": 0,
+          "noValue": "Sin muestras"
         },
         "overrides": []
       }
     },
     {
-      "id": 5,
+      "id": 4,
       "type": "timeseries",
-      "title": "Tareas de fondo activas",
+      "title": "Errores 5xx actuales",
       "gridPos": {
         "x": 12,
-        "y": 32,
+        "y": 9,
         "w": 12,
         "h": 8
       },
@@ -127,14 +85,45 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "inventory_resource_background_active{cloud=\"aws\"}",
-          "legendFormat": "{{round}}"
+          "expr": "sum(rate(inventory_http_requests_total{cloud=\"aws\",status=~\"5..\"}[1m])) or vector(0)",
+          "legendFormat": "AWS actual"
         }
       ],
       "fieldConfig": {
         "defaults": {
-          "unit": "short",
-          "min": 0
+          "unit": "reqps",
+          "min": 0,
+          "noValue": "Sin muestras"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Latencia p95 actual",
+      "gridPos": {
+        "x": 0,
+        "y": 17,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "1000 * histogram_quantile(0.95, sum by (le) (rate(inventory_http_duration_seconds_bucket{cloud=\"aws\",route=\"/api/v2/skus\"}[5m])))",
+          "legendFormat": "AWS actual"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "min": 0,
+          "noValue": "Sin muestras"
         },
         "overrides": []
       }
@@ -142,10 +131,10 @@
     {
       "id": 6,
       "type": "timeseries",
-      "title": "CPU respecto al límite de 0,5 CPU",
+      "title": "CPU / límite 0,5 CPU",
       "gridPos": {
-        "x": 0,
-        "y": 40,
+        "x": 12,
+        "y": 17,
         "w": 12,
         "h": 8
       },
@@ -157,13 +146,14 @@
         {
           "refId": "A",
           "expr": "rate(process_cpu_seconds_total{cloud=\"aws\"}[1m]) / 0.5",
-          "legendFormat": "{{round}}"
+          "legendFormat": "AWS actual"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "percentunit",
-          "min": 0
+          "min": 0,
+          "noValue": "Sin muestras"
         },
         "overrides": []
       }
@@ -171,10 +161,10 @@
     {
       "id": 7,
       "type": "timeseries",
-      "title": "Memoria respecto al límite de 512 MiB",
+      "title": "Memoria / límite 512 MiB",
       "gridPos": {
-        "x": 12,
-        "y": 40,
+        "x": 0,
+        "y": 25,
         "w": 12,
         "h": 8
       },
@@ -186,13 +176,44 @@
         {
           "refId": "A",
           "expr": "process_resident_memory_bytes{cloud=\"aws\"} / 536870912",
-          "legendFormat": "{{round}}"
+          "legendFormat": "AWS actual"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "percentunit",
-          "min": 0
+          "min": 0,
+          "noValue": "Sin muestras"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "API recolectada por Prometheus",
+      "gridPos": {
+        "x": 12,
+        "y": 25,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "up{job=\"inventory\",cloud=\"aws\"}",
+          "legendFormat": "AWS actual"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "min": 0,
+          "noValue": "Sin muestras"
         },
         "overrides": []
       }
@@ -201,10 +222,11 @@
   "__inputs": [
     {
       "name": "DS_PROMETHEUS",
-      "label": "Prometheus AWS Inventario-U",
+      "label": "Prometheus Inventario AWS",
       "type": "datasource",
       "pluginId": "prometheus",
       "pluginName": "Prometheus"
     }
-  ]
+  ],
+  "uid": "inventario-aws-evidence"
 }

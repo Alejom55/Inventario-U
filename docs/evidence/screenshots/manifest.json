@@ -1,0 +1,54 @@
+{
+  "assembled_utc": "2026-11-18T04:01:31.060067+00:00",
+  "kind": "native browser screenshots; browser region cropped without altering data",
+  "files": [
+    {
+      "name": "01-grafana-prometheus-conexion.png",
+      "sha256": "a5d2fb6b0b80b3081180f1356e43dd940308184f7bb26f0cbbec27f2f0ccff40",
+      "bytes": 381296
+    },
+    {
+      "name": "02-grafana-resultados-aws-archivados.png",
+      "sha256": "006f1431955c29e2c5a89a3f5b3678903c1284510696392d561426a1424bd7cc",
+      "bytes": 509398
+    },
+    {
+      "name": "03-grafana-trafico-latencia-cpu.png",
+      "sha256": "b0e3f12dde6293b927e7bc6d63607789e0bee4199b8f01ce3ba9c58f8d643166",
+      "bytes": 308270
+    },
+    {
+      "name": "04-grafana-memoria-disponibilidad.png",
+      "sha256": "db3dba50628c52fa9f038f32a764da3a06e347be73745ad9d18d732c38a91013",
+      "bytes": 291870
+    },
+    {
+      "name": "05-github-aws-pipeline-aprobado.png",
+      "sha256": "3fb21675ce6114e8e45620468c39783762f5ced2d57ee82a419dfee98bac4499",
+      "bytes": 316212
+    },
+    {
+      "name": "06-github-aws-resultados-rondas.png",
+      "sha256": "8ace8322f12bbba6ff03b7f51dbff8182bb03b8edb0d2ed4a0f46e66b32993a3",
+      "bytes": 317939
+    },
+    {
+      "name": "07-ciber-validacion-software-no-game-day.png",
+      "sha256": "7d358fca6a390da4e3c7dc91a120b2800dd64c59633312f7e25cbbb63344a09d",
+      "bytes": 335016
+    },
+    {
+      "name": "08-ci-validacion-completa-aprobada.png",
+      "sha256": "f1aff016b287524d521ab48301d72f51d0686a648e59f3fba7dddf7451de751f",
+      "bytes": 304769
+    },
+    {
+      "name": "09-pytest-339-pruebas-cobertura-94.png",
+      "sha256": "db883568113ee25091c78eace5e9ceccd102f3c0d6227de5774cb5ad11832c1e",
+      "bytes": 309979
+    }
+  ],
+  "official_e1_cloud_rounds_completed": false,
+  "full_ci_tests_passed": 339,
+  "full_ci_coverage_percent": 94.27
+}
