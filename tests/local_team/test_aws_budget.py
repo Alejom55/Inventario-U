@@ -1,9 +1,21 @@
 import pytest
+from datetime import datetime,timedelta,timezone
 
-from deploy.aws.launch import validate_plan
+from deploy.aws.launch import validate_plan,validate_free_account
 
 
 def test_aws_cost_reserve_requires_verified_price_and_revision():
     assert validate_plan(0.0208,'a'*40)<0.4
     for price,revision in [(0,'a'*40),(0.1,'a'*40),(0.0208,'main')]:
         with pytest.raises(ValueError):validate_plan(price,revision)
+
+
+def test_aws_free_account_is_required_even_when_paid_accounts_have_credits():
+    account={'accountPlanType':'FREE','accountPlanStatus':'ACTIVE',
+        'accountPlanRemainingCredits':{'amount':100,'unit':'USD'},
+        'accountPlanExpirationDate':datetime.now(timezone.utc)+timedelta(days=30)}
+    assert validate_free_account(account)['maximum_out_of_pocket_usd']==0
+    for changes in ({'accountPlanType':'PAID'},{'accountPlanStatus':'EXPIRED'},
+                    {'accountPlanRemainingCredits':{'amount':0,'unit':'USD'}},
+                    {'accountPlanExpirationDate':datetime.now(timezone.utc)+timedelta(hours=1)}):
+        with pytest.raises(ValueError):validate_free_account({**account,**changes})

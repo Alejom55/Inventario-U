@@ -6,6 +6,13 @@ inmutable y reserva margen dentro de USD 1 para una ventana de dos horas.
 `apply` vuelve a comprobar precio, cuenta, revisión y red antes de crear recursos.
 Los resultados y la clave SSH se guardan en `deploy/aws/runtime/`, fuera de Git.
 
+La restricción del usuario es ahora **USD 0 de bolsillo**, solo créditos gratis.
+Antes de cualquier creación, el script consulta `GetAccountPlanState` y exige
+plan `FREE`, estado `ACTIVE`, al menos USD 1 en créditos y más de dos horas hasta
+su vencimiento. También verifica `FreeTierEligible` para t3.small. Una cuenta
+`PAID` se rechaza incluso si conserva créditos; el script nunca cambia el plan.
+El consumo previsto de la práctica se mantiene por debajo de USD 1 en créditos.
+
 La VM usa un disco gp3 cifrado de 8 GiB con eliminación al terminar, CPU en modo
 standard sin cobros por créditos excedentes, una IPv4 pública y Docker Compose.
 PostgreSQL y Prometheus no publican puertos. Solo HTTPS autenticado es accesible

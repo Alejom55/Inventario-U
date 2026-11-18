@@ -22,15 +22,32 @@ def validate_plan(price,revision):
     return round(estimate,4)
 
 
+def validate_free_account(account):
+    if account.get('accountPlanType')!='FREE' or account.get('accountPlanStatus')!='ACTIVE':
+        raise ValueError('Only an ACTIVE FREE account is authorized; never upgrade the account')
+    credits=account.get('accountPlanRemainingCredits',{})
+    if credits.get('unit')!='USD' or float(credits.get('amount',0))<1:
+        raise ValueError('Insufficient free credits for the protected practice')
+    expiration=account['accountPlanExpirationDate']
+    if isinstance(expiration,str):expiration=datetime.fromisoformat(expiration.replace('Z','+00:00'))
+    if expiration<=datetime.now(timezone.utc)+timedelta(hours=2):
+        raise ValueError('Free plan expires before the authorized window ends')
+    return {'type':'FREE','status':'ACTIVE','remaining_credits_usd':float(credits['amount']),
+        'expiration_utc':expiration.isoformat(),'maximum_out_of_pocket_usd':0}
+
+
 def session_clients():
     import boto3
     session=boto3.Session(region_name=REGION)
-    return {name:session.client(name,region_name='us-east-1' if name=='pricing' else REGION)
-            for name in ('ec2','ssm','sts','pricing','iam','scheduler')}
+    return {name:session.client(name,region_name='us-east-1' if name in ('pricing','freetier') else REGION)
+            for name in ('ec2','ssm','sts','pricing','iam','scheduler','freetier')}
 
 
 def plan(clients):
     ec2=clients['ec2']
+    free=validate_free_account(clients['freetier'].get_account_plan_state())
+    eligible=ec2.describe_instance_types(InstanceTypes=[INSTANCE_TYPE])['InstanceTypes'][0]['FreeTierEligible']
+    if eligible is not True:raise ValueError('Instance is not Free Tier eligible')
     identity=clients['sts'].get_caller_identity()
     revision=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
     products=clients['pricing'].get_products(ServiceCode='AmazonEC2',Filters=[
@@ -57,7 +74,8 @@ def plan(clients):
     import ipaddress
     ipaddress.IPv4Address(address)
     result={'provider':'aws','region':REGION,'account':identity['Account'],'type':INSTANCE_TYPE,
-        'hourly_compute_usd':price,'reserved_total_usd':budget,'maximum_usd':1,'hours':2,
+        'hourly_compute_usd':price,'reserved_total_usd':budget,'maximum_credit_usage_usd':1,'hours':2,
+        'billing_protection':free,'free_tier_eligible':eligible,
         'revision':revision,'ami':image,'root_device':ami['RootDeviceName'],
         'subnet':subnet['SubnetId'],'vpc':subnet['VpcId'],'ssh_cidr':address+'/32',
         'ports':{'22':'CloudShell current IPv4 only','80':'public ACME and HTTPS redirect','443':'authenticated API and Prometheus'},
