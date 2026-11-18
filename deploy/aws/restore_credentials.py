@@ -24,7 +24,7 @@ def main():
     state=json.loads((RUNTIME/'deployment.json').read_text())
     if state.get('expiry_verified') is not True:raise ValueError('Independent expiry must be verified first')
     ssh=['ssh','-o','ConnectTimeout=7','-o','StrictHostKeyChecking=accept-new','-i',str(RUNTIME/'operator-key'),'ec2-user@'+state['public_ip']]
-    subprocess.run(ssh+['test -f /opt/inventario/BOOTSTRAP_READY'],check=True)
+    subprocess.run(ssh+['sudo test -f /opt/inventario/BOOTSTRAP_READY'],check=True)
     remote='''import json,re,sys
 from pathlib import Path
 incoming=json.load(sys.stdin)
