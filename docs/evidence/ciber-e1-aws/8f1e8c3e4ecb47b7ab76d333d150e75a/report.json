@@ -1,0 +1,94 @@
+{
+  "provider": "aws",
+  "experiment": "E1",
+  "round": "R1",
+  "execution_id": "8f1e8c3e4ecb47b7ab76d333d150e75a",
+  "authorization_mode": "owner_isolated_lab",
+  "evidence_class": "owner_authorized_aws_lab",
+  "controller_revision": "bf728842b2b634916b9c6527a61b222f134d4f81",
+  "started_utc": "2026-11-18T05:41:04.442580+00:00",
+  "ended_utc": "2026-11-18T05:41:44.107942+00:00",
+  "scope_sha256": "a3cc4c0a9ec1e998f4ace357b3ce8e77a35a02394848680d6cee20602355cb0a",
+  "application_revision": "c2ee1dc85710563768a844a671bc61b2d1f69ead",
+  "instance_id": "i-094c00455c9ac62ba",
+  "rollback_verified": true,
+  "cleanup_error_type": null,
+  "synthetic_records": [],
+  "objective": {
+    "name": "mttd_seconds",
+    "maximum": 30,
+    "value": 5.484000000000378,
+    "passed": true
+  },
+  "mttd_seconds": 5.484000000000378,
+  "mttd_censored": false,
+  "mttc_seconds": 0.5,
+  "mttc_censored": false,
+  "observation_seconds": 30.68699999999808,
+  "detection_coverage_percent": 100,
+  "techniques_emulated": 1,
+  "techniques_detected": 1,
+  "false_positive_percent": 0.0,
+  "adverse_acceptance_percent": 0.0,
+  "containment_guardrail_passed": true,
+  "injected_utc": "2026-11-18T05:41:11.219026+00:00",
+  "method": {
+    "normal_requests": 10,
+    "adverse_requests": 10,
+    "observation_seconds": 30,
+    "maximum_rps": 2
+  },
+  "timing_note": "MTTD is the measured upper bound until the controller observes the native monitoring alert. Missing detection is censored, never zero.",
+  "attack": "T1078",
+  "request_count": 52,
+  "alert_evidence": {
+    "observed_utc": "2026-11-18T05:41:16.717826+00:00",
+    "prometheus_result": [
+      {
+        "metric": {
+          "__name__": "ALERTS",
+          "alertname": "InventoryMachineIdentityMisuse",
+          "alertstate": "firing",
+          "experiment": "E1",
+          "instance": "e1-api:8000",
+          "job": "inventory",
+          "reason": "scope_violation",
+          "round": "R1",
+          "security_lab": "E1",
+          "severity": "high"
+        },
+        "value": [
+          1794980476.527,
+          "1"
+        ]
+      }
+    ]
+  },
+  "honeytoken_evidence": {
+    "trace_id": "d96c3d4337354592a897f6b97f296f05",
+    "observed_utc": "2026-11-18T05:41:43.605045+00:00",
+    "detection_upper_bound_seconds": 1.6880000000019209,
+    "prometheus_result": [
+      {
+        "metric": {
+          "__name__": "ALERTS",
+          "alertname": "InventoryMachineIdentityMisuse",
+          "alertstate": "firing",
+          "experiment": "E1",
+          "instance": "e1-api:8000",
+          "job": "inventory",
+          "reason": "honeytoken",
+          "round": "R1",
+          "security_lab": "E1",
+          "severity": "high"
+        },
+        "value": [
+          1794980503.403,
+          "1"
+        ]
+      }
+    ]
+  },
+  "result_published": true,
+  "raw_sha256": "2b70321542e0638d08b7e6acde56f4c31d96c0b212dcb83ecaebb2fdccac61e6"
+}

@@ -1,0 +1,63 @@
+{
+  "verified_utc": "2026-11-18T05:45:27.154833+00:00",
+  "provider": "aws",
+  "instance_id": "i-094c00455c9ac62ba",
+  "application_revision": "c2ee1dc85710563768a844a671bc61b2d1f69ead",
+  "controller_revision": "bf728842b2b634916b9c6527a61b222f134d4f81",
+  "api_url": "https://e1.3.151.219.131.sslip.io",
+  "authorization_mode": "owner_isolated_lab",
+  "group_signatures_claimed": false,
+  "shared_business_api_unchanged": true,
+  "objective": {
+    "name": "mttd_seconds",
+    "maximum": 30,
+    "R1_passed": true
+  },
+  "rounds": [
+    {
+      "round": "R0",
+      "execution_id": "f5c0fde699874f6b90f916d2f0b3d751",
+      "started_utc": "2026-11-18T05:39:24.550422+00:00",
+      "ended_utc": "2026-11-18T05:40:17.276154+00:00",
+      "injected_utc": "2026-11-18T05:39:31.301085+00:00",
+      "mttd_seconds": null,
+      "mttc_seconds": null,
+      "mttd_censored": true,
+      "mttc_censored": true,
+      "detection_coverage_percent": 0,
+      "false_positive_percent": 0.0,
+      "adverse_acceptance_percent": 100.0,
+      "request_count": 79,
+      "rollback_verified": true,
+      "method": {
+        "normal_requests": 10,
+        "adverse_requests": 10,
+        "observation_seconds": 30,
+        "maximum_rps": 2
+      }
+    },
+    {
+      "round": "R1",
+      "execution_id": "8f1e8c3e4ecb47b7ab76d333d150e75a",
+      "started_utc": "2026-11-18T05:41:04.442580+00:00",
+      "ended_utc": "2026-11-18T05:41:44.107942+00:00",
+      "injected_utc": "2026-11-18T05:41:11.219026+00:00",
+      "mttd_seconds": 5.484000000000378,
+      "mttc_seconds": 0.5,
+      "mttd_censored": false,
+      "mttc_censored": false,
+      "detection_coverage_percent": 100,
+      "false_positive_percent": 0.0,
+      "adverse_acceptance_percent": 0.0,
+      "request_count": 52,
+      "rollback_verified": true,
+      "method": {
+        "normal_requests": 10,
+        "adverse_requests": 10,
+        "observation_seconds": 30,
+        "maximum_rps": 2
+      }
+    }
+  ],
+  "interpretation": "R0 timings censored after 30 seconds, never zero. R1 coverage is one emulated technique; false-positive measure is rejected legitimate requests out of ten. Owner authorization does not represent group signatures."
+}

@@ -1,0 +1,532 @@
+{
+  "uid": "inventario-security-e1-aws",
+  "title": "Inventario-U | Ciber E1 AWS: R0 y R1 medidos",
+  "schemaVersion": 41,
+  "version": 1,
+  "refresh": "5s",
+  "time": {
+    "from": "2026-11-18T05:38:30Z",
+    "to": "2026-11-18T05:43:00Z"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "text",
+      "title": "Guía y límites de la evidencia",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 4
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "**E1 real en AWS** · VM i-094c00455c9ac62ba · API aislada: https://e1.3.151.219.131.sslip.io\n\nVentana mostrada: 18/11/2026, 05:38:30–05:43:00 UTC. Ejecución individual autorizada por el propietario; no representa firmas del grupo. Objetivo único: **MTTD <=30 s**. La API compartida conserva su URL y clave.\n\nLos tiempos censurados de R0 significan **no observado durante 30 s**, nunca cero. Las alertas se mantienen activas por el contador hasta recrear el proceso; no implican un ataque todavía en curso."
+      }
+    },
+    {
+      "id": 10,
+      "type": "text",
+      "title": "Resultados medidos y trazabilidad",
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 24,
+        "h": 8
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "| Ronda | MTTD | MTTC | Cobertura | Lecturas legítimas rechazadas | Escrituras indebidas aceptadas |\n|---|---:|---:|---:|---:|---:|\n| R0 | No observado en 30 s | No contenida | 0/1 técnica | 0/10 (0 %) | 10/10 (100 %) |\n| R1 | **5,484 s** | **0,500 s** | 1/1 técnica | 0/10 (0 %) | 0/10 (0 %) |\n\n**R1 cumple MTTD <=30 s. Reversión verificada en ambas rondas.** Misma carga: 10 lecturas + 10 intentos, máximo 2 peticiones/s y observación de 30 s. Muestra pequeña: no representa una garantía de producción.\n\nR0: `f5c0fde699874f6b90f916d2f0b3d751` · 05:39:24–05:40:17 UTC  \nR1: `8f1e8c3e4ecb47b7ab76d333d150e75a` · 05:41:04–05:41:44 UTC\n\n[Reportes, logs y hashes originales](https://github.com/Alejom55/Inventario-U/tree/feat/security-chaos-v4/docs/evidence/ciber-e1-aws) · [Regla y casos de detección](https://github.com/Alejom55/Inventario-U/tree/feat/security-chaos-v4/security/detection)"
+      }
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "MTTD observado por ronda",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "fg4n7aqm8d98ga"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 12,
+        "w": 12,
+        "h": 7
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "inventory_security_mttd_seconds",
+          "legendFormat": "{{round}} {{reason}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "min": 0,
+          "noValue": "No observado / sin muestra"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*R0.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "blue"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*R1.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "orange"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "MTTC observado por ronda",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "fg4n7aqm8d98ga"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 12,
+        "w": 12,
+        "h": 7
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "inventory_security_mttc_seconds",
+          "legendFormat": "{{round}} {{reason}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "min": 0,
+          "noValue": "No observado / sin muestra"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*R0.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "blue"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*R1.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "orange"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Cobertura sobre la técnica emulada",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "fg4n7aqm8d98ga"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 19,
+        "w": 12,
+        "h": 7
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "inventory_security_detection_coverage_percent",
+          "legendFormat": "{{round}} {{reason}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "noValue": "No observado / sin muestra"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*R0.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "blue"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*R1.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "orange"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Falsos positivos sobre solicitudes normales",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "fg4n7aqm8d98ga"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 19,
+        "w": 12,
+        "h": 7
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "inventory_security_false_positive_percent",
+          "legendFormat": "{{round}} {{reason}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "noValue": "No observado / sin muestra"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*R0.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "blue"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*R1.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "orange"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "Alertas nativas de identidad",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "fg4n7aqm8d98ga"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 26,
+        "w": 12,
+        "h": 7
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "ALERTS{alertname=\"InventoryMachineIdentityMisuse\",alertstate=\"firing\"}",
+          "legendFormat": "{{round}} {{reason}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "min": 0,
+          "noValue": "No observado / sin muestra"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*R0.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "blue"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*R1.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "orange"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Decisiones por causa",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "fg4n7aqm8d98ga"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 26,
+        "w": 12,
+        "h": 7
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (round,decision,reason) (inventory_security_identity_decisions_total)",
+          "legendFormat": "{{round}} {{reason}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "min": 0,
+          "noValue": "No observado / sin muestra"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*R0.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "blue"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*R1.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "orange"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "Señuelo activado",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "fg4n7aqm8d98ga"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 33,
+        "w": 12,
+        "h": 7
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "inventory_security_identity_detections_total{reason=\"honeytoken\"}",
+          "legendFormat": "{{round}} {{reason}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "min": 0,
+          "noValue": "No observado / sin muestra"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*R0.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "blue"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*R1.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "orange"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "Cobertura de telemetría de la API",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "fg4n7aqm8d98ga"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 33,
+        "w": 12,
+        "h": 7
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "up{job=\"inventory\"}",
+          "legendFormat": "{{round}} {{reason}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "min": 0,
+          "noValue": "No observado / sin muestra"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*R0.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "blue"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*R1.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "orange"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "timezone": "utc"
+}

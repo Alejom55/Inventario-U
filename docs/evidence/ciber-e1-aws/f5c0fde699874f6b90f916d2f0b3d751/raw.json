@@ -1,0 +1,180 @@
+{
+  "provider": "aws",
+  "experiment": "E1",
+  "round": "R0",
+  "execution_id": "f5c0fde699874f6b90f916d2f0b3d751",
+  "authorization_mode": "owner_isolated_lab",
+  "evidence_class": "owner_authorized_aws_lab",
+  "controller_revision": "bf728842b2b634916b9c6527a61b222f134d4f81",
+  "started_utc": "2026-11-18T05:39:24.550422+00:00",
+  "ended_utc": "2026-11-18T05:40:17.276154+00:00",
+  "scope_sha256": "a3cc4c0a9ec1e998f4ace357b3ce8e77a35a02394848680d6cee20602355cb0a",
+  "application_revision": "c2ee1dc85710563768a844a671bc61b2d1f69ead",
+  "instance_id": "i-094c00455c9ac62ba",
+  "requests": [
+    {
+      "kind": "normal",
+      "status": 200,
+      "trace_id": "b5fef1d1665d4568bb454ac904f46e15",
+      "at_utc": "2026-11-18T05:39:26.316703+00:00"
+    },
+    {
+      "kind": "normal",
+      "status": 200,
+      "trace_id": "44a476313c7b486a9e25bcecd42d5397",
+      "at_utc": "2026-11-18T05:39:26.810024+00:00"
+    },
+    {
+      "kind": "normal",
+      "status": 200,
+      "trace_id": "24be11bda44b489c979ef834f327153c",
+      "at_utc": "2026-11-18T05:39:27.313933+00:00"
+    },
+    {
+      "kind": "normal",
+      "status": 200,
+      "trace_id": "42a61e397ac2475ea91a60bb8fa2fc8c",
+      "at_utc": "2026-11-18T05:39:27.797944+00:00"
+    },
+    {
+      "kind": "normal",
+      "status": 200,
+      "trace_id": "8e74844195534ccbb3aeb1e6e90cfc27",
+      "at_utc": "2026-11-18T05:39:28.311232+00:00"
+    },
+    {
+      "kind": "normal",
+      "status": 200,
+      "trace_id": "eeedf2dedea545ad84192b70bb2ba20a",
+      "at_utc": "2026-11-18T05:39:28.817396+00:00"
+    },
+    {
+      "kind": "normal",
+      "status": 200,
+      "trace_id": "4ec3470e39bf4f4f9b83864695553c50",
+      "at_utc": "2026-11-18T05:39:29.318137+00:00"
+    },
+    {
+      "kind": "normal",
+      "status": 200,
+      "trace_id": "6b6c99d8fa874cc3b8d4fed9043da87e",
+      "at_utc": "2026-11-18T05:39:29.809975+00:00"
+    },
+    {
+      "kind": "normal",
+      "status": 200,
+      "trace_id": "862a8636ec8040cea37b2db78593ad9e",
+      "at_utc": "2026-11-18T05:39:30.314699+00:00"
+    },
+    {
+      "kind": "normal",
+      "status": 200,
+      "trace_id": "f7b89ba63b244725b0433f374ce60124",
+      "at_utc": "2026-11-18T05:39:30.805907+00:00"
+    },
+    {
+      "kind": "adverse",
+      "status": 201,
+      "trace_id": "366f01c357df47eab8f538883ad427d5",
+      "at_utc": "2026-11-18T05:39:31.809420+00:00"
+    },
+    {
+      "kind": "adverse",
+      "status": 201,
+      "trace_id": "8863e0cc7c27452891c33e37f77b153f",
+      "at_utc": "2026-11-18T05:39:32.317549+00:00"
+    },
+    {
+      "kind": "adverse",
+      "status": 201,
+      "trace_id": "3b0d8d951802412f9e4f2d809450f94c",
+      "at_utc": "2026-11-18T05:39:32.805405+00:00"
+    },
+    {
+      "kind": "adverse",
+      "status": 201,
+      "trace_id": "fb2f1893dd0b49a8897de4019a43706b",
+      "at_utc": "2026-11-18T05:39:33.315734+00:00"
+    },
+    {
+      "kind": "adverse",
+      "status": 201,
+      "trace_id": "27e9499a86144a7d99b6c483b0ef0975",
+      "at_utc": "2026-11-18T05:39:33.813840+00:00"
+    },
+    {
+      "kind": "adverse",
+      "status": 201,
+      "trace_id": "15b1cb20d5e64c0faafc9f766e0fc5d0",
+      "at_utc": "2026-11-18T05:39:34.312692+00:00"
+    },
+    {
+      "kind": "adverse",
+      "status": 201,
+      "trace_id": "469023a5b0cf4e61adfc632b2771e737",
+      "at_utc": "2026-11-18T05:39:34.818326+00:00"
+    },
+    {
+      "kind": "adverse",
+      "status": 201,
+      "trace_id": "ecf506a0f0ba439ab607deb47b3e7301",
+      "at_utc": "2026-11-18T05:39:35.319066+00:00"
+    },
+    {
+      "kind": "adverse",
+      "status": 201,
+      "trace_id": "85a5da0983874064b3ebaf8712118240",
+      "at_utc": "2026-11-18T05:39:35.815825+00:00"
+    },
+    {
+      "kind": "adverse",
+      "status": 201,
+      "trace_id": "0caf86b62ee34b05a7c63d4423a64301",
+      "at_utc": "2026-11-18T05:39:36.312951+00:00"
+    }
+  ],
+  "rollback_verified": true,
+  "cleanup_error_type": null,
+  "synthetic_records": [
+    {
+      "id": 1,
+      "codigo": "CYBER-E1-f5c0fde69987-0"
+    },
+    {
+      "id": 2,
+      "codigo": "CYBER-E1-f5c0fde69987-1"
+    },
+    {
+      "id": 3,
+      "codigo": "CYBER-E1-f5c0fde69987-2"
+    },
+    {
+      "id": 4,
+      "codigo": "CYBER-E1-f5c0fde69987-3"
+    },
+    {
+      "id": 5,
+      "codigo": "CYBER-E1-f5c0fde69987-4"
+    },
+    {
+      "id": 6,
+      "codigo": "CYBER-E1-f5c0fde69987-5"
+    },
+    {
+      "id": 7,
+      "codigo": "CYBER-E1-f5c0fde69987-6"
+    },
+    {
+      "id": 8,
+      "codigo": "CYBER-E1-f5c0fde69987-7"
+    },
+    {
+      "id": 9,
+      "codigo": "CYBER-E1-f5c0fde69987-8"
+    },
+    {
+      "id": 10,
+      "codigo": "CYBER-E1-f5c0fde69987-9"
+    }
+  ]
+}

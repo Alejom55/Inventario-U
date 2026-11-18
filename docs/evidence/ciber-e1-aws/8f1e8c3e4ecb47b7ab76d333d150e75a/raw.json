@@ -1,0 +1,139 @@
+{
+  "provider": "aws",
+  "experiment": "E1",
+  "round": "R1",
+  "execution_id": "8f1e8c3e4ecb47b7ab76d333d150e75a",
+  "authorization_mode": "owner_isolated_lab",
+  "evidence_class": "owner_authorized_aws_lab",
+  "controller_revision": "bf728842b2b634916b9c6527a61b222f134d4f81",
+  "started_utc": "2026-11-18T05:41:04.442580+00:00",
+  "ended_utc": "2026-11-18T05:41:44.107942+00:00",
+  "scope_sha256": "a3cc4c0a9ec1e998f4ace357b3ce8e77a35a02394848680d6cee20602355cb0a",
+  "application_revision": "c2ee1dc85710563768a844a671bc61b2d1f69ead",
+  "instance_id": "i-094c00455c9ac62ba",
+  "requests": [
+    {
+      "kind": "normal",
+      "status": 200,
+      "trace_id": "bc4c77aaf3ea47b19d1a695b964c1cc6",
+      "at_utc": "2026-11-18T05:41:06.209561+00:00"
+    },
+    {
+      "kind": "normal",
+      "status": 200,
+      "trace_id": "d25fa183aa234af0837cb725db21cdbb",
+      "at_utc": "2026-11-18T05:41:06.705675+00:00"
+    },
+    {
+      "kind": "normal",
+      "status": 200,
+      "trace_id": "1dcc9e0b65864ee5bc5a71f11fb2a920",
+      "at_utc": "2026-11-18T05:41:07.207513+00:00"
+    },
+    {
+      "kind": "normal",
+      "status": 200,
+      "trace_id": "c2042287e9f84ef1b690164329ff4e36",
+      "at_utc": "2026-11-18T05:41:07.714475+00:00"
+    },
+    {
+      "kind": "normal",
+      "status": 200,
+      "trace_id": "f9f3ff9e6fc6433b9047e329a9a736b7",
+      "at_utc": "2026-11-18T05:41:08.212467+00:00"
+    },
+    {
+      "kind": "normal",
+      "status": 200,
+      "trace_id": "85f396d8fd1e42ed94960c96b61d081c",
+      "at_utc": "2026-11-18T05:41:08.700762+00:00"
+    },
+    {
+      "kind": "normal",
+      "status": 200,
+      "trace_id": "d4ca181201f44a73a9a8b18e311e8883",
+      "at_utc": "2026-11-18T05:41:09.223879+00:00"
+    },
+    {
+      "kind": "normal",
+      "status": 200,
+      "trace_id": "823622727c64455e8bed4b8a8cc5fa8c",
+      "at_utc": "2026-11-18T05:41:09.717894+00:00"
+    },
+    {
+      "kind": "normal",
+      "status": 200,
+      "trace_id": "6ac4776bb3b649779fdd9ecd02cb59f5",
+      "at_utc": "2026-11-18T05:41:10.234660+00:00"
+    },
+    {
+      "kind": "normal",
+      "status": 200,
+      "trace_id": "99e4b22c0d814799b9e3bc627a2857c6",
+      "at_utc": "2026-11-18T05:41:10.735381+00:00"
+    },
+    {
+      "kind": "adverse",
+      "status": 403,
+      "trace_id": "9844481479664c50aa4f70f1a41cd000",
+      "at_utc": "2026-11-18T05:41:11.725546+00:00"
+    },
+    {
+      "kind": "adverse",
+      "status": 403,
+      "trace_id": "e76298639d32470a94602ba94edefcb2",
+      "at_utc": "2026-11-18T05:41:12.226571+00:00"
+    },
+    {
+      "kind": "adverse",
+      "status": 403,
+      "trace_id": "fe412f3360324197a2d9a823e4bf8bf4",
+      "at_utc": "2026-11-18T05:41:12.724957+00:00"
+    },
+    {
+      "kind": "adverse",
+      "status": 403,
+      "trace_id": "35a285c74d624fe5b19ae432e294f9ce",
+      "at_utc": "2026-11-18T05:41:13.221245+00:00"
+    },
+    {
+      "kind": "adverse",
+      "status": 403,
+      "trace_id": "28fa163e5a6944c4bb2baf14db628d1a",
+      "at_utc": "2026-11-18T05:41:13.723859+00:00"
+    },
+    {
+      "kind": "adverse",
+      "status": 403,
+      "trace_id": "4d007b75a90d475191607b612ae8c9dd",
+      "at_utc": "2026-11-18T05:41:14.223548+00:00"
+    },
+    {
+      "kind": "adverse",
+      "status": 403,
+      "trace_id": "ed7802a9cfbc4458b01d43e25297fafa",
+      "at_utc": "2026-11-18T05:41:14.723443+00:00"
+    },
+    {
+      "kind": "adverse",
+      "status": 403,
+      "trace_id": "8fdc6d75412546459c8ff83be8facb57",
+      "at_utc": "2026-11-18T05:41:15.222562+00:00"
+    },
+    {
+      "kind": "adverse",
+      "status": 403,
+      "trace_id": "1d016d4fd42e484e8194095d10fd06a4",
+      "at_utc": "2026-11-18T05:41:15.723630+00:00"
+    },
+    {
+      "kind": "adverse",
+      "status": 403,
+      "trace_id": "827e3d94d1f64a92b2266e03b929afd6",
+      "at_utc": "2026-11-18T05:41:16.223474+00:00"
+    }
+  ],
+  "rollback_verified": true,
+  "cleanup_error_type": null,
+  "synthetic_records": []
+}
