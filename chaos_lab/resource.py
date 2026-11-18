@@ -2,6 +2,7 @@
 import asyncio
 from datetime import datetime, timezone
 import json
+import ipaddress
 import math
 import os
 import re
@@ -31,12 +32,31 @@ def utc():
 
 def target():
     current=os.environ['CHAOS_ROUND']
+    aws=os.getenv('RESOURCE_AWS_URL')
     base=os.getenv('RESOURCE_RENDER_URL')
+    if aws:
+        match=re.fullmatch(r'https://([0-9.]+)\.sslip\.io',aws)
+        if base or not match or not ipaddress.IPv4Address(match[1]).is_global:
+            raise ValueError('Expected one verified public AWS HTTPS origin')
+        return current,aws
     if base:
         if not re.fullmatch(r'https://[a-z0-9-]+\.onrender\.com',base):
             raise ValueError('Expected one verified Render HTTPS origin')
         return current,base
     return current,'http://127.0.0.1:'+str(PORTS[current])
+
+
+def cloud_provider():
+    return 'aws' if os.getenv('RESOURCE_AWS_URL') else 'render' if os.getenv('RESOURCE_RENDER_URL') else None
+
+
+def valid_cloud_identity(response,check_instance=False):
+    provider=cloud_provider()
+    prefix='X-Cloud' if provider=='aws' else 'X-Render'
+    valid=(response.headers.get('X-Deployment-Provider')==provider
+        and response.headers.get(prefix+'-Service-Id')==os.environ['RESOURCE_EXPECTED_SERVICE_ID']
+        and response.headers.get('X-App-Revision')==os.environ['APP_REVISION'])
+    return valid and (not check_instance or response.headers.get(prefix+'-Instance-Id')==os.environ['RESOURCE_EXPECTED_INSTANCE_ID'])
 
 
 def headers(trace=None,control=False):
@@ -48,8 +68,7 @@ def healthy():
     _,base=target()
     response=httpx.get(base+'/api/v2/skus',headers=headers(),timeout=3)
     valid=response.status_code==200 and isinstance(response.json(),list)
-    if os.getenv('RESOURCE_RENDER_URL'):
-        valid=valid and response.headers.get('X-Deployment-Provider')=='render' and response.headers.get('X-Render-Service-Id')==os.environ['RESOURCE_EXPECTED_SERVICE_ID'] and response.headers.get('X-App-Revision')==os.environ['APP_REVISION']
+    if cloud_provider():valid=valid and valid_cloud_identity(response)
     return valid
 
 
@@ -74,9 +93,9 @@ def measure():
                     response=await client.get(base+'/api/v2/skus',headers=headers(trace))
                     code=response.status_code
                     identity=response.headers.get('X-Trace-Id')==trace and response.headers.get('X-Chaos-Round')==current
-                    if os.getenv('RESOURCE_RENDER_URL'):
-                        instance=response.headers.get('X-Render-Instance-Id')
-                        identity=identity and response.headers.get('X-Deployment-Provider')=='render' and response.headers.get('X-Render-Service-Id')==os.environ['RESOURCE_EXPECTED_SERVICE_ID'] and response.headers.get('X-App-Revision')==os.environ['APP_REVISION'] and instance==os.environ['RESOURCE_EXPECTED_INSTANCE_ID']
+                    if cloud_provider():
+                        instance=response.headers.get('X-Cloud-Instance-Id' if cloud_provider()=='aws' else 'X-Render-Instance-Id')
+                        identity=identity and valid_cloud_identity(response,check_instance=True)
                 except httpx.TransportError:
                     pass
                 rows.append({'index':index,'scheduled_seconds':scheduled,'sent_utc':sent_utc,
@@ -110,7 +129,7 @@ def measure():
             window=[r for r in rows if 30<=r['scheduled_seconds']<90]
             p95=sorted(r['duration_ms'] for r in window)[math.ceil(len(window)*.95)-1]
             success=sum(r['success'] for r in window)/len(window)*100
-            report={'scope':'RENDER cloud single API; not three-API E2E' if os.getenv('RESOURCE_RENDER_URL') else 'LOCAL single API replica; not cloud or three-API E2E',
+            report={'scope':cloud_provider().upper()+' cloud single API; not three-API E2E' if cloud_provider() else 'LOCAL single API replica; not cloud or three-API E2E',
                 'assignment_status':'confirmed resource c: concurrency exhaustion',
                 'round':current,'execution_id':execution,'profile':PROFILE,'revision':os.environ['APP_REVISION'],
                 'started_utc':started_utc,'ended_utc':utc(),'fault':events,'samples':len(window),
@@ -119,8 +138,8 @@ def measure():
                 **evaluate_objective(success,p95),'rollback_verified':released,
                 'trace_id':next((r['trace_id'] for r in window if r['success']),window[0]['trace_id']),
                 'requests':sorted(rows,key=lambda r:r['index'])}
-            if os.getenv('RESOURCE_RENDER_URL'):
-                report['deployment']={'provider':'render','url':base,'service_id':os.environ['RESOURCE_EXPECTED_SERVICE_ID'],
+            if cloud_provider():
+                report['deployment']={'provider':cloud_provider(),'url':base,'service_id':os.environ['RESOURCE_EXPECTED_SERVICE_ID'],
                     'instance_id':os.environ['RESOURCE_EXPECTED_INSTANCE_ID'],'application_revision':os.environ['APP_REVISION']}
                 result=await client.post(base+'/api/v2/admin/resource-result',headers=headers(control=True),json={
                     'round':current,'execution_id':execution,'samples':len(window),'successes':sum(r['success'] for r in window),'p95_ms':p95})

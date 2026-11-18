@@ -1,5 +1,5 @@
 name: Validacion local de caos
-run-name: ${{ github.ref_name == 'feat/render-free' && 'Fallo c Render Free — estado estable, R0 y R1' || github.workflow }}
+run-name: ${{ github.ref_name == 'feat/aws-chaos' && 'Fallo c AWS — estado estable, R0 y R1' || github.ref_name == 'feat/render-free' && 'Fallo c Render Free — estado estable, R0 y R1' || github.workflow }}
 
 on:
   push:
@@ -122,4 +122,73 @@ jobs:
             chaos/results/render-*/
             docs/evidence/render-cloud-results.json
           if-no-files-found: warn
+          retention-days: 14
+
+  aws_free:
+    if: github.event_name == 'workflow_dispatch' && github.ref_name == 'feat/aws-chaos'
+    needs: offline
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: inventario-aws-practice
+      cancel-in-progress: false
+    env:
+      AWS_CHAOS_API_KEY: ${{ secrets.AWS_CHAOS_API_KEY }}
+      AWS_CHAOS_ADMIN_KEY: ${{ secrets.AWS_CHAOS_ADMIN_KEY }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - uses: astral-sh/setup-uv@v9.0.0
+      - run: uv sync --frozen --group chaos
+      - name: Preparar claves exclusivas de la API sintetica AWS
+        shell: python
+        run: |
+          import json, os, time, urllib.request
+          from pathlib import Path
+          folder = Path('deploy/aws/runtime')
+          folder.mkdir(parents=True, exist_ok=True)
+          keys = {'TEAM_API_KEY': os.environ['AWS_CHAOS_API_KEY'], 'RESOURCE_ADMIN_KEY': os.environ['AWS_CHAOS_ADMIN_KEY']}
+          assert all(keys.values()), 'Missing encrypted repository secrets'
+          (folder/'credentials.json').write_text(json.dumps(keys))
+          target = json.loads(Path('deploy/aws/target.json').read_text())
+          with urllib.request.urlopen(target['api_url']+'/health', timeout=25) as response:
+              assert response.status == 200
+          time.sleep(10)
+      - name: Estado estable, R0 y R1 reales en AWS
+        run: uv run --frozen --group chaos python -m scripts.run_aws_resource
+      - name: Verificar objetivo, guardarrail y evidencia sin claves
+        id: verify
+        if: always()
+        shell: python
+        run: |
+          import json, os
+          from pathlib import Path
+          report = json.loads(Path('docs/evidence/aws-cloud-results.json').read_text())
+          rows = {row['round']: row for row in report['measurements']}
+          table = '| Ronda | Exito % | p95 ms |\n|---|---:|---:|\n'
+          for row in rows.values():
+              table += f"| {row['round']} | {row['success_percent']:.3f} | {row['p95_ms']:.3f} |\n"
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as output:
+              output.write('## Fallo c real en AWS\n\n'+table+'\nExecution ID: `'+report['execution_id']+'`\n')
+          keys = [os.environ.get('AWS_CHAOS_API_KEY'), os.environ.get('AWS_CHAOS_ADMIN_KEY')]
+          files = list(Path('chaos/results').rglob('*')) + [Path('docs/evidence/aws-cloud-results.json')]
+          for file in files:
+              if file.is_file():
+                  content = file.read_text(errors='replace')
+                  assert not any(key and key in content for key in keys), 'Secret found in artifact'
+          assert report['same_profile'] and all(row['rollback_verified'] for row in rows.values())
+          assert rows['BASELINE']['objective_passed']
+          assert not rows['R0']['objective_passed'] and rows['R0']['fault']['injection']['admitted'] == 6
+          assert rows['R1']['fault']['injection']['admitted'] == 4
+          assert rows['R1']['objective_passed'] and rows['R1']['guardrail_p95_passed']
+      - name: Descargar evidencia AWS
+        if: always() && steps.verify.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: aws-chaos-${{ github.run_id }}
+          path: |
+            chaos/results/aws-*/
+            docs/evidence/aws-cloud-results.json
           retention-days: 14
