@@ -1,9 +1,9 @@
 {
-  "api_url": "https://77.113.238.87.sslip.io",
-  "prometheus_url": "https://77.113.238.87.sslip.io/prometheus",
-  "instance_id": "i-03dee81b7d92a60c8",
-  "deadline_utc": "2026-11-18T02:29:40.124823+00:00",
-  "application_revision": "d81d9ac4c88be5211ccbd80465894280c0496cc4",
+  "api_url": "https://3.147.57.31.sslip.io",
+  "prometheus_url": "https://3.147.57.31.sslip.io/prometheus",
+  "instance_id": "i-094c00455c9ac62ba",
+  "deadline_utc": "2026-11-18T23:00:00+00:00",
+  "application_revision": "c2ee1dc85710563768a844a671bc61b2d1f69ead",
   "provider": "aws",
   "region": "us-east-2",
   "free_account_verified": true

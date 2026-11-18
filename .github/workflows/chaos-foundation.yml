@@ -1,5 +1,5 @@
 name: Validacion local de caos
-run-name: ${{ github.ref_name == 'feat/aws-chaos' && 'Fallo c AWS — estado estable, R0 y R1' || github.ref_name == 'feat/render-free' && 'Fallo c Render Free — estado estable, R0 y R1' || github.workflow }}
+run-name: ${{ (github.ref_name == 'feat/aws-chaos' || github.ref_name == 'feat/security-chaos-v4') && 'Fallo c AWS — estado estable, R0 y R1' || github.ref_name == 'feat/render-free' && 'Fallo c Render Free — estado estable, R0 y R1' || github.workflow }}
 
 on:
   push:
@@ -125,7 +125,7 @@ jobs:
           retention-days: 14
 
   aws_free:
-    if: github.event_name == 'workflow_dispatch' && github.ref_name == 'feat/aws-chaos'
+    if: github.event_name == 'workflow_dispatch' && (github.ref_name == 'feat/aws-chaos' || github.ref_name == 'feat/security-chaos-v4')
     needs: offline
     runs-on: ubuntu-latest
     timeout-minutes: 15

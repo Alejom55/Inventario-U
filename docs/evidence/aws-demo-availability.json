@@ -1,0 +1,40 @@
+{
+  "kind": "restored AWS availability, not a new chaos execution",
+  "verified_utc": "2026-11-18T03:31:53.841387+00:00",
+  "api_url": "https://3.147.57.31.sslip.io",
+  "prometheus_url": "https://3.147.57.31.sslip.io/prometheus",
+  "instance_id": "i-094c00455c9ac62ba",
+  "deadline_utc": "2026-11-18T23:00:00+00:00",
+  "application_revision": "c2ee1dc85710563768a844a671bc61b2d1f69ead",
+  "provider": "aws",
+  "region": "us-east-2",
+  "free_account_verified": true,
+  "trace_id": "aws-demo-ea214eeae2f34e97b88db574736a415e",
+  "existing_business_key_works": true,
+  "existing_metrics_token_works": true,
+  "health_status": 200,
+  "business_status": 200,
+  "unauthorized_status": 401,
+  "trace_preserved": true,
+  "synthetic_ids": {
+    "sku_id": 1,
+    "almacen_id": 1
+  },
+  "inventory": {
+    "resultados": [
+      {
+        "sku_id": 1,
+        "sku_codigo": "AWS-SYNTHETIC",
+        "sku_nombre": "AWS synthetic cloud fixture",
+        "stock_minimo": 0,
+        "almacen_id": 1,
+        "almacen_nombre": "AWS synthetic practice",
+        "stock_disponible": 8
+      }
+    ]
+  },
+  "get_and_query_match": true,
+  "prometheus_up": 1,
+  "business_key_cannot_control_faults": true,
+  "raw_metrics_publicly_blocked": true
+}
