@@ -1,0 +1,41 @@
+{
+  "verified_utc": "2026-11-18T04:55:05.796336+00:00",
+  "instance_id": "i-094c00455c9ac62ba",
+  "public_ip": "3.151.219.131",
+  "api_url": "https://3.151.219.131.sslip.io",
+  "prometheus_url": "https://3.151.219.131.sslip.io/prometheus",
+  "elastic_ip": true,
+  "tls_verified": true,
+  "credentials_preserved": true,
+  "shutdown_mode": "manual",
+  "checks": [
+    {
+      "check": "health",
+      "status": 200
+    },
+    {
+      "check": "business",
+      "status": 200
+    },
+    {
+      "check": "inventory_get",
+      "status": 200
+    },
+    {
+      "check": "missing_key",
+      "status": 401
+    },
+    {
+      "check": "prometheus",
+      "status": 200
+    },
+    {
+      "check": "prometheus_no_token",
+      "status": 401
+    },
+    {
+      "check": "private_metrics",
+      "status": 404
+    }
+  ]
+}

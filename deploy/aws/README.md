@@ -1,5 +1,21 @@
 # Práctica temporal de Inventario-U en AWS
 
+## Estado vigente de la demo
+
+VM existente `i-094c00455c9ac62ba`, Ohio, con **Elastic IP 3.151.219.131**.
+API: https://3.151.219.131.sslip.io/api/v2. Prometheus autenticado:
+https://3.151.219.131.sslip.io/prometheus. La asignación se conserva mientras
+no se libere; no desasociar ni liberar durante la demo. La IPv4 pública cuesta
+USD 0,005/h tanto en uso como inactiva.
+
+El usuario sustituyó el límite y temporizador anteriores por consumo de créditos
+Free y **apagado manual hasta su indicación**. Scheduler y el temporizador local
+siguen desactivados. No ejecutar `launch.py apply` para continuar esta VM: crea
+otra instancia con la política temporal descrita abajo. El cambio de IP no
+reinició la API ni rotó sus claves. Ver `docs/evidence/aws-elastic-ip.json`.
+
+## Lanzador original para nuevas prácticas temporales
+
 Ejecutar `python3 deploy/aws/launch.py plan` desde AWS CloudShell en Ohio.
 El plan consulta el precio vigente de una única t3.small Linux, valida el SHA
 inmutable y reserva margen dentro de USD 1 en créditos para una ventana de dos horas.

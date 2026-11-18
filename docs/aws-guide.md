@@ -1,19 +1,19 @@
 # Inventario-U: AWS con plan gratuito
 
-API: https://3.147.57.31.sslip.io
-Prometheus para Grafana Cloud: https://3.147.57.31.sslip.io/prometheus
+API: https://3.151.219.131.sslip.io
+Prometheus para Grafana Cloud: https://3.151.219.131.sslip.io/prometheus
 Instancia actual: i-094c00455c9ac62ba; aplicación: c2ee1dc85710563768a844a671bc61b2d1f69ead.
 El plan FREE se verificó antes de crear recursos. No se habilitó un plan de pago.
 Solo créditos gratuitos. El usuario autorizó consumo continuado, incluso por encima del límite anterior de USD 1, hasta indicar el apagado manual. La reserva anterior de USD 0,775 correspondía únicamente a la ventana inicial.
 Apagado manual: AWS Scheduler desactivado y temporizador systemd detenido y deshabilitado. No hay fecha de apagado programada. La VM permanece encendida hasta que el usuario indique apagarla. El estado se registra en `docs/evidence/aws-manual-shutdown.json`.
-La URL depende de esta IP y no se conserva para otro lanzamiento.
+Elastic IP asociada: la dirección se conserva mientras no se libere la asignación. No liberar ni desasociar para la demo. La IPv4 pública cuesta USD 0,005/h incluso con la VM apagada; consume los créditos autorizados.
 
 ## Postman
 
-GET https://3.147.57.31.sslip.io/api/v2/skus
+GET https://3.151.219.131.sslip.io/api/v2/skus
 Headers: X-Api-Key: {{inventario_api_key}} y X-Trace-Id: equipo-{{$guid}}.
 Esperado: 200 con lista de SKU. Es un endpoint terminal, sin llamadas a los compañeros.
-GET https://3.147.57.31.sslip.io/api/v2/inventario?sku_id=1&almacen_id=1
+GET https://3.151.219.131.sslip.io/api/v2/inventario?sku_id=1&almacen_id=1
 Devuelve resultados[]. El método QUERY /api/v2/inventario/query sigue disponible.
 Conserva CRUD de SKU, almacenes y movimientos. Usar exclusivamente datos sintéticos.
 

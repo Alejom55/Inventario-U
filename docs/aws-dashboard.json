@@ -35,7 +35,7 @@
       },
       "options": {
         "mode": "markdown",
-        "content": "**API:** https://3.147.57.31.sslip.io/api/v2\n\n**VM actual:** i-094c00455c9ac62ba · AWS Ohio\n\n**Apagado manual:** permanece encendida hasta indicación del usuario.\n\nDatos sintéticos: sku_id=1, almacen_id=1.\n\nGráficas inferiores: telemetría en vivo de esta VM. Cero errores es normal.\n\n**E1 oficial pendiente:** no hay aún MTTD/MTTC cloud ni alerta oficial; requiere reglas aceptadas. No confundir pruebas de software con rondas de Ciber."
+        "content": "**API:** https://3.151.219.131.sslip.io/api/v2\n\n**VM actual:** i-094c00455c9ac62ba · AWS Ohio\n\n**Apagado manual:** permanece encendida hasta indicación del usuario.\n\nDatos sintéticos: sku_id=1, almacen_id=1.\n\nGráficas inferiores: telemetría en vivo de esta VM. Cero errores es normal.\n\n**E1 oficial pendiente:** no hay aún MTTD/MTTC cloud ni alerta oficial; requiere reglas aceptadas. No confundir pruebas de software con rondas de Ciber."
       }
     },
     {
