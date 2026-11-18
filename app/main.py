@@ -20,10 +20,14 @@ from .faults import install_faults
 from .resource_lab import install_resource_lab
 from .render_surface import restrict_render_surface
 from .observability import configure_logging, correlation_id
+from .security_identity import IdentityPolicy
+from .security_results import install_security_results
 
 
 configure_logging()
 logger = logging.getLogger(__name__)
+identity_policy = IdentityPolicy.from_environment()
+identity_policy.announce()
 API_V2_PREFIX = "/api/v2"
 HEALTH_PATHS = {"/health", f"{API_V2_PREFIX}/health", "/api/v3/health"}
 FUNCTIONAL_PATHS = ("/skus", "/almacenes", "/movimientos", "/inventario/query", API_V2_PREFIX, "/api/v3")
@@ -53,9 +57,16 @@ async def agregar_trace_id(request: Request, call_next):
     logger.info("Solicitud recibida", extra={"trace_id": trace_id, "path": request.url.path})
 
     team_api_key = os.getenv("TEAM_API_KEY")
-    control_key = os.getenv('RESOURCE_ADMIN_KEY') if request.url.path.startswith('/api/v2/admin/resource-') else None
+    control_key = os.getenv('RESOURCE_ADMIN_KEY') if request.url.path.startswith(('/api/v2/admin/resource-', '/api/v2/admin/security-')) else None
     required_key = control_key or team_api_key
     es_ruta_funcional = request.url.path.startswith(FUNCTIONAL_PATHS)
+    if identity_policy.mode == 'workload' and es_ruta_funcional and request.url.path not in HEALTH_PATHS and not control_key:
+        denial = identity_policy.authorize(request)
+        if denial is not None:
+            return denial
+        response = await call_next(request)
+        response.headers['X-Trace-Id'] = request.state.trace_id
+        return response
     if (
         required_key
         and request.url.path not in HEALTH_PATHS
@@ -684,5 +695,6 @@ def consultar_integracion(
 install_v3(app, consultar_inventario)
 install_faults(app)
 install_resource_lab(app)
+install_security_results(app)
 restrict_render_surface(app)
 install_telemetry(app)

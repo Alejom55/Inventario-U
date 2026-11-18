@@ -51,6 +51,7 @@ def install_telemetry(app):
         response.headers["X-App-Version"] = VERSION
         response.headers["X-App-Track"] = TRACK
         response.headers["X-App-Revision"] = REVISION
+        response.headers['X-Identity-Policy']=os.getenv('SECURITY_AUTH_MODE','legacy')
         if os.getenv('RENDER')=='true':
             response.headers['X-Deployment-Provider']='render'
             for name,header in (('RENDER_SERVICE_ID','X-Render-Service-Id'),('RENDER_INSTANCE_ID','X-Render-Instance-Id')):

@@ -20,7 +20,8 @@ class JsonFormatter(logging.Formatter):
             "round": round_identity(),
             "execution_id": execution_identity(),
         }
-        for field in ("trace_id", "service", "path", "status", "duration_ms", "round", "event", "outcome"):
+        for field in ("trace_id", "service", "path", "status", "duration_ms", "round", "event", "outcome",
+                      "control", "reason", "decision", "actor", "credential_ref", "execution_id"):
             if hasattr(record, field):
                 data[field] = getattr(record, field)
         return json.dumps(data, ensure_ascii=True)
