@@ -6,3 +6,4 @@
 *.yml text eol=lf
 *.json text eol=lf
 *.pdf binary
+docs/evidence/aws-fault-c/* -text
