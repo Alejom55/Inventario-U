@@ -1,0 +1,23 @@
+{
+  "kind": "security software validation screenshots, not official cloud experiment",
+  "files": [
+    {
+      "name": "01-ciber-pipeline-validacion.png",
+      "sha256": "08cf7149c86866a5daf73b529516c9a000cc0f83e51656382863f755c2e7089d",
+      "width": 1484,
+      "height": 860
+    },
+    {
+      "name": "02-ciber-promtool-casos-positivo-negativo.png",
+      "sha256": "19bd5acca60dafe770230a079f8e8e908c9b2775c266a3391c0c3a93f03f3bba",
+      "width": 1484,
+      "height": 860
+    },
+    {
+      "name": "03-ciber-reglas-casos-positivo-negativo.png",
+      "sha256": "07b278d6879dcf9897d74961028905606c57c063ecd94862176e55a853db79d7",
+      "width": 1484,
+      "height": 860
+    }
+  ]
+}

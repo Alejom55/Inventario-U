@@ -1,0 +1,15 @@
+{
+  "verified_utc": "2026-11-18T04:36:41.736727+00:00",
+  "kind": "offline security tests, not official cloud rounds",
+  "security_tests_passed": 35,
+  "security_test_warnings": 3,
+  "pytest_duration_seconds": 2.2,
+  "promtool_version": "3.5.0",
+  "positive_and_negative_rule_cases": "SUCCESS",
+  "accepted_group_signatures": 0,
+  "official_cloud_round_reports": 0,
+  "mttd_r0_seconds": null,
+  "mttd_r1_seconds": null,
+  "mttc_r0_seconds": null,
+  "mttc_r1_seconds": null
+}
