@@ -1,4 +1,4 @@
-"""Fail-closed gate for the group's explicitly accepted security experiment scope."""
+"""Fail-closed scope gate for group acceptance or isolated owner-authorized E1."""
 from datetime import datetime,timezone,timedelta
 import hashlib
 import json
@@ -24,7 +24,7 @@ def validate_scope(path,now=None):
         owner=rules.get('owner_authorization',{})
         if participants or rules.get('isolated_lab') is not True or rules.get('evidence_class')!='owner_authorized_aws_lab':
             raise ValueError('Owner authorization is limited to a separate lab, not a group acceptance')
-        if not owner.get('name','').strip() or owner.get('accepted') is not True or owner.get('source')!='direct_user_request':
+        if not owner.get('name','').strip() or owner.get('accepted') is not True or owner.get('source') not in ('direct_user_request','owner_cli'):
             raise ValueError('Explicit owner authorization is required')
         if owner.get('accepted_scope_sha256')!=digest:raise ValueError('The accepted scope or window changed; owner authorization must be renewed')
         accepted=datetime.fromisoformat(owner['accepted_at_utc'].replace('Z','+00:00'))

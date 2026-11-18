@@ -1,6 +1,6 @@
 """Operate the isolated E1 lab without stopping the shared business service."""
 import argparse
-from datetime import datetime,timezone
+from datetime import datetime,timezone,timedelta
 import json
 from pathlib import Path
 import subprocess
@@ -12,7 +12,7 @@ import httpx
 
 from .deploy_aws_lab import ROOT,RUNTIME,AWS,HOST,INSTANCE,REVISION,remote,ssh_options
 from security.prepare import refresh_honeytoken
-from security.scope import validate_scope
+from security.scope import validate_scope,scope_digest
 from security.stop_e1 import stop
 
 
@@ -32,10 +32,27 @@ def check_live(base,token,phase=None):
         'round':health.headers.get('X-Chaos-Round'),'policy':health.headers.get('X-Identity-Policy')}
 
 
+def authorize_owner(path,minutes,now=None):
+    if type(minutes) is not int or not 5<=minutes<=120:raise ValueError('Owner experiment window must be 5 to 120 minutes')
+    now=now or datetime.now(timezone.utc)
+    rules=json.loads((ROOT/'security/rules-of-engagement.example.json').read_text(encoding='utf-8'))
+    rules.update(authorization_mode='owner_isolated_lab',isolated_lab=True,evidence_class='owner_authorized_aws_lab',
+        api_origin='https://e1.'+HOST+'.sslip.io',prometheus_origin='https://e1.'+HOST+'.sslip.io/prometheus',
+        application_revision=REVISION,instance_id=INSTANCE,account_id='536202634723',
+        window_start_utc=(now-timedelta(seconds=1)).isoformat(),window_end_utc=(now+timedelta(minutes=minutes)).isoformat(),
+        controller_revision=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
+        acceptance_note='Explicit owner CLI authorization for isolated E1 only; not group signatures or a VM shutdown schedule.')
+    rules['owner_authorization']={'name':'Alejandro Marín','accepted':True,'source':'owner_cli',
+        'accepted_at_utc':now.isoformat(),'accepted_scope_sha256':scope_digest(rules)}
+    Path(path).write_text(json.dumps(rules,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+    return validate_scope(path,now)
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action',choices=('state','R0','R1','stop'))
+    parser.add_argument('action',choices=('state','R0','R1','stop','authorize'))
     parser.add_argument('--scope',type=Path,default=RUNTIME/'rules-owner.json')
+    parser.add_argument('--minutes',type=int,default=60,help='Explicit owner authorization window; does not schedule VM shutdown')
     args=parser.parse_args()
     if args.action=='stop':
         print(stop());return
@@ -44,6 +61,10 @@ def main():
     token=credentials.get('prometheus_token',credentials['metrics_token'])
     if args.action=='state':
         print(json.dumps(check_live(base,token)));return
+    if args.action=='authorize':
+        check_live(base,token)
+        rules=authorize_owner(args.scope,args.minutes)
+        print('Owner E1 window until '+rules['window_end_utc']+'. No VM shutdown scheduled. STOP is preserved.');return
     rules=validate_scope(args.scope)
     assert rules['api_origin']==base and rules['instance_id']==INSTANCE and rules['application_revision']==REVISION
     assert not (RUNTIME/'STOP').exists(),'STOP is active; review the reason before clearing it'
@@ -69,7 +90,13 @@ print('ISOLATED_E1_ROUND_READY')
     print(remote(code).stdout.strip())
     for attempt in range(25):
         try:
-            check_live(base,token,phase);break
+            check_live(base,token,phase)
+            with httpx.Client(timeout=5) as client:
+                query=client.get(base+'/prometheus/api/v1/query',params={'query':'ALERTS{alertname="InventoryMachineIdentityMisuse",alertstate="firing",round="'+phase+'"}'},
+                    headers={'Authorization':'Bearer '+token})
+                query.raise_for_status()
+                assert not query.json()['data']['result'],'Previous round alert has not cleared yet'
+            break
         except (httpx.HTTPError,AssertionError):
             if attempt==24:raise
             time.sleep(1)
