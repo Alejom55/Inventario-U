@@ -1,0 +1,26 @@
+{
+  "verified_utc": "2026-11-18T00:41:01.919241+00:00",
+  "provider": "aws",
+  "instance_id": "i-03dee81b7d92a60c8",
+  "free_account": {
+    "type": "FREE",
+    "status": "ACTIVE",
+    "remaining_credits_usd": 100.0,
+    "expiration_utc": "2027-05-18T00:12:34.814000+00:00",
+    "maximum_out_of_pocket_usd": 0
+  },
+  "native_schedule_enabled": true,
+  "deadline_utc": "2026-11-18T02:29:40.124823+00:00",
+  "scheduler_can_terminate_only_this_instance": true,
+  "automatic_schedule_cleanup": true,
+  "shutdown_behavior": "terminate",
+  "disk_encrypted": true,
+  "disk_size_gib": 8,
+  "disk_delete_on_termination": true,
+  "cpu_credits": "standard",
+  "ssh_restricted_to_cloudshell": true,
+  "only_public_ports": [
+    80,
+    443
+  ]
+}

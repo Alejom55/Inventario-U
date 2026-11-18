@@ -2,6 +2,15 @@
 
 API para administrar inventario entre varios almacenes.
 
+## Práctica AWS con cuenta gratuita
+
+La [guía AWS](docs/aws-guide.md) contiene el contrato, Postman, Prometheus y las
+rondas reales BASELINE/R0/R1. El [despliegue temporal](deploy/aws/README.md)
+rechaza cuentas de pago y usa únicamente créditos de una cuenta FREE activa.
+La VM y el disco sintético se eliminan al vencer las dos horas autorizadas;
+consultar la fecha exacta en la guía y no asumir que una URL histórica sigue activa.
+Las evidencias de Render y las locales se conservan por separado.
+
 ## Practica local compartida con el equipo
 
 La [guía local](deploy/local_team/README.md) levanta un entorno Docker aislado

@@ -1,0 +1,715 @@
+{
+  "info": {
+    "name": "Inventario-U — AWS Free",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://77.113.238.87.sslip.io"
+    },
+    {
+      "key": "inventario_api_key",
+      "value": ""
+    },
+    {
+      "key": "test_sku_id",
+      "value": ""
+    },
+    {
+      "key": "test_almacen_id",
+      "value": ""
+    },
+    {
+      "key": "test_movimiento_id",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-Api-Key",
+            "value": "{{inventario_api_key}}"
+          },
+          {
+            "key": "X-Trace-Id",
+            "value": "peer-{{$guid}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v2/health",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v2",
+            "health"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Inventario GET",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-Api-Key",
+            "value": "{{inventario_api_key}}"
+          },
+          {
+            "key": "X-Trace-Id",
+            "value": "peer-{{$guid}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v2/inventario?sku_id=1&almacen_id=1",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v2",
+            "inventario"
+          ],
+          "query": [
+            {
+              "key": "sku_id",
+              "value": "1"
+            },
+            {
+              "key": "almacen_id",
+              "value": "1"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Inventario QUERY",
+      "request": {
+        "method": "QUERY",
+        "header": [
+          {
+            "key": "X-Api-Key",
+            "value": "{{inventario_api_key}}"
+          },
+          {
+            "key": "X-Trace-Id",
+            "value": "peer-{{$guid}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v2/inventario/query",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v2",
+            "inventario",
+            "query"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"sku_id\": 1, \"almacen_id\": 1}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Listar SKU",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-Api-Key",
+            "value": "{{inventario_api_key}}"
+          },
+          {
+            "key": "X-Trace-Id",
+            "value": "peer-{{$guid}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v2/skus",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v2",
+            "skus"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Crear SKU",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-Api-Key",
+            "value": "{{inventario_api_key}}"
+          },
+          {
+            "key": "X-Trace-Id",
+            "value": "peer-{{$guid}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v2/skus",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v2",
+            "skus"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"codigo\": \"MI-PRUEBA-001\", \"nombre\": \"Prueba equipo\", \"stock_minimo\": 10}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Listar almacenes",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-Api-Key",
+            "value": "{{inventario_api_key}}"
+          },
+          {
+            "key": "X-Trace-Id",
+            "value": "peer-{{$guid}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v2/almacenes",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v2",
+            "almacenes"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Listar movimientos",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-Api-Key",
+            "value": "{{inventario_api_key}}"
+          },
+          {
+            "key": "X-Trace-Id",
+            "value": "peer-{{$guid}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v2/movimientos",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v2",
+            "movimientos"
+          ]
+        }
+      }
+    },
+    {
+      "name": "CRUD skus — datos propios",
+      "item": [
+        {
+          "name": "Crear skus",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Api-Key",
+                "value": "{{inventario_api_key}}"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "peer-{{$guid}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v2/skus",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "skus"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"codigo\": \"PEER-{{$guid}}\", \"nombre\": \"Prueba equipo\", \"stock_minimo\": 10}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) pm.collectionVariables.set(\"test_sku_id\", pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Consultar skus",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Api-Key",
+                "value": "{{inventario_api_key}}"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "peer-{{$guid}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v2/skus/{{test_sku_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "skus",
+                "{{test_sku_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar skus",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "X-Api-Key",
+                "value": "{{inventario_api_key}}"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "peer-{{$guid}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v2/skus/{{test_sku_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "skus",
+                "{{test_sku_id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"codigo\": \"PEER-{{$guid}}\", \"nombre\": \"Prueba equipo\", \"stock_minimo\": 10}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Eliminar skus",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Api-Key",
+                "value": "{{inventario_api_key}}"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "peer-{{$guid}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v2/skus/{{test_sku_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "skus",
+                "{{test_sku_id}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "CRUD almacenes — datos propios",
+      "item": [
+        {
+          "name": "Crear almacenes",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Api-Key",
+                "value": "{{inventario_api_key}}"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "peer-{{$guid}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v2/almacenes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "almacenes"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"nombre\": \"Prueba {{$guid}}\", \"ubicacion\": \"Sintetica\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) pm.collectionVariables.set(\"test_almacen_id\", pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Consultar almacenes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Api-Key",
+                "value": "{{inventario_api_key}}"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "peer-{{$guid}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v2/almacenes/{{test_almacen_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "almacenes",
+                "{{test_almacen_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar almacenes",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "X-Api-Key",
+                "value": "{{inventario_api_key}}"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "peer-{{$guid}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v2/almacenes/{{test_almacen_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "almacenes",
+                "{{test_almacen_id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"nombre\": \"Prueba {{$guid}}\", \"ubicacion\": \"Sintetica\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Eliminar almacenes",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Api-Key",
+                "value": "{{inventario_api_key}}"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "peer-{{$guid}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v2/almacenes/{{test_almacen_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "almacenes",
+                "{{test_almacen_id}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "CRUD movimientos — datos propios",
+      "item": [
+        {
+          "name": "Crear movimientos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Api-Key",
+                "value": "{{inventario_api_key}}"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "peer-{{$guid}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v2/movimientos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "movimientos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"sku_id\": {{test_sku_id}}, \"almacen_id\": {{test_almacen_id}}, \"tipo\": \"entrada\", \"cantidad\": 8, \"motivo\": \"Prueba equipo\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) pm.collectionVariables.set(\"test_movimiento_id\", pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Consultar movimientos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Api-Key",
+                "value": "{{inventario_api_key}}"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "peer-{{$guid}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v2/movimientos/{{test_movimiento_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "movimientos",
+                "{{test_movimiento_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar movimientos",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "X-Api-Key",
+                "value": "{{inventario_api_key}}"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "peer-{{$guid}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v2/movimientos/{{test_movimiento_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "movimientos",
+                "{{test_movimiento_id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"sku_id\": {{test_sku_id}}, \"almacen_id\": {{test_almacen_id}}, \"tipo\": \"entrada\", \"cantidad\": 8, \"motivo\": \"Prueba equipo\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Eliminar movimientos",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Api-Key",
+                "value": "{{inventario_api_key}}"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "peer-{{$guid}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v2/movimientos/{{test_movimiento_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "movimientos",
+                "{{test_movimiento_id}}"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

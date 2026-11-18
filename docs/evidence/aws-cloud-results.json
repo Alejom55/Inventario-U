@@ -1,0 +1,173 @@
+{
+  "provider": "aws",
+  "scope": "real cloud single API; not full three-API E2E or GKE/Chaos Mesh",
+  "execution_id": "dd2699928d6149b2ad7cc8d1dc9bc187",
+  "instance_id": "i-03dee81b7d92a60c8",
+  "application_revision": "d81d9ac4c88be5211ccbd80465894280c0496cc4",
+  "api_url": "https://77.113.238.87.sslip.io",
+  "generator": {
+    "environment": "GitHub-hosted Ubuntu",
+    "run_id": "44209628616",
+    "repository": "Alejom55/Inventario-U"
+  },
+  "same_profile": true,
+  "measurements": [
+    {
+      "scope": "AWS cloud single API; not three-API E2E",
+      "assignment_status": "confirmed resource c: concurrency exhaustion",
+      "round": "BASELINE",
+      "execution_id": "dd2699928d6149b2ad7cc8d1dc9bc187",
+      "profile": {
+        "requests_per_second": 5,
+        "duration_seconds": 120,
+        "fault_start_seconds": 30,
+        "fault_duration_seconds": 60,
+        "timeout_seconds": 2,
+        "workers": 6,
+        "max_p95_ms": 500,
+        "min_success_percent": 99,
+        "window_seconds": 60
+      },
+      "revision": "d81d9ac4c88be5211ccbd80465894280c0496cc4",
+      "started_utc": "2026-11-18T00:40:40.423089+00:00",
+      "ended_utc": "2026-11-18T00:42:40.496167+00:00",
+      "fault": {},
+      "samples": 300,
+      "total_requests": 600,
+      "p95_ms": 82.779,
+      "success_percent": 100.0,
+      "error_percent": 0.0,
+      "max_scheduler_lag_ms": 2.315,
+      "objective_name": "success_percent",
+      "objective_threshold": 99,
+      "objective_passed": true,
+      "guardrail_p95_passed": true,
+      "passed": true,
+      "promotion_allowed": true,
+      "rollback_verified": true,
+      "trace_id": "23ff1ef5271641c5968003abff50364b",
+      "deployment": {
+        "provider": "aws",
+        "url": "https://77.113.238.87.sslip.io",
+        "service_id": "i-03dee81b7d92a60c8",
+        "instance_id": "i-03dee81b7d92a60c8",
+        "application_revision": "d81d9ac4c88be5211ccbd80465894280c0496cc4"
+      },
+      "p95_variation_vs_baseline_percent": 0.0,
+      "success_variation_percentage_points": 0.0
+    },
+    {
+      "scope": "AWS cloud single API; not three-API E2E",
+      "assignment_status": "confirmed resource c: concurrency exhaustion",
+      "round": "R0",
+      "execution_id": "dd2699928d6149b2ad7cc8d1dc9bc187",
+      "profile": {
+        "requests_per_second": 5,
+        "duration_seconds": 120,
+        "fault_start_seconds": 30,
+        "fault_duration_seconds": 60,
+        "timeout_seconds": 2,
+        "workers": 6,
+        "max_p95_ms": 500,
+        "min_success_percent": 99,
+        "window_seconds": 60
+      },
+      "revision": "d81d9ac4c88be5211ccbd80465894280c0496cc4",
+      "started_utc": "2026-11-18T00:42:41.645523+00:00",
+      "ended_utc": "2026-11-18T00:44:41.714949+00:00",
+      "fault": {
+        "injection_request_utc": "2026-11-18T00:43:11.645879+00:00",
+        "injection_ack_utc": "2026-11-18T00:43:11.758737+00:00",
+        "injection": {
+          "requested": 6,
+          "admitted": 6,
+          "rejected": 0,
+          "duration_seconds": 60,
+          "protected": false
+        },
+        "release": true,
+        "release_verified_utc": "2026-11-18T00:44:11.990614+00:00"
+      },
+      "samples": 300,
+      "total_requests": 600,
+      "p95_ms": 2128.845,
+      "success_percent": 0.0,
+      "error_percent": 100.0,
+      "max_scheduler_lag_ms": 2.295,
+      "objective_name": "success_percent",
+      "objective_threshold": 99,
+      "objective_passed": false,
+      "guardrail_p95_passed": false,
+      "passed": false,
+      "promotion_allowed": false,
+      "rollback_verified": true,
+      "trace_id": "a8b01a06cd0e4974a3314f68c1fd0cab",
+      "deployment": {
+        "provider": "aws",
+        "url": "https://77.113.238.87.sslip.io",
+        "service_id": "i-03dee81b7d92a60c8",
+        "instance_id": "i-03dee81b7d92a60c8",
+        "application_revision": "d81d9ac4c88be5211ccbd80465894280c0496cc4"
+      },
+      "p95_variation_vs_baseline_percent": 2471.72,
+      "success_variation_percentage_points": -100.0
+    },
+    {
+      "scope": "AWS cloud single API; not three-API E2E",
+      "assignment_status": "confirmed resource c: concurrency exhaustion",
+      "round": "R1",
+      "execution_id": "dd2699928d6149b2ad7cc8d1dc9bc187",
+      "profile": {
+        "requests_per_second": 5,
+        "duration_seconds": 120,
+        "fault_start_seconds": 30,
+        "fault_duration_seconds": 60,
+        "timeout_seconds": 2,
+        "workers": 6,
+        "max_p95_ms": 500,
+        "min_success_percent": 99,
+        "window_seconds": 60
+      },
+      "revision": "d81d9ac4c88be5211ccbd80465894280c0496cc4",
+      "started_utc": "2026-11-18T00:44:42.836273+00:00",
+      "ended_utc": "2026-11-18T00:46:43.074892+00:00",
+      "fault": {
+        "injection_request_utc": "2026-11-18T00:45:12.837184+00:00",
+        "injection_ack_utc": "2026-11-18T00:45:12.951654+00:00",
+        "injection": {
+          "requested": 6,
+          "admitted": 4,
+          "rejected": 2,
+          "duration_seconds": 60,
+          "protected": true
+        },
+        "release": true,
+        "release_verified_utc": "2026-11-18T00:46:13.313371+00:00"
+      },
+      "samples": 300,
+      "total_requests": 600,
+      "p95_ms": 82.624,
+      "success_percent": 100.0,
+      "error_percent": 0.0,
+      "max_scheduler_lag_ms": 2.255,
+      "objective_name": "success_percent",
+      "objective_threshold": 99,
+      "objective_passed": true,
+      "guardrail_p95_passed": true,
+      "passed": true,
+      "promotion_allowed": true,
+      "rollback_verified": true,
+      "trace_id": "fa6d21aee8db4f91aca3fb5ad64aea03",
+      "deployment": {
+        "provider": "aws",
+        "url": "https://77.113.238.87.sslip.io",
+        "service_id": "i-03dee81b7d92a60c8",
+        "instance_id": "i-03dee81b7d92a60c8",
+        "application_revision": "d81d9ac4c88be5211ccbd80465894280c0496cc4"
+      },
+      "p95_variation_vs_baseline_percent": -0.19,
+      "success_variation_percentage_points": 0.0
+    }
+  ],
+  "github_run_url": "https://github.com/Alejom55/Inventario-U/actions/runs/44209628616"
+}

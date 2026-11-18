@@ -1,0 +1,210 @@
+{
+  "title": "Inventario-U — Guía y fallo c en AWS",
+  "schemaVersion": 41,
+  "version": 1,
+  "refresh": "5s",
+  "time": {
+    "from": "now-3h",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "text",
+      "title": "Guía del equipo y evidencia AWS",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 24
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "# Inventario-U: AWS con plan gratuito\n\nAPI: https://77.113.238.87.sslip.io\nPrometheus para Grafana Cloud: https://77.113.238.87.sslip.io/prometheus\nInstancia: i-03dee81b7d92a60c8; aplicación: d81d9ac4c88be5211ccbd80465894280c0496cc4.\nEl plan FREE se verificó antes de crear recursos. No se habilitó un plan de pago.\nSolo créditos gratuitos; el cálculo reservado de la práctica es USD 0,31.\nTerminación automática: 2026-11-18T02:29:40.124823+00:00. Se elimina el disco sintético.\nLa URL depende de esta IP y no se conserva para otro lanzamiento.\n\n## Postman\n\nGET https://77.113.238.87.sslip.io/api/v2/skus\nHeaders: X-Api-Key: {{inventario_api_key}} y X-Trace-Id: equipo-{{$guid}}.\nEsperado: 200 con lista de SKU. Es un endpoint terminal, sin llamadas a los compañeros.\nGET https://77.113.238.87.sslip.io/api/v2/inventario?sku_id=1&almacen_id=1\nDevuelve resultados[]. El método QUERY /api/v2/inventario/query sigue disponible.\nConserva CRUD de SKU, almacenes y movimientos. Usar exclusivamente datos sintéticos.\n\n## Grafana Cloud\n\nCrear datasource Prometheus con la URL anterior, método POST y header seguro\nAuthorization: Bearer <token privado de métricas>. Importar docs/aws-dashboard.json.\nLas claves se entregan por privado; no ponerlas en paneles ni en el grupo.\nCero tráfico sin peticiones es normal. Una petición aislada apenas cambia una tasa.\nLos indicadores del cliente se publican al terminar la ronda, contando timeouts.\nEstos gráficos comparan BASELINE/R0/R1 de una API; no son dos versiones Canary.\n\n## Resultados reales\n\nPerfil: 5 peticiones/s, 120 s; agotamiento de concurrencia desde t=30 durante 60 s.\nÚnico objetivo: éxito del cliente >=99%. Guardarraíl separado: p95 <500 ms.\nR0 ocupa los seis trabajadores compartidos. R1 usa bulkhead y admite cuatro tareas\nde fondo, rechazando dos sin cola. Reversión verificada en las tres rondas.\nGenerador: GitHub-hosted Ubuntu. Comparar únicamente rondas del mismo origen.\nExecution ID: dd2699928d6149b2ad7cc8d1dc9bc187.\n\n| Ronda | Éxito % | p95 ms | Variación p95 % |\n|---|---:|---:|---:|\n| BASELINE | 100.000 | 82.779 | 0.00 |\n| R0 | 0.000 | 2128.845 | 2471.72 |\n| R1 | 100.000 | 82.624 | -0.19 |\n\nActions > Validacion local de caos > Run workflow > feat/aws-chaos > Run workflow. Coordinar R0 con el grupo antes de ejecutarla. Solo funciona durante la ventana autorizada.\n\nPara las IA: consumir /api/v2/skus y las otras rutas propietarias; nunca llamar a /integracion desde una dependencia. Enviar X-Api-Key desde secretos, propagar X-Trace-Id, establecer timeouts y tratar respuestas no 2xx como errores.\n\nEsta evidencia corresponde a una API en AWS. No acredita la integración de las tres APIs ni Chaos Mesh/GKE. El Grafana Cloud común requiere que su responsable agregue la fuente y el tablero.\n\nEjecución: https://github.com/Alejom55/Inventario-U/actions/runs/44209628616\n"
+      }
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Objetivo único: éxito del cliente ≥99%",
+      "gridPos": {
+        "x": 0,
+        "y": 24,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "inventory_resource_client_success_ratio{cloud=\"aws\"}",
+          "legendFormat": "{{round}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Guardarraíl: p95 del cliente <500 ms",
+      "gridPos": {
+        "x": 12,
+        "y": 24,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "1000 * inventory_resource_client_p95_seconds{cloud=\"aws\"}",
+          "legendFormat": "{{round}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "min": 0
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Tráfico HTTP",
+      "gridPos": {
+        "x": 0,
+        "y": 32,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(inventory_http_requests_total{cloud=\"aws\",route=\"/api/v2/skus\"}[1m]))",
+          "legendFormat": "{{round}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "min": 0
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Tareas de fondo activas",
+      "gridPos": {
+        "x": 12,
+        "y": 32,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "inventory_resource_background_active{cloud=\"aws\"}",
+          "legendFormat": "{{round}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "min": 0
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "CPU respecto al límite de 0,5 CPU",
+      "gridPos": {
+        "x": 0,
+        "y": 40,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "rate(process_cpu_seconds_total{cloud=\"aws\"}[1m]) / 0.5",
+          "legendFormat": "{{round}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Memoria respecto al límite de 512 MiB",
+      "gridPos": {
+        "x": 12,
+        "y": 40,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "process_resident_memory_bytes{cloud=\"aws\"} / 536870912",
+          "legendFormat": "{{round}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0
+        },
+        "overrides": []
+      }
+    }
+  ],
+  "__inputs": [
+    {
+      "name": "DS_PROMETHEUS",
+      "label": "Prometheus AWS Inventario-U",
+      "type": "datasource",
+      "pluginId": "prometheus",
+      "pluginName": "Prometheus"
+    }
+  ]
+}

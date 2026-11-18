@@ -2,7 +2,7 @@
 
 Ejecutar `python3 deploy/aws/launch.py plan` desde AWS CloudShell en Ohio.
 El plan consulta el precio vigente de una única t3.small Linux, valida el SHA
-inmutable y reserva margen dentro de USD 1 para una ventana de dos horas.
+inmutable y reserva margen dentro de USD 1 en créditos para una ventana de dos horas.
 `apply` vuelve a comprobar precio, cuenta, revisión y red antes de crear recursos.
 Los resultados y la clave SSH se guardan en `deploy/aws/runtime/`, fuera de Git.
 
@@ -31,7 +31,28 @@ antes del vencimiento. El hostname `IP.sslip.io` dura lo mismo que esa IPv4; no 
 una dirección permanente para otro lanzamiento. No se reutilizan claves de Render.
 Los roles, clave pública SSH y grupo de seguridad se deben limpiar al terminar;
 no generan cargos por hora. El temporizador y Scheduler son protecciones de tiempo,
-no un tope monetario nativo: el precio y el consumo se deben verificar en Billing.
+no un tope monetario por recurso: la protección de USD 0 de bolsillo corresponde
+al plan de cuenta FREE, que el script exige antes de cualquier creación. No usar
+este procedimiento para cuentas PAID. El precio y consumo de créditos siguen
+siendo verificables en Billing.
+
+## Validación y entrega
+
+La ejecución [44209628616](https://github.com/Alejom55/Inventario-U/actions/runs/44209628616)
+se inició desde el botón **Run workflow**, rama `feat/aws-chaos`. Sus tres rondas
+se ejecutaron contra la misma aplicación e instancia EC2. El artefacto contiene
+las 600 observaciones por ronda, journals de Chaos Toolkit y sus registros.
+El objetivo durante el fallo pasó de 0% en R0 a 100% en R1; p95 de R1: 82,624 ms.
+
+`uv run --frozen python -m scripts.verify_aws` verificó por HTTPS CRUD sintético,
+GET/QUERY, trazas, autenticación y consultas reales de todos los paneles.
+`python3 -m deploy.aws.verify_control`, ejecutado en CloudShell, contrastó el
+plan FREE y las protecciones contra las API de EC2, IAM y Scheduler. Las pruebas
+offline de resiliencia y configuración suman 178 aprobadas.
+
+Guía pública: `docs/aws-guide.md`; colección: `docs/aws-postman.json`;
+tablero importable: `docs/aws-dashboard.json`. Claves y entorno Postman privado:
+`deploy/aws/runtime/`. Las claves AWS son distintas de las de Render.
 
 Render queda separado. La evidencia anterior continúa identificada como Render;
 este despliegue no acredita automáticamente las rondas ni la integración del grupo.

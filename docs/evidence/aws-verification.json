@@ -1,0 +1,16 @@
+{
+  "verified_utc": "2026-11-18T00:48:14.060781+00:00",
+  "provider": "aws",
+  "instance_id": "i-03dee81b7d92a60c8",
+  "revision": "d81d9ac4c88be5211ccbd80465894280c0496cc4",
+  "execution_id": "dd2699928d6149b2ad7cc8d1dc9bc187",
+  "synthetic_ids": {
+    "sku_id": 1,
+    "almacen_id": 1
+  },
+  "crud_get_query_trace_auth": "passed",
+  "metrics_and_readonly_queries": "passed",
+  "dashboard_promql": "passed",
+  "public_storage_coordinator_and_raw_metrics": "blocked",
+  "common_grafana_cloud": "not configured; owner must import"
+}
