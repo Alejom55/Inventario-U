@@ -1,0 +1,26 @@
+name: Ciber E1 AWS - verificar evidencia real
+on:
+  push:
+    branches: [feat/security-chaos-v4]
+    paths: ['docs/evidence/ciber-e1-aws/**', 'security/verify_aws_evidence.py', 'tests/security/test_aws_evidence.py', '.github/workflows/e1-aws-evidence.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  measured_evidence_gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - name: Verificar archivos originales, trazas y umbral numerico R1
+        run: python -m security.verify_aws_evidence
+      - name: Conservar evidencia medida y su manifiesto
+        uses: actions/upload-artifact@v4
+        with:
+          name: E1-AWS-R0-R1-medidos
+          path: docs/evidence/ciber-e1-aws/
+      - name: Explicar alcance del run
+        run: echo 'Este run valida evidencia AWS ya medida; no inyecta ni representa firmas del grupo.' >> "$GITHUB_STEP_SUMMARY"
