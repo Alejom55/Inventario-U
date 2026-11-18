@@ -8,7 +8,7 @@ from urllib.parse import urlsplit
 
 
 def scope_digest(rules):
-    content={k:v for k,v in rules.items() if k not in ('participants','acceptance_note')}
+    content={k:v for k,v in rules.items() if k not in ('participants','acceptance_note','owner_authorization')}
     return hashlib.sha256(json.dumps(content,sort_keys=True,separators=(',',':'),ensure_ascii=True).encode()).hexdigest()
 
 
@@ -18,8 +18,22 @@ def validate_scope(path,now=None):
     if rules.get('schema_version')!=1 or rules.get('experiment')!='E1':raise ValueError('Expected E1 rules of engagement')
     if rules.get('synthetic_only') is not True:raise ValueError('Only synthetic data are authorized')
     participants=rules.get('participants',[])
-    if len(participants)!=3:raise ValueError('Three personal acceptances are required before cloud execution')
     names=set();digest=scope_digest(rules)
+    mode=rules.get('authorization_mode','group')
+    if mode=='owner_isolated_lab':
+        owner=rules.get('owner_authorization',{})
+        if participants or rules.get('isolated_lab') is not True or rules.get('evidence_class')!='owner_authorized_aws_lab':
+            raise ValueError('Owner authorization is limited to a separate lab, not a group acceptance')
+        if not owner.get('name','').strip() or owner.get('accepted') is not True or owner.get('source')!='direct_user_request':
+            raise ValueError('Explicit owner authorization is required')
+        if owner.get('accepted_scope_sha256')!=digest:raise ValueError('The accepted scope or window changed; owner authorization must be renewed')
+        accepted=datetime.fromisoformat(owner['accepted_at_utc'].replace('Z','+00:00'))
+        if accepted.tzinfo is None or accepted>now:raise ValueError('Owner authorization must precede execution')
+        api=urlsplit(rules.get('api_origin',''));prom=urlsplit(rules.get('prometheus_origin',''))
+        if not api.hostname or not api.hostname.startswith('e1.') or api.hostname!=prom.hostname:
+            raise ValueError('Owner lab must use its separate E1 host and monitoring origin')
+    elif mode!='group':raise ValueError('Unsupported experiment authorization mode')
+    elif len(participants)!=3:raise ValueError('Three personal acceptances are required before cloud execution')
     for person in participants:
         name=person.get('name','').strip()
         if not name or name.casefold() in names or person.get('accepted') is not True:raise ValueError('Missing or duplicate participant acceptance')

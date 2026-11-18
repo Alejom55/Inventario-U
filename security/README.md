@@ -1,5 +1,28 @@
 # E1: identidad de máquinas y agentes
 
+## Laboratorio individual autorizado por el propietario
+
+El usuario autorizó desplegar y preparar E1 sin depender de los compañeros.
+`authorization_mode=owner_isolated_lab` registra esa autorización directa,
+mantiene los límites de carga y exige un host E1 separado. No crea firmas ni
+declara aceptación grupal. El modo grupal conserva las tres aceptaciones PDF.
+La clasificación de cada resultado distingue ambos modos.
+
+API aislada: https://e1.3.151.219.131.sslip.io. El servicio grupal conserva
+https://3.151.219.131.sslip.io/api/v2 y su clave original.
+
+```powershell
+uv run python -m deploy.security.aws_e1 state
+uv run python -m deploy.security.aws_e1 R0
+uv run python -m deploy.security.aws_e1 R1
+uv run python -m deploy.security.aws_e1 stop
+```
+
+R0/R1 requieren el alcance privado vigente `security/runtime/rules-owner.json`.
+El comando cambia solo `e1-api`, ejecuta el perfil acotado y conserva reportes
+y logs por execution_id. `stop` es cooperativo; no apaga la VM ni detiene la API
+compartida. La clave privada JWT permanece en el equipo operador.
+
 Estado: implementación y pruebas offline. **No hay todavía rondas de Ciber ejecutadas en AWS, firmas del grupo ni capturas del tablero con datos reales.** Los resultados de `docs/evidence/aws-cloud-results.json` corresponden al fallo de concurrencia de DevOps; no sirven como resultados de E1.
 
 ## Hipótesis y método declarado

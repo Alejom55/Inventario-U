@@ -2,6 +2,7 @@
 import argparse
 from datetime import datetime,timezone
 import json
+import re
 from pathlib import Path
 import time
 from uuid import uuid4
@@ -33,13 +34,16 @@ def main():
     parser.add_argument('--scope',type=Path,required=True)
     parser.add_argument('--credentials',type=Path,required=True)
     parser.add_argument('--round',choices=('R0','R1'),required=True)
+    parser.add_argument('--execution-id',help='Optional pinned ID shared with the isolated API logs')
     args=parser.parse_args()
     rules=validate_scope(args.scope)
     stop=ROOT/rules['stop_file']
     if stop.exists():raise InterruptedError('Stop switch is set; no network request was made')
     secrets=json.loads(args.credentials.read_text(encoding='utf-8'))
     base=rules['api_origin'].rstrip('/');prom=rules['prometheus_origin'].rstrip('/')
-    execution=uuid4().hex;folder=ROOT/'security/results'/execution;folder.mkdir(parents=True)
+    execution=args.execution_id or uuid4().hex
+    if not re.fullmatch('[a-f0-9]{32}',execution):raise ValueError('Execution ID must be 32 hexadecimal characters')
+    folder=ROOT/'security/results'/execution;folder.mkdir(parents=True,exist_ok=False)
     current=args.round
     if current=='R0':
         business={'X-Api-Key':secrets['legacy_key']};operator=business
@@ -47,7 +51,7 @@ def main():
         private=Path(secrets['issuer_private_key'])
         business={'Authorization':'Bearer '+issue(private,subject='coordinator-demo')}
         operator={'Authorization':'Bearer '+issue(private,subject='security-operator',scope='inventory:read inventory:write')}
-    metrics={'Authorization':'Bearer '+secrets['metrics_token']}
+    metrics={'Authorization':'Bearer '+secrets.get('prometheus_token',secrets['metrics_token'])}
     rows=[];created=[];requests=0;last_request=0.0;rollback=False
     started=datetime.now(timezone.utc).isoformat();mttd=None;mttc=None;adverse_start=None;alert_evidence=None;honey_evidence=None;observed_seconds=0
     end=datetime.fromisoformat(rules['window_end_utc'].replace('Z','+00:00'))
@@ -144,6 +148,9 @@ def main():
             except Exception as error:
                 cleanup_error=error
             partial={'provider':'aws','experiment':'E1','round':current,'execution_id':execution,
+                'authorization_mode':rules.get('authorization_mode','group'),
+                'evidence_class':rules.get('evidence_class','group_accepted_experiment'),
+                'controller_revision':rules.get('controller_revision','unrecorded'),
                 'started_utc':started,'ended_utc':datetime.now(timezone.utc).isoformat(),
                 'scope_sha256':rules['scope_sha256'],'application_revision':rules['application_revision'],
                 'instance_id':rules['instance_id'],'requests':rows,'rollback_verified':rollback,

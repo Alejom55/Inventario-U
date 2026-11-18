@@ -49,3 +49,31 @@ def test_altered_acceptance_pdf_is_rejected(accepted_unit_scope):
     path,_,now=accepted_unit_scope
     (path.parent/'unit-acceptance.pdf').write_bytes(b'%PDF-altered-unit-fixture')
     with pytest.raises(ValueError,match='digest changed'):validate_scope(path,now)
+
+
+def owner_unit_scope(accepted_unit_scope):
+    path,rules,now=accepted_unit_scope
+    rules.update(participants=[],authorization_mode='owner_isolated_lab',isolated_lab=True,
+        evidence_class='owner_authorized_aws_lab',api_origin='https://e1.unit.invalid',
+        prometheus_origin='https://e1.unit.invalid/prometheus')
+    rules['owner_authorization']={'name':'Unit owner','accepted':True,'source':'direct_user_request',
+        'accepted_at_utc':(now-timedelta(seconds=10)).isoformat(),'accepted_scope_sha256':scope_digest(rules)}
+    path.write_text(json.dumps(rules))
+    return path,rules,now
+
+
+def test_owner_can_authorize_only_separate_lab_without_claiming_group_signatures(accepted_unit_scope):
+    path,rules,now=owner_unit_scope(accepted_unit_scope)
+    assert validate_scope(path,now)['authorization_mode']=='owner_isolated_lab'
+    assert not rules['participants']
+
+
+@pytest.mark.parametrize('changes',[
+    {'isolated_lab':False}, {'evidence_class':'official_group_run'},
+    {'api_origin':'https://shared.unit.invalid'}, {'authorization_mode':'skip'},
+    {'maximum_requests':1000},
+])
+def test_owner_mode_cannot_expand_impact_or_claim_group_acceptance(accepted_unit_scope,changes):
+    path,rules,now=owner_unit_scope(accepted_unit_scope)
+    rules.update(changes);path.write_text(json.dumps(rules))
+    with pytest.raises(ValueError):validate_scope(path,now)
