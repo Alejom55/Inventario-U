@@ -1,0 +1,62 @@
+name: inventario-security-e1
+services:
+  e1-db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    mem_limit: 128m
+    environment:
+      POSTGRES_DB: security_e1
+      POSTGRES_USER: inventario
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?required}
+    volumes: [security_data:/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U inventario -d security_e1]
+      interval: 5s
+      retries: 20
+  e1-api:
+    image: ${SECURITY_API_IMAGE:?use the verified existing application image}
+    restart: unless-stopped
+    mem_limit: 384m
+    cpus: 0.5
+    command: [/app/.venv/bin/uvicorn, app.main:app, --host, 0.0.0.0, --port, '8000', --no-access-log]
+    environment:
+      DATABASE_URL: postgresql://inventario:${POSTGRES_PASSWORD:?required}@e1-db:5432/security_e1
+      TEAM_API_KEY: ${TEAM_API_KEY:?required}
+      METRICS_BEARER_TOKEN: ${METRICS_BEARER_TOKEN:?required}
+      RESOURCE_ADMIN_KEY: ${RESOURCE_ADMIN_KEY:?required}
+      APP_REVISION: ${APP_REVISION:?required}
+      CLOUD_PROVIDER: aws
+      AWS_INSTANCE_ID: ${AWS_INSTANCE_ID:?required}
+      CHAOS_ROUND: ${CHAOS_ROUND:?required}
+      CHAOS_EXECUTION_ID: ${CHAOS_EXECUTION_ID:-none}
+      SECURITY_AUTH_MODE: ${SECURITY_AUTH_MODE:?required}
+      SECURITY_JWT_PUBLIC_KEY_FILE: /run/identity/issuer-public.pem
+      SECURITY_ALLOWED_SUBJECTS: coordinator-demo,security-operator
+      SECURITY_HONEYTOKEN_SHA256: ${SECURITY_HONEYTOKEN_SHA256:?required}
+      TERMINAL_API_ONLY: 'true'
+      RESOURCE_LAB_ENABLED: 'false'
+      SECURITY_RESULTS_ENABLED: 'true'
+    volumes: ['../../security/runtime/issuer-public.pem:/run/identity/issuer-public.pem:ro']
+    networks: [default, shared_gateway]
+    depends_on:
+      e1-db: {condition: service_healthy}
+    logging:
+      options: {max-size: 5m, max-file: '3'}
+  e1-prometheus:
+    image: prom/prometheus:v3.5.0
+    restart: unless-stopped
+    mem_limit: 128m
+    command: ['--config.file=/etc/prometheus/prometheus.yml', '--storage.tsdb.retention.time=3h']
+    volumes:
+      - ./prometheus.aws.yml:/etc/prometheus/prometheus.yml:ro
+      - ../../security/detection/identity-alerts.yml:/etc/prometheus/identity-alerts.yml:ro
+      - ../../security/runtime/metrics-token:/etc/prometheus/metrics-token:ro
+      - security_prometheus:/prometheus
+    networks: [default, shared_gateway]
+volumes:
+  security_data:
+  security_prometheus:
+networks:
+  shared_gateway:
+    external: true
+    name: inventario-aws-practice_default

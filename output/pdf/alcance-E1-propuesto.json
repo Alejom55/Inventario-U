@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "experiment": "E1",
+  "participants": [],
+  "window_start_utc": "2026-11-18T15:00:00+00:00",
+  "window_end_utc": "2026-11-18T16:00:00+00:00",
+  "api_origin": "https://e1.3.151.219.131.sslip.io",
+  "prometheus_origin": "https://e1.3.151.219.131.sslip.io/prometheus",
+  "application_revision": "c2ee1dc85710563768a844a671bc61b2d1f69ead",
+  "account_id": "536202634723",
+  "instance_id": "i-094c00455c9ac62ba",
+  "provider": "aws",
+  "synthetic_only": true,
+  "allowed_paths": [
+    "/api/v2/skus",
+    "/api/v2/skus/{id}",
+    "/api/v2/health",
+    "/api/v2/admin/security-result"
+  ],
+  "allowed_methods": [
+    "GET",
+    "POST",
+    "DELETE"
+  ],
+  "maximum_requests": 100,
+  "maximum_requests_per_second": 2,
+  "stop_file": "security/runtime/STOP",
+  "rollback": "Stop attempts; delete only synthetic SKU created by this execution; verify deletion and API health. Tokens expire within 300 seconds.",
+  "objective": {
+    "name": "mttd_seconds",
+    "maximum": 30
+  },
+  "containment_guardrail_seconds": 5,
+  "normal_requests": 10,
+  "adverse_requests": 10,
+  "observation_seconds": 30,
+  "acceptance_note": "Each participant must personally accept the exact scope and window. Attach the actual signed PDF and its SHA256. No signatures have been supplied."
+}

@@ -1,0 +1,23 @@
+# Append to the existing gateway only after validating its current configuration.
+# The public query token is the existing shared metrics token, never the API key.
+e1.3.151.219.131.sslip.io {
+    @prometheus {
+        path /prometheus/api/v1/query /prometheus/api/v1/query_range /prometheus/api/v1/labels /prometheus/api/v1/label/*/values /prometheus/api/v1/series /prometheus/api/v1/metadata /prometheus/api/v1/status/buildinfo
+        method GET POST
+        header Authorization "Bearer {$METRICS_BEARER_TOKEN}"
+    }
+    handle @prometheus {
+        uri strip_prefix /prometheus
+        reverse_proxy e1-prometheus:9090 {
+            header_up -Authorization
+        }
+    }
+    handle /prometheus/* {
+        respond "Unauthorized" 401
+    }
+    @experiment path /api/v2/health /api/v2/skus /api/v2/skus/* /api/v2/admin/security-result
+    handle @experiment {
+        reverse_proxy e1-api:8000
+    }
+    respond "Not found" 404
+}

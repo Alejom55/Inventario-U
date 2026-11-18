@@ -10,8 +10,9 @@ from security.identity_tokens import create_keypair
 from security import run_e1
 
 
-@pytest.mark.parametrize('phase,fail_cleanup',[('R0',False),('R1',False),('R0',True)])
-def test_bounded_runner_measures_and_preserves_failed_rollback(tmp_path,monkeypatch,phase,fail_cleanup):
+@pytest.mark.parametrize('phase,fail_cleanup,interrupt',[
+    ('R0',False,False),('R1',False,False),('R0',True,False),('R0',False,True)])
+def test_bounded_runner_measures_and_preserves_failed_rollback(tmp_path,monkeypatch,phase,fail_cleanup,interrupt):
     private,_=create_keypair(tmp_path)
     credentials=tmp_path/'credentials.json'
     credentials.write_text(json.dumps({'legacy_key':'unit-only','issuer_private_key':str(private),
@@ -48,6 +49,9 @@ def test_bounded_runner_measures_and_preserves_failed_rollback(tmp_path,monkeypa
             adverse[0]+=1
             if phase=='R1':return httpx.Response(403,json={'reason':'scope_violation'},headers=response_headers)
             identifier=adverse[0];records[identifier]={**json.loads(request.content),'id':identifier}
+            if interrupt:
+                from security.stop_e1 import stop
+                stop(tmp_path)
             return httpx.Response(201,json=records[identifier],headers=response_headers)
         if path.endswith('/skus'):return httpx.Response(200,json=[],headers=response_headers)
         identifier=int(path.rsplit('/',1)[1])
@@ -59,15 +63,20 @@ def test_bounded_runner_measures_and_preserves_failed_rollback(tmp_path,monkeypa
 
     original_client=httpx.Client
     monkeypatch.setattr(run_e1.httpx,'Client',lambda **kwargs:original_client(transport=httpx.MockTransport(respond),**kwargs))
-    if fail_cleanup:
+    if interrupt:
+        with pytest.raises(InterruptedError,match='Stop switch observed'):run_e1.main()
+    elif fail_cleanup:
         with pytest.raises(RuntimeError,match='Rollback incomplete'):run_e1.main()
     else:run_e1.main()
     folders=list((tmp_path/'security/results').iterdir());assert len(folders)==1
     raw=json.loads((folders[0]/'raw.json').read_text())
-    assert len(raw['requests'])==20
+    assert len(raw['requests'])==(11 if interrupt else 20)
     if fail_cleanup:
         assert not raw['rollback_verified'] and raw['cleanup_error_type']=='ConnectError'
         assert raw['synthetic_records'] and not (folders[0]/'report.json').exists()
+    elif interrupt:
+        assert not records and raw['rollback_verified'] and raw['cleanup_error_type'] is None
+        assert not (folders[0]/'report.json').exists()
     else:
         report=json.loads((folders[0]/'report.json').read_text())
         assert not records and report['rollback_verified'] and report['request_count']<=100

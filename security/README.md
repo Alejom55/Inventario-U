@@ -43,7 +43,7 @@ La rúbrica exige reglas escritas y aceptadas por los tres antes de ejecutar. El
 4. Cada persona revisa ese alcance y deja su aceptación personal en PDF. Registrar nombre, `accepted: true`, fecha UTC, `accepted_scope_sha256`, ruta relativa `signed_pdf` y SHA256 del PDF en `participants`. Guardar los PDF dentro de la carpeta privada. El formulario en `output/pdf/reglas-e1-para-firmar.pdf` ayuda a documentarlo; **debe completarse antes de firmar**.
 5. Revisar manualmente la identidad y aceptación de cada participante. El programa verifica integridad de archivos y coincidencia del alcance; no autentica escritura manuscrita ni constituye una firma electrónica certificada. Cambiar ventana o destino exige renovar la aceptación.
 
-El validador impide ejecutar sin tres aceptaciones, fuera de ventana, con destinos no HTTPS o con un perfil distinto. Antes de ejecutar, comprobar facturación y apagado automático nativo del recurso autorizado. No hay creación automática de VM en este paquete.
+El validador impide ejecutar sin tres aceptaciones, fuera de ventana, con destinos no HTTPS o con un perfil distinto. Antes de ejecutar, comprobar facturación y la política de cierre vigente. En la VM actual el usuario autorizó créditos Free y apagado manual: no reinstalar un temporizador ni apagar el servicio grupal al terminar una ronda. La ventana E1 limita la carga, no la disponibilidad de la API. No hay creación automática de VM en este paquete.
 
 ## Entorno aislado y arranque local de ensayo
 
@@ -83,12 +83,14 @@ Prometheus debe comenzar cada ronda sin alerta previa y con `up{job="inventory"}
 
 ```powershell
 # Parada de la carga; el ejecutor aún intenta eliminar solo sus SKU sintéticos.
-New-Item security/runtime/STOP -ItemType File
+uv run python -m security.stop_e1
 # Detener únicamente este entorno, conservando sus volúmenes.
 docker compose --env-file security/runtime/R0.env -f deploy/security/compose.yml down
 ```
 
 Retirar STOP únicamente después de revisar la causa y antes de otra ejecución autorizada. Cada intento crea un código `CYBER-E1-<execution_id>-<índice>`. La reversión comprueba código, elimina solo IDs devueltos por esa ejecución y verifica GET 404 y salud 200. Si falla la red, revisar `raw.json` y terminar la limpieza manualmente; no se garantiza reversión cuando la VM ya no existe.
+
+La parada es cooperativa: el comando crea STOP y el ejecutor entra en `finally`. No matar el proceso antes de completar la limpieza. Comprobar `rollback_verified=true` y `cleanup_error_type=null` en `security/results/<execution_id>/raw.json`; una interrupción no genera un informe de ronda completa. No detener la API compartida ni la VM para parar este experimento.
 
 Resultados privados: `security/results/<execution_id>/raw.json` y `report.json`, con hashes, UTC, `trace_id`, estado, alerta nativa observada, mediciones y reversión. Guardar logs reales y capturas del tablero con el intervalo de la ronda antes de apagar. Revisar secretos antes de seleccionar evidencias públicas.
 
@@ -109,7 +111,7 @@ Importar `security/dashboard.json`, seleccionar la fuente `security-prometheus` 
 2. Mostrar alcance aceptado, inyección y archivo STOP; demostrar detención acotada.
 3. Correlacionar UTC, `execution_id`, `trace_id`, alerta Prometheus y logs JSON.
 4. Comparar R0 y R1 bajo el mismo perfil; mostrar rechazo por alcance y señuelo detectado.
-5. Verificar eliminación de SKU sintéticos, salud y apagado del recurso.
+5. Verificar eliminación de SKU sintéticos y salud; mantener la VM compartida encendida hasta la orden del usuario.
 
 Este guion corresponde a las cinco demostraciones de Ciber de la rúbrica. El grupo debe proporcionar su lista de cinco demos de DevOps para ensayarla exactamente.
 
