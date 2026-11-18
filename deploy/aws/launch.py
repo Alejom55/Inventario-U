@@ -2,6 +2,7 @@
 import argparse
 from datetime import datetime, timedelta, timezone
 import json
+import math
 from pathlib import Path
 import re
 import subprocess
@@ -13,16 +14,18 @@ RUNTIME=Path(__file__).resolve().parent/'runtime'
 PROJECT='inventario-chaos-practice'
 
 
-def validate_plan(price,revision):
+def validate_plan(price,revision,hours=2):
     if not re.fullmatch('[a-f0-9]{40}',revision):raise ValueError('Expected immutable Git revision')
     if not 0<price<=0.04:raise ValueError('Unexpected hourly price')
     # Reserve $0.25 for traffic plus ample tax/headroom; no optional paid services.
-    estimate=2*(price+0.005+8*0.08/730)+0.25
-    if estimate>0.75:raise ValueError('Budget reserve insufficient')
+    if type(hours) not in (int,float) or not math.isfinite(hours) or not 0<hours<=24:
+        raise ValueError('Expected an authorized window of at most 24 hours')
+    estimate=hours*(price+0.005+8*0.08/730)+0.25
+    if estimate>0.95:raise ValueError('Budget reserve insufficient')
     return round(estimate,4)
 
 
-def validate_free_account(account):
+def validate_free_account(account,hours=2):
     if account.get('accountPlanType')!='FREE' or account.get('accountPlanStatus')!='ACTIVE':
         raise ValueError('Only an ACTIVE FREE account is authorized; never upgrade the account')
     credits=account.get('accountPlanRemainingCredits',{})
@@ -30,7 +33,7 @@ def validate_free_account(account):
         raise ValueError('Insufficient free credits for the protected practice')
     expiration=account['accountPlanExpirationDate']
     if isinstance(expiration,str):expiration=datetime.fromisoformat(expiration.replace('Z','+00:00'))
-    if expiration<=datetime.now(timezone.utc)+timedelta(hours=2):
+    if expiration<=datetime.now(timezone.utc)+timedelta(hours=hours):
         raise ValueError('Free plan expires before the authorized window ends')
     return {'type':'FREE','status':'ACTIVE','remaining_credits_usd':float(credits['amount']),
         'expiration_utc':expiration.isoformat(),'maximum_out_of_pocket_usd':0}
@@ -43,9 +46,19 @@ def session_clients():
             for name in ('ec2','ssm','sts','pricing','iam','scheduler','freetier')}
 
 
-def plan(clients):
+def window_deadline(value=None,now=None):
+    now=now or datetime.now(timezone.utc)
+    end=datetime.fromisoformat(value.replace('Z','+00:00')) if value else now+timedelta(hours=2)
+    if end.tzinfo is None or not timedelta(minutes=10)<end-now<=timedelta(hours=24):
+        raise ValueError('Explicit deadline must be timezone-aware, future, and within 24 hours')
+    return end.astimezone(timezone.utc)
+
+
+def plan(clients,until_utc=None):
     ec2=clients['ec2']
-    free=validate_free_account(clients['freetier'].get_account_plan_state())
+    deadline=window_deadline(until_utc)
+    hours=(deadline-datetime.now(timezone.utc)).total_seconds()/3600
+    free=validate_free_account(clients['freetier'].get_account_plan_state(),hours)
     eligible=ec2.describe_instance_types(InstanceTypes=[INSTANCE_TYPE])['InstanceTypes'][0]['FreeTierEligible']
     if eligible is not True:raise ValueError('Instance is not Free Tier eligible')
     identity=clients['sts'].get_caller_identity()
@@ -62,7 +75,7 @@ def plan(clients):
             prices.extend(float(value['pricePerUnit']['USD']) for value in term['priceDimensions'].values() if value['unit']=='Hrs')
     if not prices:raise RuntimeError('Could not verify current compute price')
     price=max(prices)
-    budget=validate_plan(price,revision)
+    budget=validate_plan(price,revision,hours)
     image=clients['ssm'].get_parameter(Name='/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64')['Parameter']['Value']
     ami=ec2.describe_images(ImageIds=[image])['Images'][0]
     subnets=ec2.describe_subnets(Filters=[{'Name':'default-for-az','Values':['true']}])['Subnets']
@@ -74,7 +87,8 @@ def plan(clients):
     import ipaddress
     ipaddress.IPv4Address(address)
     result={'provider':'aws','region':REGION,'account':identity['Account'],'type':INSTANCE_TYPE,
-        'hourly_compute_usd':price,'reserved_total_usd':budget,'maximum_credit_usage_usd':1,'hours':2,
+        'hourly_compute_usd':price,'reserved_total_usd':budget,'maximum_credit_usage_usd':1,'hours':hours,
+        'deadline_utc':deadline.isoformat(),
         'billing_protection':free,'free_tier_eligible':eligible,
         'revision':revision,'ami':image,'root_device':ami['RootDeviceName'],
         'subnet':subnet['SubnetId'],'vpc':subnet['VpcId'],'ssh_cidr':address+'/32',
@@ -88,12 +102,12 @@ def plan(clients):
 
 
 def apply(clients,expected):
-    current=plan(clients)
+    current=plan(clients,expected.get('deadline_utc'))
     # Re-read the actual price and account immediately before creating anything.
-    if any(current[k]!=expected[k] for k in ('account','revision','hourly_compute_usd','subnet','vpc','ssh_cidr')):
+    if any(current[k]!=expected[k] for k in ('account','revision','hourly_compute_usd','subnet','vpc','ssh_cidr','deadline_utc')):
         raise RuntimeError('Plan changed; review before launching')
     ec2=clients['ec2'];iam=clients['iam'];scheduler=clients['scheduler']
-    now=datetime.now(timezone.utc);deadline=now+timedelta(hours=2)
+    now=datetime.now(timezone.utc);deadline=datetime.fromisoformat(current['deadline_utc'])
     name=PROJECT+'-'+now.strftime('%m%d%H%M%S')
     state={'name':name,'account':current['account'],'region':REGION,'deadline_utc':deadline.isoformat(),
         'application_revision':current['revision'],'plan':current}
@@ -154,9 +168,11 @@ def apply(clients,expected):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('action',choices=('plan','apply'))
+    parser.add_argument('--until-utc',help='Explicit user-authorized deadline; default two hours, maximum 24 hours')
     args=parser.parse_args();clients=session_clients()
-    if args.action=='plan':result=plan(clients)
+    if args.action=='plan':result=plan(clients,args.until_utc)
     else:
+        if args.until_utc:parser.error('Review the deadline in plan.json; apply cannot override it')
         expected=json.loads((RUNTIME/'plan.json').read_text());result=apply(clients,expected)
     print(json.dumps(result,indent=2))
 

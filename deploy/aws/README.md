@@ -6,6 +6,13 @@ inmutable y reserva margen dentro de USD 1 en créditos para una ventana de dos 
 `apply` vuelve a comprobar precio, cuenta, revisión y red antes de crear recursos.
 Los resultados y la clave SSH se guardan en `deploy/aws/runtime/`, fuera de Git.
 
+Cuando el usuario autorice expresamente una ventana mayor, `plan --until-utc
+2026-11-18T23:00:00Z` permite fijar ese vencimiento exacto (18:00 COL). El máximo
+es 24 horas, con reserva calculada de hasta USD 0,95, dentro de USD 1 en créditos.
+`apply` conserva el vencimiento revisado y consulta otra vez precio, cuenta y red;
+no extiende el plazo desde la hora de ejecución. Sin opción explícita siguen
+siendo dos horas. La vigencia del plan FREE debe cubrir toda la ventana.
+
 La restricción del usuario es ahora **USD 0 de bolsillo**, solo créditos gratis.
 Antes de cualquier creación, el script consulta `GetAccountPlanState` y exige
 plan `FREE`, estado `ACTIVE`, al menos USD 1 en créditos y más de dos horas hasta

@@ -25,8 +25,11 @@ systemctl enable --now docker
 install -d /usr/local/lib/docker/cli-plugins
 curl -fsSL https://github.com/docker/compose/releases/download/v2.39.4/docker-compose-linux-x86_64 -o /usr/local/lib/docker/cli-plugins/docker-compose
 chmod 755 /usr/local/lib/docker/cli-plugins/docker-compose
-git clone --depth 1 --branch feat/aws-chaos https://github.com/Alejom55/Inventario-U.git /opt/inventario
+git init /opt/inventario
 cd /opt/inventario
+git remote add origin https://github.com/Alejom55/Inventario-U.git
+git fetch --depth 1 origin '__REVISION__'
+git checkout --detach FETCH_HEAD
 test "$(git rev-parse HEAD)" = '__REVISION__'
 TOKEN=$(curl -fsS -X PUT -H 'X-aws-ec2-metadata-token-ttl-seconds: 60' http://169.254.169.254/latest/api/token)
 INSTANCE=$(curl -fsS -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id)
