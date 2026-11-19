@@ -2,6 +2,16 @@
 
 API para administrar inventario entre varios almacenes.
 
+## Entrega versionada v4.0.0
+
+El [release v4.0.0](https://github.com/Alejom55/Inventario-U/releases/tag/v4.0.0)
+fija el código, los experimentos y las evidencias de AWS de esta entrega.
+Las [notas de versión](docs/release-v4.0.0.md) distinguen los resultados de
+DevOps del laboratorio de Ciber E1 y enlazan sus runs, informes y capturas.
+El tag identifica el código entregado; no implica un nuevo despliegue ni una
+nueva ejecución de los experimentos. Las secciones de entregas anteriores
+conservan su contexto histórico.
+
 ## Ciber E1: identidad de máquinas
 
 La [guía E1](security/README.md) incluye identidad con alcance y vencimiento,
